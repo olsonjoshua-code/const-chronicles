@@ -2863,7 +2863,7 @@ function renderShop(){
   catGroups.forEach(cat=>{
     const avs=AVATAR_DEFS.filter(a=>a.cat===cat.key);
     if(!avs.length)return;
-    html+=`<div style="font-family:var(--cinzel);font-size:9px;color:var(--text3);letter-spacing:.1em;padding:10px 4px 6px;margin-bottom:6px;border-bottom:1px solid var(--border);width:100%">${cat.label}</div>`;
+    html+=`<div style="font-family:var(--cinzel);font-size:9px;color:var(--text3);letter-spacing:.1em;padding:10px 4px 6px;margin-bottom:6px;border-bottom:1px solid var(--border);width:100%;grid-column:1/-1">${cat.label}</div>`;
     avs.forEach(a=>{
       const owned=G.unlockedAvatars.includes(a.id),eq=G.avatarId===a.id;
       const isCard=a.unlockMethod.startsWith('card:');
