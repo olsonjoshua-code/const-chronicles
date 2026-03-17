@@ -668,7 +668,7 @@ option{background:var(--bg2)}
 const JSONBIN_BIN_ID='69b8b896b7ec241ddc758225';
 const JSONBIN_API_KEY='$2a$10$5nNXYI2swPu5wbLXMn.6SuyVWa61gIcRFw/txiUg2ReQTDjvI9oIy';
 const JSONBIN_URL=`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
-const CLASS_CODES={'APGOV25':'all','GOV2OLN':'2','GOV4OLN':'4','APTEACH':'teacher'};
+const CLASS_CODES={'APGOV25':'all','GOVPD2':'2','GOVPD4':'4','APTEACH':'teacher'};
 const RANKS=[{level:1,name:'Citizen'},{level:3,name:'Juror'},{level:5,name:'Constituent'},{level:7,name:'Delegate'},{level:10,name:'Counselor'},{level:14,name:'Associate Justice'},{level:18,name:'Chief Justice'},{level:20,name:'Founding Legend'}];
 const ARMORS=[
   {id:'none',name:'No Protection',icon:'🩲',cost:0,defBonus:0,desc:'Unprotected in debate',rarity:'common'},
@@ -2487,7 +2487,6 @@ function checkTeacherCode(val){
 function submitLogin(){
   const first=document.getElementById('login-first').value.trim();
   const last=document.getElementById('login-last').value.trim();
-  const period=document.getElementById('login-period').value;
   const code=document.getElementById('login-code').value.trim().toUpperCase();
   const err=document.getElementById('login-error');
   if(!first||first.length<2){err.textContent='Enter your first name';return;}
@@ -2495,8 +2494,10 @@ function submitLogin(){
   if(!code){err.textContent='Enter the class code from your teacher';return;}
   if(!CLASS_CODES[code]){err.textContent='Invalid code — check with your teacher';return;}
   const cp=CLASS_CODES[code];
-  if(cp!=='all'&&cp!=='teacher'&&cp!==period){err.textContent='That code is for a different period';return;}
-  if(!period&&cp!=='teacher'){err.textContent='Select your class period';return;}
+  // Auto-set period from code — no need to manually select
+  const period = cp==='all'||cp==='teacher' ? (document.getElementById('login-period').value||cp) : cp;
+  const sel=document.getElementById('login-period');
+  if(sel&&cp!=='all'&&cp!=='teacher'){sel.value=cp;}
   err.textContent='';
   window._loginFirst=first.charAt(0).toUpperCase()+first.slice(1).toLowerCase();
   window._loginLast=last.charAt(0).toUpperCase()+last.slice(1).toLowerCase();
