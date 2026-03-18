@@ -397,20 +397,17 @@ option{background:var(--bg2)}
     <div style="font-family:var(--pixel);font-size:6px;color:var(--teal);text-align:center;margin-bottom:16px">— SELECT YOUR CLASS —</div>
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
       <div onclick="selectLoginPeriod('2')" id="pd-btn-2"
-        style="padding:16px;cursor:pointer;border:1.5px solid var(--border2);background:var(--bg2);text-align:center;transition:all .2s"
-        onmouseover="this.style.borderColor='var(--gold)'" onmouseout="if(!this.classList.contains('sel'))this.style.borderColor='var(--border2)'">
+        style="padding:16px;cursor:pointer;border:1.5px solid var(--border2);background:var(--bg2);text-align:center;transition:all .2s">
         <div style="font-family:var(--cinzel);font-size:16px;color:var(--gold);letter-spacing:.1em">Period 2</div>
         <div style="font-family:var(--inter);font-size:11px;color:var(--text3);margin-top:3px">Mr. Olson · AP Gov</div>
       </div>
       <div onclick="selectLoginPeriod('4')" id="pd-btn-4"
-        style="padding:16px;cursor:pointer;border:1.5px solid var(--border2);background:var(--bg2);text-align:center;transition:all .2s"
-        onmouseover="this.style.borderColor='var(--gold)'" onmouseout="if(!this.classList.contains('sel'))this.style.borderColor='var(--border2)'">
+        style="padding:16px;cursor:pointer;border:1.5px solid var(--border2);background:var(--bg2);text-align:center;transition:all .2s">
         <div style="font-family:var(--cinzel);font-size:16px;color:var(--gold);letter-spacing:.1em">Period 4</div>
         <div style="font-family:var(--inter);font-size:11px;color:var(--text3);margin-top:3px">Mr. Olson · AP Gov</div>
       </div>
       <div onclick="selectLoginPeriod('guest')" id="pd-btn-guest"
-        style="padding:14px;cursor:pointer;border:1.5px solid var(--border2);background:var(--bg2);text-align:center;transition:all .2s"
-        onmouseover="this.style.borderColor='var(--text2)'" onmouseout="if(!this.classList.contains('sel'))this.style.borderColor='var(--border2)'">
+        style="padding:14px;cursor:pointer;border:1.5px solid var(--border2);background:var(--bg2);text-align:center;transition:all .2s">
         <div style="font-family:var(--cinzel);font-size:13px;color:var(--text2);letter-spacing:.08em">Guest / Other</div>
         <div style="font-family:var(--inter);font-size:11px;color:var(--text3);margin-top:3px">Play without a class</div>
       </div>
@@ -1198,6 +1195,7 @@ const WEAPONS=[
   {id:'gavel',name:'Judge\'s Gavel',icon:'🔨',cost:1600,dmgBonus:15,minLevel:7,desc:'+15 damage — court authority',rarity:'epic'},
   {id:'constitution',name:'The Constitution',icon:'📜',cost:3200,dmgBonus:23,minLevel:11,desc:'+23 damage — supreme law',rarity:'legendary'},
   {id:'sword_justice',name:'Sword of Justice',icon:'⚖️',cost:5500,dmgBonus:32,minLevel:15,desc:'+32 damage — total authority',rarity:'legendary'},
+  {id:'big_stick',name:"TR's Big Stick",icon:'🪵',cost:8000,dmgBonus:45,minLevel:18,desc:'+45 damage — Speak softly and carry a big stick',rarity:'mythic'},
 ];
 
 // ═══════════════ EPISODES (shell — data filled below) ═══════════════
@@ -2546,6 +2544,8 @@ function selectLoginPeriod(period){
     else{btn.style.borderColor='var(--border2)';btn.style.background='var(--bg2)';}
   });
   document.getElementById('login-error-1').textContent='';
+  // Auto-advance after brief highlight so user sees their selection
+  setTimeout(()=>goToLoginStep2(), 280);
 }
 function checkTeacherCodeAndAdvance(){
   const code=document.getElementById('login-teacher-code').value.trim().toUpperCase();
@@ -2615,7 +2615,7 @@ function launchTeacherDashboard(){
 }
 function closeTeacherDashboard(){
   document.getElementById('teacher-dashboard').classList.remove('show');
-  goToLoginScreen();
+  launchGame();
 }
 // ─── AVATAR CREATOR ───
 let selectedAvatarId='scholar';
@@ -2790,35 +2790,15 @@ function checkEraUnlocks(){
 }
 function showMapNotif(msg){const el=document.getElementById('map-notification');if(el){el.textContent='★ '+msg+' ★';el.style.display='block';setTimeout(()=>el.style.display='none',4000);}}
 // ─── BATTLE ───
-// ─── ENEMY ATTACK TABLE (base dmg range per unit) ───
-const ENEMY_ATTACK_TABLE={
-  ep1:{min:5,max:9,wrongBonus:7},
-  ep2:{min:10,max:16,wrongBonus:9},
-  ep3:{min:14,max:22,wrongBonus:11},
-  ep4:{min:19,max:28,wrongBonus:13},
-  ep5:{min:25,max:36,wrongBonus:16},
-};
-function getEnemyAttack(epId,isWrongAnswer){
-  const tbl=ENEMY_ATTACK_TABLE[epId]||ENEMY_ATTACK_TABLE.ep1;
-  const base=Math.floor(Math.random()*(tbl.max-tbl.min+1))+tbl.min;
-  return isWrongAnswer?base+tbl.wrongBonus:base;
-}
-function getPlayerAgility(){
-  // Base agility 0; cards and avatar passives will add to this in Phase 2
-  return G.agility||0;
-}
-function tryDodge(){
-  const agility=getPlayerAgility();
-  const dodgeChance=Math.min(0.4,agility*0.02); // 2% per agility point, cap 40%
-  return Math.random()<dodgeChance;
-}
+const ENEMY_ATTACK_TABLE={ep1:{min:5,max:9,wrongBonus:7},ep2:{min:10,max:16,wrongBonus:9},ep3:{min:14,max:22,wrongBonus:11},ep4:{min:19,max:28,wrongBonus:13},ep5:{min:25,max:36,wrongBonus:16}};
+function getEnemyAttack(epId,isWrong){var t=ENEMY_ATTACK_TABLE[epId]||ENEMY_ATTACK_TABLE.ep1;var b=Math.floor(Math.random()*(t.max-t.min+1))+t.min;return isWrong?b+t.wrongBonus:b;}
+function getPlayerAgility(){return G.agility||0;}
+function tryDodge(){var ag=getPlayerAgility();var chance=Math.min(0.4,ag*0.02);return Math.random()<chance;}
 function startBattle(epId,eraId,enemyId){
   const ep=EPISODES.find(e=>e.id===epId);const era=ep?.eras?.find(r=>r.id===eraId);const enemy=era?.enemies?.find(e=>e.id===enemyId);
   if(!enemy)return;G.lastEpId=epId;G.lastEraId=eraId;
   const weapon=WEAPONS.find(w=>w.id===G.equippedWeapon)||WEAPONS[0];const armor=ARMORS.find(a=>a.id===G.equippedArmor)||ARMORS[0];
-  const epNum=parseInt(epId.replace('ep',''))||1;
-  // HP scales much harder per unit now
-  const hpScale=1+(epNum-1)*0.8;
+  const epNum=parseInt(epId.replace('ep',''))||1;const hpScale=1+(epNum-1)*0.8;
   const scaledHp=Math.round(enemy.hp*hpScale);
   BT={epId,eraId,enemyId,enemy,enemyHp:scaledHp,enemyMaxHp:scaledHp,combo:0,hintUsed:false,
     earnedXP:0,earnedGold:0,earnedScore:0,askedQ:[],currentQ:null,hintText:'',action:'',
@@ -2898,28 +2878,16 @@ function answerShuffled(idx){
   const q=BT.currentQ;if(!q)return;
   const opts=document.querySelectorAll('.t-opt');
   opts.forEach((o,i)=>{o.classList.remove('correct','wrong');if(BT.shuffledOpts[i].isCorrect)o.classList.add('correct');else if(i===idx&&!isCorrect)o.classList.add('wrong');o.onclick=null;});
-  // ── ENEMY ATTACKS EVERY ROUND ──
-  const dodged=tryDodge();
-  const enemyBaseDmg=getEnemyAttack(BT.epId,false);
-  const armor=ARMORS.find(a=>a.id===G.equippedArmor)||ARMORS[0];
-  const netEnemyDmg=Math.max(1,enemyBaseDmg-(armor.defBonus||0));
-  if(dodged){
-    spawnDmg('DODGE!','heal');
-    BT.log='You dodged the attack!';
-  } else {
-    G.hp=Math.max(0,G.hp-netEnemyDmg);
-    spawnDmg('-'+netEnemyDmg,'dmg');
-  }
-  // ── WRONG ANSWER — EXTRA HIT ──
+  var armor=ARMORS.find(function(a){return a.id===G.equippedArmor;})||ARMORS[0];
+  var dodged=tryDodge();
+  var baseDmg=getEnemyAttack(BT.epId,false);
+  var netDmg=Math.max(1,baseDmg-(armor.defBonus||0));
+  if(dodged){spawnDmg('DODGE!','heal');BT.log='You dodged the attack!';}
+  else{G.hp=Math.max(0,G.hp-netDmg);spawnDmg('-'+netDmg,'dmg');}
   if(!isCorrect){
-    const wrongDmg=getEnemyAttack(BT.epId,true);
-    const wrongNet=Math.max(1,wrongDmg-(armor.defBonus||0));
-    setTimeout(()=>{
-      G.hp=Math.max(0,G.hp-wrongNet);
-      spawnDmg('-'+wrongNet+' WRONG!','dmg');
-      updateHeader();renderBattle();
-      if(G.hp<=0){setTimeout(()=>endBattle(false),800);}
-    },600);
+    var wrongDmg=getEnemyAttack(BT.epId,true);
+    var wrongNet=Math.max(1,wrongDmg-(armor.defBonus||0));
+    setTimeout(function(){G.hp=Math.max(0,G.hp-wrongNet);spawnDmg('-'+wrongNet+' WRONG!','dmg');updateHeader();renderBattle();if(G.hp<=0)setTimeout(function(){endBattle(false);},800);},600);
   }
   G.qTotal++;if(isCorrect){G.qCorrect++;G.currentStreak++;if(G.currentStreak>G.maxStreak)G.maxStreak=G.currentStreak;}else G.currentStreak=0;
   BT.currentQ=null;BT.hintText='';
@@ -2928,29 +2896,17 @@ function answerShuffled(idx){
 function applyAnswerResult(correct,q){
   const en=BT.enemy;
   if(correct){
-    let dmg=3+Math.floor(Math.random()*4)+Math.floor(G.level/3)+BT.weaponBonus;
-    if(BT.action==='defend'){
-      const heal=10+Math.floor(Math.random()*8);
-      G.hp=Math.min(G.maxHp,G.hp+heal);BT.combo=Math.min(5,BT.combo+1);
-      BT.log=`✅ Correct! Restored ${heal} HP!`;spawnDmg('+'+heal,'heal');
-    } else if(BT.action==='special'){
-      dmg=Math.floor(dmg*2.5);BT.enemyHp=Math.max(0,BT.enemyHp-dmg);BT.combo=0;
-      BT.log=`⚖️ PRECEDENT STRIKE! ${dmg} damage!`;spawnDmg('-'+dmg,'dmg');
-    } else {
-      if(BT.combo>=3)dmg=Math.floor(dmg*1.7);
-      BT.enemyHp=Math.max(0,BT.enemyHp-dmg);BT.combo=Math.min(5,BT.combo+1);
-      BT.log=`✅ Correct! ${dmg} damage!`+(BT.combo>=3?` STREAK ×${BT.combo}!`:'');
-      spawnDmg('-'+dmg,'dmg');
-    }
+    let dmg=2+Math.floor(Math.random()*3)+Math.floor(G.level/4)+BT.weaponBonus;
+    if(BT.action==='defend'){const heal=8+Math.floor(Math.random()*6);G.hp=Math.min(G.maxHp,G.hp+heal);BT.combo=Math.min(5,BT.combo+1);BT.log=`✅ Correct! Restored ${heal} HP!`;spawnDmg('+'+heal,'heal');}
+    else if(BT.action==='special'){dmg=Math.floor(dmg*2.2);BT.enemyHp=Math.max(0,BT.enemyHp-dmg);BT.combo=0;BT.log=`⚖️ PRECEDENT STRIKE! ${dmg} damage!`;spawnDmg('-'+dmg,'dmg');}
+    else{if(BT.combo>=3)dmg=Math.floor(dmg*1.6);BT.enemyHp=Math.max(0,BT.enemyHp-dmg);BT.combo=Math.min(5,BT.combo+1);BT.log=`✅ Correct! ${dmg} damage!`+(BT.combo>=3?` STREAK ×${BT.combo}!`:'');spawnDmg('-'+dmg,'dmg');}
     BT.earnedXP+=5;BT.earnedGold+=3;BT.earnedScore+=10;
   } else {
-    // Wrong answer penalty — enemy already hit in answerShuffled, just show correct answer
     BT.combo=0;
-    BT.log=`❌ Wrong! Correct: ${q.opts[q.a]}`;
+    BT.log='Wrong! Correct: '+q.opts[q.a];
   }
-  // Check win condition — loss already handled in answerShuffled timeout
-  if(BT.enemyHp<=0)setTimeout(()=>endBattle(true),400);
-  else if(G.hp<=0)setTimeout(()=>endBattle(false),400);
+  if(BT.enemyHp<=0)setTimeout(function(){endBattle(true);},400);
+  else if(G.hp<=0)setTimeout(function(){endBattle(false);},400);
 }
 function useHint(){if(BT.hintUsed)return;const q=BT.currentQ||getQ();BT.currentQ=q;BT.hintUsed=true;BT.earnedScore=Math.max(0,BT.earnedScore-5);BT.hintText=q.hint||'No hint available.';renderBattle();if(currentScreen==='trivia')renderTriviaScreen();}
 function usePotion(){
@@ -3005,42 +2961,8 @@ function endBattle(won){
 function setShopTab(tab){shopTab=tab;document.querySelectorAll('.shop-tab').forEach((t,i)=>{t.classList.toggle('active',['weapons','armor','items','avatars'][i]===tab);});renderShop();}
 function renderShop(){
   document.getElementById('shop-gold-display').textContent=G.gold;let html='<div class="shop-grid">';
-  if(shopTab==='weapons'){html+=WEAPONS.map(w=>{
-    const owned=G.ownedWeapons.includes(w.id),eq=G.equippedWeapon===w.id;
-    const lvlOk=G.level>=(w.minLevel||1);
-    const locked=!owned&&!lvlOk;
-    const cantAfford=!owned&&lvlOk&&G.gold<w.cost;
-    return `<div class="shop-item ${owned?'owned':''} ${eq?'equipped':''}" style="${locked?'opacity:.45':''}">
-      <span class="si-sprite">${w.icon}</span>
-      <div class="si-name">${w.name}</div>
-      <div class="si-desc">${w.desc}</div>
-      <div class="si-stat">+${w.dmgBonus} ATK</div>
-      <div style="font-family:var(--pixel);font-size:5px;color:var(--text3);margin:2px 0">REQ LVL ${w.minLevel||1}</div>
-      <div class="si-cost rarity-${w.rarity}">${w.rarity.toUpperCase()}</div>
-      ${eq?'<div style="font-family:var(--pixel);font-size:5px;color:var(--gold)">✓ EQUIPPED</div>':
-        locked?`<div style="font-family:var(--pixel);font-size:5px;color:var(--red)">🔒 NEED LVL ${w.minLevel}</div>`:
-        owned?`<button class="btn green sm full" onclick="equipWeapon('${w.id}')">EQUIP</button>`:
-        `<div class="si-cost">${w.cost>0?w.cost+' ⚖️':'FREE'}</div>
-         <button class="btn sm full ${cantAfford?'disabled':''}" onclick="buyWeapon('${w.id}')" ${cantAfford?'disabled':''}>BUY</button>`}
-    </div>`;}).join('');}
-  else if(shopTab==='armor'){html+=ARMORS.map(a=>{
-    const owned=G.ownedArmors.includes(a.id),eq=G.equippedArmor===a.id;
-    const lvlOk=G.level>=(a.minLevel||1);
-    const locked=!owned&&!lvlOk;
-    const cantAfford=!owned&&lvlOk&&G.gold<a.cost;
-    return `<div class="shop-item ${owned?'owned':''} ${eq?'equipped':''}" style="${locked?'opacity:.45':''}">
-      <span class="si-sprite">${a.icon}</span>
-      <div class="si-name">${a.name}</div>
-      <div class="si-desc">${a.desc}</div>
-      <div class="si-stat">-${a.defBonus} DMG</div>
-      <div style="font-family:var(--pixel);font-size:5px;color:var(--text3);margin:2px 0">REQ LVL ${a.minLevel||1}</div>
-      <div class="si-cost rarity-${a.rarity}">${a.rarity.toUpperCase()}</div>
-      ${eq?'<div style="font-family:var(--pixel);font-size:5px;color:var(--gold)">✓ EQUIPPED</div>':
-        locked?`<div style="font-family:var(--pixel);font-size:5px;color:var(--red)">🔒 NEED LVL ${a.minLevel}</div>`:
-        owned?`<button class="btn green sm full" onclick="equipArmor('${a.id}')">EQUIP</button>`:
-        `<div class="si-cost">${a.cost>0?a.cost+' ⚖️':'FREE'}</div>
-         <button class="btn sm full ${cantAfford?'disabled':''}" onclick="buyArmor('${a.id}')" ${cantAfford?'disabled':''}>BUY</button>`}
-    </div>`;}).join('');}
+  if(shopTab==='weapons'){html+=WEAPONS.map(w=>{const owned=G.ownedWeapons.includes(w.id),eq=G.equippedWeapon===w.id;return `<div class="shop-item ${owned?'owned':''} ${eq?'equipped':''}"><span class="si-sprite">${w.icon}</span><div class="si-name">${w.name}</div><div class="si-desc">${w.desc}</div><div class="si-stat">+${w.dmgBonus} ATK</div><div class="si-cost rarity-${w.rarity}">${w.rarity.toUpperCase()}</div>${eq?'<div style="font-family:var(--pixel);font-size:5px;color:var(--gold)">✓ EQUIPPED</div>':owned?`<button class="btn green sm full" onclick="equipWeapon('${w.id}')">EQUIP</button>`:`<div class="si-cost">${w.cost>0?w.cost+' ⚖️':'FREE'}</div><button class="btn sm full ${G.gold<w.cost?'disabled':''}" onclick="buyWeapon('${w.id}')" ${G.gold<w.cost?'disabled':''}>BUY</button>`}</div>`;}).join('');}
+  else if(shopTab==='armor'){html+=ARMORS.map(a=>{const owned=G.ownedArmors.includes(a.id),eq=G.equippedArmor===a.id;return `<div class="shop-item ${owned?'owned':''} ${eq?'equipped':''}"><span class="si-sprite">${a.icon}</span><div class="si-name">${a.name}</div><div class="si-desc">${a.desc}</div><div class="si-stat">-${a.defBonus} DMG</div><div class="si-cost rarity-${a.rarity}">${a.rarity.toUpperCase()}</div>${eq?'<div style="font-family:var(--pixel);font-size:5px;color:var(--gold)">✓ EQUIPPED</div>':owned?`<button class="btn green sm full" onclick="equipArmor('${a.id}')">EQUIP</button>`:`<div class="si-cost">${a.cost>0?a.cost+' ⚖️':'FREE'}</div><button class="btn sm full ${G.gold<a.cost?'disabled':''}" onclick="buyArmor('${a.id}')" ${G.gold<a.cost?'disabled':''}>BUY</button>`}</div>`;}).join('');}
   else if(shopTab==='items'){html+=CONSUMABLES.map(c=>{const owned=(G.inventory[c.id]||0);return `<div class="shop-item"><span class="si-sprite">${c.icon}</span><div class="si-name">${c.name}</div><div class="si-desc">${c.desc}</div>${owned>0?`<div style="font-family:var(--pixel);font-size:5px;color:var(--teal)">OWNED: ${owned}</div>`:''}<div class="si-cost rarity-${c.rarity}">${c.rarity.toUpperCase()}</div><div class="si-cost">${c.cost} ⚖️</div><button class="btn sm full ${G.gold<c.cost?'disabled':''}" onclick="buyItem('${c.id}')" ${G.gold<c.cost?'disabled':''}>BUY</button></div>`;}).join('');}
   else if(shopTab==='avatars'){
   const catGroups=[
