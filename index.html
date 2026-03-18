@@ -2505,7 +2505,7 @@ function submitLogin(){
   window._loginCode=code;
   const sk='apgov_v1_'+first.toLowerCase()+'_'+last.toLowerCase();
   window._loginSaveKey=sk;
-  try{const ex=localStorage.getItem(sk);if(ex){const d=JSON.parse(ex);if(d&&d.name){G=d;launchGame();return;}}}catch(e){}
+  try{const ex=localStorage.getItem(sk);if(ex){const d=JSON.parse(ex);if(d&&d.name){G=d;G.period=window._loginPeriod;save();launchGame();return;}}}catch(e){}
   goToAvatarCreator();
 }
 function goToLoginScreen(){
