@@ -389,29 +389,64 @@ option{background:var(--bg2)}
     <div style="font-size:52px;margin-bottom:12px;filter:drop-shadow(0 0 24px rgba(201,168,76,.3))">🏛️</div>
     <div class="main-title" style="font-size:20px">Constitutional Chronicles</div>
     <div class="title-ornament" style="margin:10px 0"><div class="ornament-line"></div><div class="ornament-symbol">⚖</div><div class="ornament-line r"></div></div>
+    <div style="font-family:var(--inter);font-size:12px;color:var(--text3);letter-spacing:.05em">AP U.S. Government &amp; Politics</div>
   </div>
-  <div class="panel">
-    <div style="font-family:var(--pixel);font-size:6px;color:var(--teal);text-align:center;margin-bottom:14px">— STUDENT REGISTRATION —</div>
-    <div style="font-size:14px;color:var(--text2);text-align:center;margin-bottom:14px;line-height:1.6;background:rgba(200,168,50,.06);border:1px solid var(--gold2);padding:10px">
-      ⚖️ Use your real name.<br>Your teacher can see all entries.<br>Fake names will not receive credit.
+
+  <!-- STEP 1: SELECT PERIOD -->
+  <div id="login-step-1" class="panel">
+    <div style="font-family:var(--pixel);font-size:6px;color:var(--teal);text-align:center;margin-bottom:16px">— SELECT YOUR CLASS —</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+      <div onclick="selectLoginPeriod('2')" id="pd-btn-2"
+        style="padding:16px;cursor:pointer;border:1.5px solid var(--border2);background:var(--bg2);text-align:center;transition:all .2s"
+        onmouseover="this.style.borderColor='var(--gold)'" onmouseout="if(!this.classList.contains('sel'))this.style.borderColor='var(--border2)'">
+        <div style="font-family:var(--cinzel);font-size:16px;color:var(--gold);letter-spacing:.1em">Period 2</div>
+        <div style="font-family:var(--inter);font-size:11px;color:var(--text3);margin-top:3px">Mr. Olson · AP Gov</div>
+      </div>
+      <div onclick="selectLoginPeriod('4')" id="pd-btn-4"
+        style="padding:16px;cursor:pointer;border:1.5px solid var(--border2);background:var(--bg2);text-align:center;transition:all .2s"
+        onmouseover="this.style.borderColor='var(--gold)'" onmouseout="if(!this.classList.contains('sel'))this.style.borderColor='var(--border2)'">
+        <div style="font-family:var(--cinzel);font-size:16px;color:var(--gold);letter-spacing:.1em">Period 4</div>
+        <div style="font-family:var(--inter);font-size:11px;color:var(--text3);margin-top:3px">Mr. Olson · AP Gov</div>
+      </div>
+      <div onclick="selectLoginPeriod('guest')" id="pd-btn-guest"
+        style="padding:14px;cursor:pointer;border:1.5px solid var(--border2);background:var(--bg2);text-align:center;transition:all .2s"
+        onmouseover="this.style.borderColor='var(--text2)'" onmouseout="if(!this.classList.contains('sel'))this.style.borderColor='var(--border2)'">
+        <div style="font-family:var(--cinzel);font-size:13px;color:var(--text2);letter-spacing:.08em">Guest / Other</div>
+        <div style="font-family:var(--inter);font-size:11px;color:var(--text3);margin-top:3px">Play without a class</div>
+      </div>
+    </div>
+    <!-- Hidden teacher code field -->
+    <div style="margin-top:6px">
+      <input class="unlock-input" id="login-teacher-code" placeholder="TEACHER CODE (optional)..." maxlength="12"
+        style="font-size:11px;text-align:center;opacity:.4;transition:opacity .2s"
+        onfocus="this.style.opacity='1'" onblur="this.style.opacity=this.value?'1':'.4'"
+        oninput="this.value=this.value.toUpperCase()"
+        onkeydown="if(event.key==='Enter')checkTeacherCodeAndAdvance()">
+    </div>
+    <div id="login-error-1" style="font-family:var(--pixel);font-size:5px;color:var(--red);min-height:14px;margin:6px 0;text-align:center"></div>
+    <button class="btn green full" onclick="goToLoginStep2()">▶ NEXT</button>
+  </div>
+
+  <!-- STEP 2: ENTER NAME -->
+  <div id="login-step-2" style="display:none" class="panel">
+    <div style="font-family:var(--pixel);font-size:6px;color:var(--teal);text-align:center;margin-bottom:6px">— ENTER YOUR NAME —</div>
+    <div id="login-step2-period-label" style="font-family:var(--cinzel);font-size:11px;color:var(--gold);text-align:center;letter-spacing:.1em;margin-bottom:14px"></div>
+    <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:14px;line-height:1.6;background:rgba(200,168,50,.06);border:1px solid var(--gold2);padding:10px">
+      ⚖️ Use your <strong style="color:var(--gold)">real name</strong>.<br>
+      Your teacher can see all entries.<br>
+      <span style="color:var(--red);font-size:12px">Fake or silly names will be deleted.</span>
     </div>
     <div style="font-family:var(--pixel);font-size:5px;color:var(--text3);margin-bottom:4px">FIRST NAME</div>
-    <input class="unlock-input" id="login-first" placeholder="FIRST NAME..." maxlength="20" style="margin-bottom:10px" oninput="this.value=this.value.replace(/[^a-zA-Z]/g,'')">
+    <input class="unlock-input" id="login-first" placeholder="FIRST NAME..." maxlength="20" style="margin-bottom:10px"
+      oninput="this.value=this.value.replace(/[^a-zA-Z]/g,'')"
+      onkeydown="if(event.key==='Enter')document.getElementById('login-last').focus()">
     <div style="font-family:var(--pixel);font-size:5px;color:var(--text3);margin-bottom:4px">LAST NAME</div>
-    <input class="unlock-input" id="login-last" placeholder="LAST NAME..." maxlength="20" style="margin-bottom:10px" oninput="this.value=this.value.replace(/[^a-zA-Z]/g,'')">
-    <div id="period-row">
-      <div style="font-family:var(--pixel);font-size:5px;color:var(--text3);margin-bottom:4px">CLASS PERIOD</div>
-      <select id="login-period" class="unlock-input" style="margin-bottom:10px">
-        <option value="">SELECT YOUR PERIOD...</option>
-        <option value="2">Period 2</option>
-        <option value="4">Period 4</option>
-        <option value="teacher" style="display:none">Teacher</option>
-      </select>
-    </div>
-    <div style="font-family:var(--pixel);font-size:5px;color:var(--text3);margin-bottom:4px">CLASS CODE</div>
-    <input class="unlock-input" id="login-code" placeholder="CODE FROM YOUR TEACHER..." maxlength="10" oninput="checkTeacherCode(this.value)" onkeyup="checkTeacherCode(this.value)" onblur="checkTeacherCode(this.value)">
-    <div id="login-error" style="font-family:var(--pixel);font-size:5px;color:var(--red);min-height:16px;margin-bottom:8px;text-align:center"></div>
-    <button class="btn green full" onclick="submitLogin()">▶ BEGIN</button>
+    <input class="unlock-input" id="login-last" placeholder="LAST NAME..." maxlength="20" style="margin-bottom:12px"
+      oninput="this.value=this.value.replace(/[^a-zA-Z]/g,'')"
+      onkeydown="if(event.key==='Enter')submitLogin()">
+    <div id="login-error" style="font-family:var(--pixel);font-size:5px;color:var(--red);min-height:14px;margin-bottom:8px;text-align:center"></div>
+    <button class="btn green full" onclick="submitLogin()">▶ ENTER THE REPUBLIC</button>
+    <button class="btn full" onclick="goBackToStep1()" style="border-color:var(--text3);color:var(--text3);margin-top:6px;font-size:10px">← BACK</button>
   </div>
 </div>
 
@@ -600,8 +635,32 @@ option{background:var(--bg2)}
     <div class="overlay-title">🏆 LEADERBOARD</div>
     <button class="overlay-close" onclick="closeLeaderboard()">✕ CLOSE</button>
   </div>
-  <div style="font-family:var(--pixel);font-size:5px;color:var(--text3);text-align:center;margin-bottom:8px" id="lb-sync-status">Syncing...</div>
+  <div style="font-family:var(--pixel);font-size:5px;color:var(--text3);text-align:center;margin-bottom:10px" id="lb-sync-status">Syncing...</div>
+  <div style="display:flex;gap:6px;margin-bottom:14px" id="lb-tabs">
+    <button onclick="setLbTab('all')" id="lb-tab-all"
+      style="font-family:var(--cinzel);font-size:9px;letter-spacing:.08em;padding:7px 14px;cursor:pointer;border:1px solid var(--gold);background:var(--gold);color:var(--bg);transition:all .2s">ALL</button>
+    <button onclick="setLbTab('myclass')" id="lb-tab-myclass"
+      style="font-family:var(--cinzel);font-size:9px;letter-spacing:.08em;padding:7px 14px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text3);transition:all .2s" id="lb-tab-myclass">MY CLASS</button>
+  </div>
   <div id="lb-content"></div>
+</div>
+
+<!-- TEACHER DASHBOARD -->
+<div id="teacher-dashboard" class="overlay">
+  <div class="overlay-header">
+    <div class="overlay-title">📊 TEACHER DASHBOARD</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="resetAllScores()" style="font-family:var(--cinzel);font-size:8px;letter-spacing:.06em;background:transparent;border:1px solid var(--red);color:var(--red);padding:6px 10px;cursor:pointer">RESET ALL</button>
+      <button class="overlay-close" onclick="closeTeacherDashboard()">✕ CLOSE</button>
+    </div>
+  </div>
+  <div style="font-family:var(--pixel);font-size:5px;color:var(--text3);letter-spacing:.1em;margin-bottom:12px" id="td-sync-status">Loading class data…</div>
+  <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap" id="td-period-tabs"></div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px" id="td-summary"></div>
+  <div style="font-family:var(--cinzel);font-size:9px;color:var(--text3);letter-spacing:.12em;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:12px">CLASS PROGRESS BY UNIT</div>
+  <div id="td-era-bars" style="margin-bottom:16px"></div>
+  <div style="font-family:var(--cinzel);font-size:9px;color:var(--text3);letter-spacing:.12em;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:12px">STUDENT ROSTER</div>
+  <div id="td-roster"></div>
 </div>
 
 <!-- TIMELINE -->
@@ -665,10 +724,10 @@ option{background:var(--bg2)}
 </div>
 <script>
 'use strict';
-const JSONBIN_BIN_ID='69b8b896b7ec241ddc758225';
-const JSONBIN_API_KEY='$2a$10$5nNXYI2swPu5wbLXMn.6SuyVWa61gIcRFw/txiUg2ReQTDjvI9oIy';
-const JSONBIN_URL=`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
-const CLASS_CODES={'APGOV25':'all','GOVPD2':'2','GOVPD4':'4','APTEACH':'teacher'};
+const SUPA_URL='https://iluvuartxsenbgylogit.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsdXZ1YXJ0eHNlbmJneWxvZ2l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NjA2OTIsImV4cCI6MjA4OTQzNjY5Mn0.stAmdi5xy7ofDAB4AiRg78Eoky-7FXZEa-Ui1dgwHd0';
+const SUPA_HEADERS={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
+const TEACHER_CODE='OLSON219';
 const RANKS=[{level:1,name:'Citizen'},{level:3,name:'Juror'},{level:5,name:'Constituent'},{level:7,name:'Delegate'},{level:10,name:'Counselor'},{level:14,name:'Associate Justice'},{level:18,name:'Chief Justice'},{level:20,name:'Founding Legend'}];
 const ARMORS=[
   {id:'none',name:'No Protection',icon:'🩲',cost:0,defBonus:0,desc:'Unprotected in debate',rarity:'common'},
@@ -2442,7 +2501,7 @@ EPISODES[4].timeline = [
 
 
 // ═══════════════ GAME STATE ═══════════════
-let G=null,BT={},currentScreen='login',shopTab='weapons',lbSyncInterval=null,lbPeriodFilter='all';
+let G=null,BT={},currentScreen="login",shopTab="weapons",lbSyncInterval=null,lbTab="all",tdPeriodFilter="all",tdSort="score",tdSortDir=-1;
 function defaultState(){
   return {name:'',avatarId:'scholar',level:1,xp:0,score:0,gold:0,packs:0,hp:50,maxHp:50,
     collection:[],beatenEnemies:[],unlockedEras:[],unlockedEpisodes:['ep1'],
@@ -2477,32 +2536,57 @@ function renderAllSprites(){
   if(b){b.outerHTML=`<div id="b-player-sprite" style="width:80px;height:80px;z-index:1">${getMedallionSVG(G.avatarId,80)}</div>`;}
 }
 // ─── LOGIN ───
-function checkTeacherCode(val){
-  const code=val.trim().toUpperCase();
-  const pr=document.getElementById('period-row');
-  const ps=document.getElementById('login-period');
-  if(CLASS_CODES[code]==='teacher'){if(pr)pr.style.display='none';if(ps)ps.value='teacher';}
-  else{if(pr)pr.style.display='block';if(ps&&ps.value==='teacher')ps.value='';}
+let _loginPeriodSelected=null;
+function selectLoginPeriod(period){
+  _loginPeriodSelected=period;
+  ['2','4','guest'].forEach(p=>{
+    const btn=document.getElementById('pd-btn-'+p);
+    if(!btn)return;
+    if(p===period){btn.style.borderColor='var(--gold)';btn.style.background='rgba(201,168,76,.1)';}
+    else{btn.style.borderColor='var(--border2)';btn.style.background='var(--bg2)';}
+  });
+  document.getElementById('login-error-1').textContent='';
+}
+function checkTeacherCodeAndAdvance(){
+  const code=document.getElementById('login-teacher-code').value.trim().toUpperCase();
+  if(code===TEACHER_CODE){
+    window._loginFirst='Mr';window._loginLast='Olson';
+    window._loginPeriod='teacher';window._isTeacher=true;
+    window._loginSaveKey='apgov_v1_teacher_olson';
+    const sk=window._loginSaveKey;
+    try{const ex=localStorage.getItem(sk);if(ex){const d=JSON.parse(ex);if(d&&d.name){G=d;launchTeacherDashboard();return;}}}catch(e){}
+    G=defaultState();G.name='MR. OLSON';G.firstName='Mr';G.lastName='Olson';G.period='teacher';G.avatarId='senator';
+    save();launchTeacherDashboard();
+  }
+}
+function goToLoginStep2(){
+  const code=document.getElementById('login-teacher-code').value.trim().toUpperCase();
+  if(code===TEACHER_CODE){checkTeacherCodeAndAdvance();return;}
+  if(!_loginPeriodSelected){
+    document.getElementById('login-error-1').textContent='Please select your class period';return;
+  }
+  document.getElementById('login-step-1').style.display='none';
+  document.getElementById('login-step-2').style.display='block';
+  const labels={'2':'Period 2 — Mr. Olson','4':'Period 4 — Mr. Olson','guest':'Guest / Other'};
+  document.getElementById('login-step2-period-label').textContent=labels[_loginPeriodSelected]||'';
+  document.getElementById('login-first').focus();
+}
+function goBackToStep1(){
+  document.getElementById('login-step-2').style.display='none';
+  document.getElementById('login-step-1').style.display='block';
 }
 function submitLogin(){
   const first=document.getElementById('login-first').value.trim();
   const last=document.getElementById('login-last').value.trim();
-  const code=document.getElementById('login-code').value.trim().toUpperCase();
   const err=document.getElementById('login-error');
   if(!first||first.length<2){err.textContent='Enter your first name';return;}
   if(!last||last.length<2){err.textContent='Enter your last name';return;}
-  if(!code){err.textContent='Enter the class code from your teacher';return;}
-  if(!CLASS_CODES[code]){err.textContent='Invalid code — check with your teacher';return;}
-  const cp=CLASS_CODES[code];
-  // Auto-set period from code — no need to manually select
-  const period = cp==='all'||cp==='teacher' ? (document.getElementById('login-period').value||cp) : cp;
-  const sel=document.getElementById('login-period');
-  if(sel&&cp!=='all'&&cp!=='teacher'){sel.value=cp;}
   err.textContent='';
   window._loginFirst=first.charAt(0).toUpperCase()+first.slice(1).toLowerCase();
   window._loginLast=last.charAt(0).toUpperCase()+last.slice(1).toLowerCase();
-  window._loginPeriod=cp==='teacher'?null:period;
-  window._loginCode=code;
+  window._loginPeriod=_loginPeriodSelected==='guest'?'guest':_loginPeriodSelected;
+  window._isGuest=(_loginPeriodSelected==='guest');
+  window._isTeacher=false;
   const sk='apgov_v1_'+first.toLowerCase()+'_'+last.toLowerCase();
   window._loginSaveKey=sk;
   try{const ex=localStorage.getItem(sk);if(ex){const d=JSON.parse(ex);if(d&&d.name){G=d;G.period=window._loginPeriod;save();launchGame();return;}}}catch(e){}
@@ -2510,13 +2594,28 @@ function submitLogin(){
 }
 function goToLoginScreen(){
   window._loginFirst=null;window._loginLast=null;window._loginPeriod=null;window._loginSaveKey=null;
-  ['login-first','login-last','login-code'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  const per=document.getElementById('login-period');if(per)per.value='';
+  window._isGuest=false;window._isTeacher=false;_loginPeriodSelected=null;
+  ['login-first','login-last','login-teacher-code'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('login-error').textContent='';
+  document.getElementById('login-error-1').textContent='';
+  document.getElementById('login-step-1').style.display='block';
+  document.getElementById('login-step-2').style.display='none';
+  ['2','4','guest'].forEach(p=>{const btn=document.getElementById('pd-btn-'+p);if(btn){btn.style.borderColor='var(--border2)';btn.style.background='var(--bg2)';}});
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('login-screen').classList.add('active');
   document.getElementById('game-header').style.display='none';
   document.getElementById('bottom-nav').style.display='none';
+}
+function launchTeacherDashboard(){
+  document.getElementById('game-header').style.display='none';
+  document.getElementById('bottom-nav').style.display='none';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('teacher-dashboard').classList.add('show');
+  loadTeacherData();
+}
+function closeTeacherDashboard(){
+  document.getElementById('teacher-dashboard').classList.remove('show');
+  goToLoginScreen();
 }
 // ─── AVATAR CREATOR ───
 let selectedAvatarId='scholar';
@@ -2573,7 +2672,7 @@ function showScreen(id){
 function launchGame(){
   document.getElementById('game-header').style.display='block';
   document.getElementById('bottom-nav').style.display='grid';
-  updateHeader();renderAllSprites();checkEraUnlocks();showScreen('map');startLbSync();if(G.score>0)pushLeaderboard();
+  updateHeader();renderAllSprites();checkEraUnlocks();showScreen('map');startLbSync();if(G.score>0)pushToSupabase();
 }
 function returnToTitle(){if(G)save();document.getElementById('game-header').style.display='none';document.getElementById('bottom-nav').style.display='none';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('title-screen').classList.add('active');currentScreen='title';}
 function returnToCurrentEra(){if(G.lastEpId&&G.lastEraId){selectEpisode(G.lastEpId);setTimeout(()=>selectEra(G.lastEpId,G.lastEraId),50);}else showScreen('map');}
@@ -2832,7 +2931,7 @@ function endBattle(won){
     else document.getElementById('new-card-reveal').style.display='none';
     document.getElementById('open-pack-btn').style.display=en.givePack?'block':'none';
     const badge=document.getElementById('pack-badge');if(badge)badge.style.display=G.packs>0?'inline':'none';
-    save();updateHeader();pushLeaderboard();
+    save();updateHeader();pushToSupabase();
   } else {
     const gl=Math.floor(G.gold*0.2);G.gold=Math.max(0,G.gold-gl);G.losses++;addXP(Math.floor(BT.earnedXP*0.3));save();updateHeader();
     document.getElementById('result-emoji').textContent='💀';document.getElementById('result-headline').textContent='OVERRULED!';document.getElementById('result-headline').style.color='var(--red)';
@@ -3018,31 +3117,190 @@ function checkAchievements(){
   const scotus=[];EPISODES.forEach(ep=>(ep.eras||[]).forEach(era=>era.enemies.forEach(e=>{if(e.type==='scotus')scotus.push(e);})));
   if(scotus.some(e=>G.collection.includes(e.id)))add('scotus_case');
 }
+// ─── LEADERBOARD (now handled by Supabase — see pushToSupabase/fetchLeaderboard above) ───
+// ─── SUPABASE SYNC ───
+async function pushToSupabase(){
+  if(!G||!G.name||window._isTeacher)return;
+  const def=AVATAR_DEFS.find(a=>a.id===G.avatarId)||AVATAR_DEFS[0];
+  const rank=getRank();
+  const scoreEntry={
+    name:G.name,first_name:G.firstName||'',last_name:G.lastName||'',
+    period:G.period||'guest',score:G.score,level:G.level,rank:rank.name,
+    cards:G.collection.length,wins:G.wins,avatar_badge:def.badge||'⚖️',
+    is_guest:!!(window._isGuest),updated_at:new Date().toISOString()
+  };
+  const statsEntry={
+    name:G.name,first_name:G.firstName||'',last_name:G.lastName||'',
+    period:G.period||'guest',score:G.score,level:G.level,rank:rank.name,
+    wins:G.wins,q_correct:G.qCorrect||0,q_total:G.qTotal||0,
+    beaten_count:G.beatenEnemies.length,cards_count:G.collection.length,
+    max_streak:G.maxStreak||0,avatar_badge:def.badge||'⚖️',
+    is_guest:!!(window._isGuest),is_teacher:false,updated_at:new Date().toISOString()
+  };
+  try{
+    await fetch(SUPA_URL+'/rest/v1/const_scores',{method:'POST',headers:{...SUPA_HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(scoreEntry)});
+    await fetch(SUPA_URL+'/rest/v1/const_student_stats',{method:'POST',headers:{...SUPA_HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(statsEntry)});
+  }catch(e){console.warn('Supabase sync failed',e);}
+}
+
 // ─── LEADERBOARD ───
-async function fetchLeaderboard(){try{const r=await fetch(JSONBIN_URL+'/latest',{headers:{'X-Master-Key':JSONBIN_API_KEY}});const data=await r.json();return data.record?.scores||[];}catch(e){return[];}}
-async function pushLeaderboard(){
-  if(!G||!G.name)return;
-  await new Promise(r=>setTimeout(r,Math.random()*5000));
-  try{const scores=await fetchLeaderboard();const rank=getRank();const def=AVATAR_DEFS.find(a=>a.id===G.avatarId)||AVATAR_DEFS[0];
-    const entry={name:G.name,score:G.score,level:G.level,rank:rank.name,cards:G.collection.length,avatarId:G.avatarId,avatarBadge:def.badge||'⚖️',period:G.period||'?',updatedAt:Date.now()};
-    const idx=scores.findIndex(s=>s.name===G.name);if(idx>=0){if(entry.score>scores[idx].score)scores[idx]=entry;}else scores.push(entry);
-    scores.sort((a,b)=>b.score-a.score);await fetch(JSONBIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_API_KEY},body:JSON.stringify({scores:scores.slice(0,200)})});
-  }catch(e){}
+async function fetchLeaderboard(period){
+  try{
+    let url=SUPA_URL+'/rest/v1/const_scores?order=score.desc&limit=50';
+    if(period&&period!=='all')url+=`&period=eq.${encodeURIComponent(period)}`;
+    const r=await fetch(url,{headers:SUPA_HEADERS});
+    return await r.json();
+  }catch(e){return [];}
+}
+function setLbTab(tab){
+  lbTab=tab;
+  document.getElementById('lb-tab-all').style.background=tab==='all'?'var(--gold)':'transparent';
+  document.getElementById('lb-tab-all').style.color=tab==='all'?'var(--bg)':'var(--text3)';
+  document.getElementById('lb-tab-all').style.borderColor=tab==='all'?'var(--gold)':'var(--border2)';
+  document.getElementById('lb-tab-myclass').style.background=tab==='myclass'?'var(--gold)':'transparent';
+  document.getElementById('lb-tab-myclass').style.color=tab==='myclass'?'var(--bg)':'var(--text3)';
+  document.getElementById('lb-tab-myclass').style.borderColor=tab==='myclass'?'var(--gold)':'var(--border2)';
+  renderLeaderboard();
 }
 async function renderLeaderboard(){
-  const el=document.getElementById('lb-content');const status=document.getElementById('lb-sync-status');
-  if(status){status.textContent='Syncing...';status.classList.add('syncing');}
-  const allScores=await fetchLeaderboard();
-  if(status){status.textContent=`${allScores.length} citizens on the board`;status.classList.remove('syncing');}
-  const tabHtml=`<div style="display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap">${['all','2','4'].map(p=>`<button onclick="lbPeriodFilter='${p}';renderLeaderboard()" style="font-family:var(--pixel);font-size:5px;padding:6px 10px;cursor:pointer;border:1px solid;background:${lbPeriodFilter===p?'var(--gold)':'var(--bg3)'};color:${lbPeriodFilter===p?'var(--bg)':'var(--text3)'};border-color:${lbPeriodFilter===p?'var(--gold)':'var(--border)'}">${p==='all'?'ALL':'PD '+p}</button>`).join('')}</div>`;
-  const scores=lbPeriodFilter==='all'?allScores:allScores.filter(s=>String(s.period)===lbPeriodFilter);
-  if(!scores.length){el.innerHTML=tabHtml+'<div style="text-align:center;padding:2rem;color:var(--text3);font-size:14px">No entries yet.</div>';return;}
+  const el=document.getElementById('lb-content');
+  const status=document.getElementById('lb-sync-status');
+  // Hide My Class tab for guests
+  const mycTab=document.getElementById('lb-tab-myclass');
+  if(mycTab){
+    const isGuest=!G||!G.period||G.period==='guest';
+    mycTab.style.display=isGuest?'none':'inline-block';
+    if(isGuest&&lbTab==='myclass')lbTab='all';
+  }
+  if(status)status.textContent='Syncing...';
+  const period=lbTab==='myclass'?(G&&G.period)||null:null;
+  const allScores=await fetchLeaderboard(period);
+  if(status)status.textContent=allScores.length+' citizens on the board';
+  if(!allScores.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:14px">No entries yet.</div>';return;}
   const medals=['🥇','🥈','🥉'];
-  el.innerHTML=tabHtml+`<table class="lb-table"><thead><tr><th>#</th><th>CITIZEN</th><th>PD</th><th>LVL</th><th>SCORE</th><th>CARDS</th></tr></thead><tbody>${scores.slice(0,20).map((s,i)=>`<tr ${G&&s.name===G.name?'class="lb-you"':''}><td style="font-family:var(--pixel);font-size:7px;color:${i<3?'var(--gold)':'var(--text3)'}">${i<3?medals[i]:'#'+(i+1)}</td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">${s.avatarBadge||'⚖️'}</span><div><div class="lb-name">${s.name}</div><div style="font-size:11px;color:var(--teal)">${s.rank||''}</div></div></div></td><td style="font-family:var(--pixel);font-size:5px;color:var(--text2)">${s.period||'?'}</td><td style="font-size:13px;color:var(--teal)">${s.level}</td><td class="lb-score">${s.score}</td><td style="font-size:13px;color:var(--text2)">${s.cards}</td></tr>`).join('')}</tbody></table>`;
+  el.innerHTML=`<table class="lb-table"><thead><tr><th>#</th><th>CITIZEN</th><th>PD</th><th>LVL</th><th>SCORE</th><th>CARDS</th></tr></thead><tbody>${allScores.slice(0,25).map((s,i)=>`<tr ${G&&s.name===G.name?'class="lb-you"':''}><td style="font-family:var(--pixel);font-size:7px;color:${i<3?'var(--gold)':'var(--text3)'}">${i<3?medals[i]:'#'+(i+1)}</td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">${s.avatar_badge||'⚖️'}</span><div><div class="lb-name">${s.name}</div><div style="font-size:11px;color:var(--teal)">${s.rank||''}</div></div></div></td><td style="font-family:var(--pixel);font-size:5px;color:var(--text2)">${s.period==='guest'?'Guest':s.period?'Pd '+s.period:'?'}</td><td style="font-size:13px;color:var(--teal)">${s.level}</td><td class="lb-score">${(s.score||0).toLocaleString()}</td><td style="font-size:13px;color:var(--text2)">${s.cards||0}</td></tr>`).join('')}</tbody></table>`;
 }
-function openLeaderboard(){document.getElementById('leaderboard-overlay').classList.add('show');renderLeaderboard();}
+function openLeaderboard(){
+  document.getElementById('leaderboard-overlay').classList.add('show');
+  lbTab='all';
+  setLbTab('all');
+}
 function closeLeaderboard(){document.getElementById('leaderboard-overlay').classList.remove('show');}
 function startLbSync(){}
+
+// ─── TEACHER DASHBOARD ───
+async function loadTeacherData(){
+  const status=document.getElementById('td-sync-status');
+  if(status)status.textContent='Loading…';
+  try{
+    const r=await fetch(SUPA_URL+'/rest/v1/const_student_stats?order=score.desc&limit=200',{headers:SUPA_HEADERS});
+    const students=await r.json();
+    if(status)status.textContent=`${students.filter(s=>!s.is_teacher).length} students · Last updated ${new Date().toLocaleTimeString()}`;
+    renderTeacherView(students);
+  }catch(e){if(status)status.textContent='Error loading data';}
+}
+function renderTeacherView(everyone){
+  window._tdStudents=everyone;
+  const students=everyone.filter(s=>!s.is_teacher&&!s.is_guest);
+  const all=everyone.filter(s=>!s.is_teacher);
+  // Period tabs
+  const tabs=document.getElementById('td-period-tabs');
+  if(tabs){
+    const periods=['all','2','4','guest'];
+    const labels={all:'All Students',2:'Period 2',4:'Period 4',guest:'Guests'};
+    tabs.innerHTML=periods.map(p=>`<button onclick="tdPeriodFilter='${p}';renderTeacherView(window._tdStudents)"
+      style="font-family:var(--cinzel);font-size:8px;letter-spacing:.06em;padding:6px 12px;cursor:pointer;border:1px solid;transition:all .15s;
+      background:${tdPeriodFilter===p?'var(--gold)':'transparent'};
+      color:${tdPeriodFilter===p?'var(--bg)':'var(--text3)'};
+      border-color:${tdPeriodFilter===p?'var(--gold)':'var(--border2)'}">${labels[p]||p}</button>`).join('');
+  }
+  // Filter for selected period
+  const filtered=tdPeriodFilter==='all'?all:tdPeriodFilter==='guest'?everyone.filter(s=>s.is_guest):all.filter(s=>String(s.period)===tdPeriodFilter);
+  const classStudents=tdPeriodFilter==='all'?students:students.filter(s=>String(s.period)===tdPeriodFilter);
+  // Summary stats
+  const avgScore=classStudents.length?Math.round(classStudents.reduce((a,s)=>a+(s.score||0),0)/classStudents.length):0;
+  const avgAcc=classStudents.filter(s=>s.q_total>0).length?Math.round(classStudents.filter(s=>s.q_total>0).reduce((a,s)=>a+Math.round((s.q_correct||0)/s.q_total*100),0)/classStudents.filter(s=>s.q_total>0).length):0;
+  const allEn=[];EPISODES.forEach(ep=>(ep.eras||[]).forEach(era=>era.enemies.forEach(e=>allEn.push(e))));
+  const completed=classStudents.filter(s=>(s.beaten_count||0)>=allEn.length).length;
+  const sumEl=document.getElementById('td-summary');
+  if(sumEl)sumEl.innerHTML=[
+    {icon:'👥',val:classStudents.length,lbl:'Students'},
+    {icon:'⭐',val:avgScore.toLocaleString(),lbl:'Avg Score'},
+    {icon:'🎯',val:avgAcc+'%',lbl:'Avg Accuracy'},
+    {icon:'🏛️',val:completed,lbl:'Completed'},
+  ].map(s=>`<div style="background:var(--bg2);border:1px solid var(--border2);padding:12px;text-align:center">
+    <div style="font-size:20px;margin-bottom:4px">${s.icon}</div>
+    <div style="font-family:var(--cinzel);font-size:18px;color:var(--gold)">${s.val}</div>
+    <div style="font-family:var(--inter);font-size:8px;color:var(--text3);margin-top:2px;letter-spacing:1px">${s.lbl}</div>
+  </div>`).join('');
+  // Era bars
+  const barsEl=document.getElementById('td-era-bars');
+  if(barsEl&&classStudents.length){
+    const eraNames=[];EPISODES.forEach(ep=>(ep.eras||[]).forEach(era=>eraNames.push({name:era.name,count:era.enemies.length})));
+    let html='';let cumulative=0;
+    eraNames.forEach(({name,count})=>{
+      const reached=classStudents.filter(s=>(s.beaten_count||0)>cumulative).length;
+      const pct=Math.round(reached/classStudents.length*100);
+      const col=pct>=75?'var(--green)':pct>=50?'var(--gold)':'var(--red)';
+      html+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="font-family:var(--inter);font-size:9px;color:var(--text2);width:120px;flex-shrink:0;line-height:1.3">${name}</div>
+        <div style="flex:1;height:12px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:${col};transition:width .5s"></div>
+        </div>
+        <div style="font-family:var(--cinzel);font-size:11px;color:${col};min-width:36px;text-align:right">${pct}%</div>
+        <div style="font-family:var(--inter);font-size:8px;color:var(--text3);min-width:60px">${reached}/${classStudents.length}</div>
+      </div>`;
+      cumulative+=count;
+    });
+    barsEl.innerHTML=html||'<div style="color:var(--text3);font-size:13px;font-style:italic">No data yet.</div>';
+  }
+  // Roster
+  const rosterEl=document.getElementById('td-roster');
+  if(rosterEl){
+    if(!filtered.length){rosterEl.innerHTML='<div style="color:var(--text3);font-size:13px;font-style:italic;padding:12px">No students found.</div>';return;}
+    const sorted=[...filtered].sort((a,b)=>{
+      const v={score:s=>s.score||0,level:s=>s.level||1,wins:s=>s.wins||0,cards:s=>s.cards_count||0,name:s=>(s.name||'').toLowerCase(),accuracy:s=>s.q_total>0?Math.round((s.q_correct||0)/s.q_total*100):0}[tdSort]||(s=>s.score||0);
+      return tdSortDir*(v(a)<v(b)?-1:v(a)>v(b)?1:0);
+    });
+    const arrow=col=>tdSort===col?(tdSortDir>0?' ↑':' ↓'):'';
+    const th=(col,lbl)=>`<th style="cursor:pointer;user-select:none" onclick="tdSort='${col}';tdSortDir=tdSort==='${col}'?-tdSortDir:-1;renderTeacherView(window._tdStudents)">${lbl}${arrow(col)}</th>`;
+    rosterEl.innerHTML=`<table class="lb-table" style="margin-bottom:20px"><thead><tr>
+      <th>#</th>${th('name','STUDENT')}${th('score','SCORE')}${th('accuracy','CORRECT%')}${th('wins','WINS')}${th('cards','CARDS')}<th>PD</th><th>LAST SEEN</th><th></th>
+    </tr></thead><tbody>${sorted.map((s,i)=>{
+      const acc=s.q_total>0?Math.round((s.q_correct||0)/s.q_total*100):null;
+      const lastSeen=s.updated_at?new Date(s.updated_at).toLocaleDateString():'—';
+      const accColor=acc===null?'var(--text3)':acc>=80?'var(--green)':acc>=60?'var(--gold)':'var(--red)';
+      return `<tr>
+        <td style="font-size:10px;color:var(--text3)">${i+1}</td>
+        <td><div class="lb-name">${s.name||'—'}</div><div style="font-size:9px;color:var(--teal)">${s.rank||''}</div></td>
+        <td class="lb-score">${(s.score||0).toLocaleString()}</td>
+        <td style="font-size:12px;color:${accColor}">${acc!==null?acc+'%':'—'}</td>
+        <td style="font-size:12px;color:var(--text2)">${s.wins||0}</td>
+        <td style="font-size:12px;color:var(--text2)">${s.cards_count||0}</td>
+        <td style="font-family:var(--cinzel);font-size:8px;color:var(--text2)">${s.period==='guest'?'Guest':s.period?'Pd '+s.period:'—'}</td>
+        <td style="font-size:9px;color:var(--text3)">${lastSeen}</td>
+        <td><button onclick="deleteStudent('${s.name}')" style="font-family:var(--cinzel);font-size:8px;background:transparent;border:1px solid var(--red);color:var(--red);padding:3px 8px;cursor:pointer">✕</button></td>
+      </tr>`;
+    }).join('')}</tbody></table>`;
+  }
+}
+async function deleteStudent(name){
+  if(!confirm(`Remove "${name}" from the leaderboard?`))return;
+  try{
+    await fetch(SUPA_URL+'/rest/v1/const_scores?name=eq.'+encodeURIComponent(name),{method:'DELETE',headers:SUPA_HEADERS});
+    await fetch(SUPA_URL+'/rest/v1/const_student_stats?name=eq.'+encodeURIComponent(name),{method:'DELETE',headers:SUPA_HEADERS});
+    notify(name+' removed','green');loadTeacherData();
+  }catch(e){notify('Error removing student','red');}
+}
+async function resetAllScores(){
+  if(!confirm('Reset ALL scores? This cannot be undone.'))return;
+  if(!confirm('Are you sure? Every student score will be deleted.'))return;
+  try{
+    await fetch(SUPA_URL+'/rest/v1/const_scores?id=gte.0',{method:'DELETE',headers:SUPA_HEADERS});
+    await fetch(SUPA_URL+'/rest/v1/const_student_stats?id=gte.0',{method:'DELETE',headers:SUPA_HEADERS});
+    notify('Leaderboard reset!','green');loadTeacherData();
+  }catch(e){notify('Error resetting','red');}
+}
 // ─── TIMELINE ───
 function openTimeline(){renderTimeline();document.getElementById('timeline-overlay').classList.add('show');}
 function closeTimeline(){document.getElementById('timeline-overlay').classList.remove('show');}
