@@ -2573,7 +2573,7 @@ function showScreen(id){
 function launchGame(){
   document.getElementById('game-header').style.display='block';
   document.getElementById('bottom-nav').style.display='grid';
-  updateHeader();renderAllSprites();checkEraUnlocks();showScreen('map');startLbSync();
+  updateHeader();renderAllSprites();checkEraUnlocks();showScreen('map');startLbSync();if(G.score>0)pushLeaderboard();
 }
 function returnToTitle(){if(G)save();document.getElementById('game-header').style.display='none';document.getElementById('bottom-nav').style.display='none';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('title-screen').classList.add('active');currentScreen='title';}
 function returnToCurrentEra(){if(G.lastEpId&&G.lastEraId){selectEpisode(G.lastEpId);setTimeout(()=>selectEra(G.lastEpId,G.lastEraId),50);}else showScreen('map');}
@@ -3022,10 +3022,11 @@ function checkAchievements(){
 async function fetchLeaderboard(){try{const r=await fetch(JSONBIN_URL+'/latest',{headers:{'X-Master-Key':JSONBIN_API_KEY}});const data=await r.json();return data.record?.scores||[];}catch(e){return[];}}
 async function pushLeaderboard(){
   if(!G||!G.name)return;
+  await new Promise(r=>setTimeout(r,Math.random()*5000));
   try{const scores=await fetchLeaderboard();const rank=getRank();const def=AVATAR_DEFS.find(a=>a.id===G.avatarId)||AVATAR_DEFS[0];
     const entry={name:G.name,score:G.score,level:G.level,rank:rank.name,cards:G.collection.length,avatarId:G.avatarId,avatarBadge:def.badge||'⚖️',period:G.period||'?',updatedAt:Date.now()};
     const idx=scores.findIndex(s=>s.name===G.name);if(idx>=0){if(entry.score>scores[idx].score)scores[idx]=entry;}else scores.push(entry);
-    scores.sort((a,b)=>b.score-a.score);await fetch(JSONBIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_API_KEY},body:JSON.stringify({scores:scores.slice(0,50)})});
+    scores.sort((a,b)=>b.score-a.score);await fetch(JSONBIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_API_KEY},body:JSON.stringify({scores:scores.slice(0,200)})});
   }catch(e){}
 }
 async function renderLeaderboard(){
@@ -3041,7 +3042,7 @@ async function renderLeaderboard(){
 }
 function openLeaderboard(){document.getElementById('leaderboard-overlay').classList.add('show');renderLeaderboard();}
 function closeLeaderboard(){document.getElementById('leaderboard-overlay').classList.remove('show');}
-function startLbSync(){if(lbSyncInterval)clearInterval(lbSyncInterval);lbSyncInterval=setInterval(()=>{if(G)pushLeaderboard();},60000);}
+function startLbSync(){}
 // ─── TIMELINE ───
 function openTimeline(){renderTimeline();document.getElementById('timeline-overlay').classList.add('show');}
 function closeTimeline(){document.getElementById('timeline-overlay').classList.remove('show');}
