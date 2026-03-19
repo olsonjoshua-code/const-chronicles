@@ -635,7 +635,11 @@ option{background:var(--bg2)}
 <!-- SHOP -->
 <div id="shop-screen" class="screen">
   <div style="font-family:var(--pixel);font-size:7px;color:var(--gold);text-align:center;margin-bottom:4px">⚖️ CIVIC ARMORY</div>
-  <div style="font-family:var(--pixel);font-size:6px;color:var(--text2);text-align:center;margin-bottom:12px">Credits: <span style="color:var(--gold)" id="shop-gold-display">0</span> ⚖️</div>
+  <div style="display:flex;justify-content:center;gap:16px;margin-bottom:12px;font-family:var(--pixel);font-size:5px;color:var(--text2)">
+    <span>⚖️ <span id="shop-gold-display" style="color:var(--gold)">0</span> gold</span>
+    <span>📊 <span id="shop-level-display" style="color:var(--teal)">LVL 1</span></span>
+    <span>❤️ <span id="shop-hp-display" style="color:var(--red)">50/50</span></span>
+  </div>
   <div class="shop-tabs">
     <button class="shop-tab active" onclick="setShopTab('weapons')">🪶 ARGUMENTS</button>
     <button class="shop-tab" onclick="setShopTab('armor')">🛡️ DEFENSES</button>
@@ -1381,7 +1385,7 @@ const AVATAR_DEFS = [
   {id:'ron_paul', name:'Ron Paul', cat:'ultra_mythic', rarity:'ultra_mythic', cost:9999, unlockMethod:'gold', badge:'🌟',
    desc:'Champion of liberty, required to defeat the Final Boss. The only citizen who can expose the Constitution\'s ultimate defender.',
    passive:{stat:'all', value:1, label:'ALL stats boosted, the Revolution is here'},
-   minLevel:18,
+   minLevel:5,
    portrait:()=>makeMedallion({bg:'#0a0808',ring:'#ffd700',ring2:'#c8a800',face:`
     <circle cx="20" cy="17" r="6.5" fill="#e8c080"/>
     <ellipse cx="20" cy="25.5" rx="9" ry="5" fill="#1a0a00"/>
@@ -1397,7 +1401,7 @@ const AVATAR_DEFS = [
   {id:'mises', name:'Ludwig von Mises', cat:'ultra_mythic', rarity:'ultra_mythic', cost:9999, unlockMethod:'gold', badge:'📕',
    desc:'Human Action, the intellectual foundation of liberty. Equip Mises OR Ron Paul to defeat the final boss.',
    passive:{stat:'all', value:1, label:'ALL stats boosted, Human Action'},
-   minLevel:18,
+   minLevel:5,
    portrait:()=>makeMedallion({bg:'#080608',ring:'#ffd700',ring2:'#c8a800',face:`
     <circle cx="20" cy="17" r="6.5" fill="#d4a870"/>
     <ellipse cx="20" cy="25.5" rx="9" ry="5" fill="#1a0808"/>
@@ -3475,22 +3479,22 @@ function applyAnswerResult(correct,q){
       // Streak tiers: 3=1.5x, 6=2.0x, 9=3.0x
       var streakMult=BT.combo>=9?3.0:BT.combo>=6?2.0:BT.combo>=3?1.5:1.0;
       if(streakMult>1)dmg=Math.floor(dmg*streakMult);
-      // Final boss immunity
-      if(isFinalBoss&&!hasEconomist){
-        dmg=0;
-        var seqPl2=document.getElementById('seq-player');
-        if(seqPl2){seqPl2.style.cssText='display:block;font-family:var(--pixel);font-size:5px;padding:8px 10px;border-radius:3px;border:1px solid var(--red);color:var(--red);background:rgba(192,57,43,.15);text-align:center;line-height:1.7';
-        seqPl2.textContent='The College Board is IMMUNE! You need Ron Paul or Mises to deal damage!';}
-      }
+      // Final boss immunity — zero damage but let battle play normally
+      if(isFinalBoss&&!hasEconomist) dmg=0;
       BT.enemyHp=Math.max(0,BT.enemyHp-dmg);BT.combo=Math.min(9,BT.combo+1);G.battleStreak=BT.combo;
-      if(enEl){enEl.style.filter='brightness(2.5) sepia(1) hue-rotate(180deg)';setTimeout(function(){if(enEl)enEl.style.filter='';},400);}
-      updateComboPips(); // update immediately so player sees tier change
+      if(enEl&&dmg>0){enEl.style.filter='brightness(2.5) sepia(1) hue-rotate(180deg)';setTimeout(function(){if(enEl)enEl.style.filter='';},400);}
+      updateComboPips();
       var smsg=streakMult>=3?' 🔥🔥🔥 3× MAX POWER!':streakMult>=2?' 🔥🔥 2× DOUBLE DAMAGE!':streakMult>1?' 🔥 1.5× STREAK BONUS!':'';
       var scolor=BT.combo>=9?'#ff00ff':BT.combo>=6?'#ff2200':BT.combo>=3?'#ff6600':'var(--teal)';
-      BT.log='Correct! '+dmg+' damage!'+smsg;
-      spawnDmg('-'+dmg,'dmg');
-      updateHpBars();
-      showSeqPl('⚡ '+pn+' attacks '+en2+' — HIT! -'+dmg+' HP!'+smsg,scolor,'rgba(26,188,156,.08)');
+      if(isFinalBoss&&!hasEconomist){
+        BT.log='Correct! But the College Board is immune to your attack!';
+        showSeqPl('✅ Correct! But you need Ron Paul or Mises to damage the College Board!','#ff8c00','rgba(255,140,0,.1)');
+      } else {
+        BT.log='Correct! '+dmg+' damage!'+smsg;
+        spawnDmg('-'+dmg,'dmg');
+        updateHpBars();
+        showSeqPl('⚡ '+pn+' attacks '+en2+' — HIT! -'+dmg+' HP!'+smsg,scolor,'rgba(26,188,156,.08)');
+      }
     }
     BT.earnedXP+=5;BT.earnedGold+=3;BT.earnedScore+=10;
   } else {
@@ -3626,9 +3630,47 @@ function endBattle(won){
 // ─── SHOP ───
 function setShopTab(tab){shopTab=tab;document.querySelectorAll('.shop-tab').forEach((t,i)=>{t.classList.toggle('active',['weapons','armor','items','avatars'][i]===tab);});renderShop();}
 function renderShop(){
-  document.getElementById('shop-gold-display').textContent=G.gold;let html='<div class="shop-grid">';
-  if(shopTab==='weapons'){html+=WEAPONS.map(w=>{const owned=G.ownedWeapons.includes(w.id),eq=G.equippedWeapon===w.id;return `<div class="shop-item ${owned?'owned':''} ${eq?'equipped':''}"><span class="si-sprite">${w.icon}</span><div class="si-name">${w.name}</div><div class="si-desc">${w.desc}</div><div class="si-stat">+${w.dmgBonus} ATK</div><div class="si-cost rarity-${w.rarity}">${w.rarity.toUpperCase()}</div>${eq?'<div style="font-family:var(--pixel);font-size:5px;color:var(--gold)">✓ EQUIPPED</div>':owned?`<button class="btn green sm full" onclick="equipWeapon('${w.id}')">EQUIP</button>`:`<div class="si-cost">${w.cost>0?w.cost+' ⚖️':'FREE'}</div><button class="btn sm full ${G.gold<w.cost?'disabled':''}" onclick="buyWeapon('${w.id}')" ${G.gold<w.cost?'disabled':''}>BUY</button>`}</div>`;}).join('');}
-  else if(shopTab==='armor'){html+=ARMORS.map(a=>{const owned=G.ownedArmors.includes(a.id),eq=G.equippedArmor===a.id;const armorDodgeMap={none:0,amendment:5,precedent:8,due_process:12,scotus:16,unanimous:20};const dodgeAdd=armorDodgeMap[a.id]||0;return `<div class="shop-item ${owned?'owned':''} ${eq?'equipped':''}"><span class="si-sprite">${a.icon}</span><div class="si-name">${a.name}</div><div class="si-desc">${a.desc}</div><div class="si-stat">-${a.defBonus} DMG &nbsp;|&nbsp; +${dodgeAdd}% DODGE</div><div class="si-cost rarity-${a.rarity}">${a.rarity.toUpperCase()}</div>${eq?'<div style="font-family:var(--pixel);font-size:5px;color:var(--gold)">✓ EQUIPPED</div>':owned?`<button class="btn green sm full" onclick="equipArmor('${a.id}')">EQUIP</button>`:`<div class="si-cost">${a.cost>0?a.cost+' ⚖️':'FREE'}</div><button class="btn sm full ${G.gold<a.cost?'disabled':''}" onclick="buyArmor('${a.id}')" ${G.gold<a.cost?'disabled':''}>BUY</button>`}</div>`;}).join('');}
+  document.getElementById('shop-gold-display').textContent=G.gold;
+  const slvl=document.getElementById('shop-level-display');if(slvl)slvl.textContent='LVL '+G.level;
+  const shp=document.getElementById('shop-hp-display');if(shp)shp.textContent=G.hp+'/'+G.maxHp;let html='<div class="shop-grid">';
+  if(shopTab==='weapons'){html+=WEAPONS.map(w=>{
+    const owned=G.ownedWeapons.includes(w.id),eq=G.equippedWeapon===w.id;
+    const lvlReq=w.minLevel||1;
+    const lvlOk=G.level>=lvlReq;
+    const lvlTag=lvlReq>1?`<div style="font-family:var(--pixel);font-size:4px;color:${lvlOk?'var(--teal)':'var(--red)'};margin-bottom:4px">${lvlOk?'✓':'🔒'} LVL ${lvlReq} REQUIRED</div>`:'';
+    return `<div class="shop-item ${owned?'owned':''} ${eq?'equipped':''}" style="${!owned&&!lvlOk?'opacity:0.5':''}">
+      <span class="si-sprite">${w.icon}</span>
+      <div class="si-name">${w.name}</div>
+      <div class="si-desc">${w.desc}</div>
+      <div class="si-stat">+${w.dmgBonus} ATK</div>
+      ${lvlTag}
+      <div class="si-cost rarity-${w.rarity}">${w.rarity.toUpperCase()}</div>
+      ${eq?'<div style="font-family:var(--pixel);font-size:5px;color:var(--gold)">✓ EQUIPPED</div>'
+        :owned?`<button class="btn green sm full" onclick="equipWeapon('${w.id}')">EQUIP</button>`
+        :!lvlOk?`<div style="font-family:var(--pixel);font-size:4px;color:var(--red);padding:4px 0">🔒 Reach Level ${lvlReq} to unlock</div>`
+        :`<div class="si-cost">${w.cost>0?w.cost+' ⚖️':'FREE'}</div>
+         <button class="btn sm full ${G.gold<w.cost?'disabled':''}" onclick="buyWeapon('${w.id}')" ${G.gold<w.cost?'disabled':''}>BUY</button>`}
+    </div>`;}).join('');}
+  else if(shopTab==='armor'){html+=ARMORS.map(a=>{
+    const owned=G.ownedArmors.includes(a.id),eq=G.equippedArmor===a.id;
+    const armorDodgeMap={none:0,amendment:5,precedent:8,due_process:12,scotus:16,unanimous:20};
+    const dodgeAdd=armorDodgeMap[a.id]||0;
+    const lvlReq=a.minLevel||1;
+    const lvlOk=G.level>=lvlReq;
+    const lvlTag=lvlReq>1?`<div style="font-family:var(--pixel);font-size:4px;color:${lvlOk?'var(--teal)':'var(--red)'};margin-bottom:4px">${lvlOk?'✓':'🔒'} LVL ${lvlReq} REQUIRED</div>`:'';
+    return `<div class="shop-item ${owned?'owned':''} ${eq?'equipped':''}" style="${!owned&&!lvlOk?'opacity:0.5':''}">
+      <span class="si-sprite">${a.icon}</span>
+      <div class="si-name">${a.name}</div>
+      <div class="si-desc">${a.desc}</div>
+      <div class="si-stat">-${a.defBonus} DMG &nbsp;|&nbsp; +${dodgeAdd}% DODGE</div>
+      ${lvlTag}
+      <div class="si-cost rarity-${a.rarity}">${a.rarity.toUpperCase()}</div>
+      ${eq?'<div style="font-family:var(--pixel);font-size:5px;color:var(--gold)">✓ EQUIPPED</div>'
+        :owned?`<button class="btn green sm full" onclick="equipArmor('${a.id}')">EQUIP</button>`
+        :!lvlOk?`<div style="font-family:var(--pixel);font-size:4px;color:var(--red);padding:4px 0">🔒 Reach Level ${lvlReq} to unlock</div>`
+        :`<div class="si-cost">${a.cost>0?a.cost+' ⚖️':'FREE'}</div>
+         <button class="btn sm full ${G.gold<a.cost?'disabled':''}" onclick="buyArmor('${a.id}')" ${G.gold<a.cost?'disabled':''}>BUY</button>`}
+    </div>`;}).join('');}
   else if(shopTab==='items'){html+=CONSUMABLES.map(c=>{const owned=(G.inventory[c.id]||0);return `<div class="shop-item"><span class="si-sprite">${c.icon}</span><div class="si-name">${c.name}</div><div class="si-desc">${c.desc}</div>${owned>0?`<div style="font-family:var(--pixel);font-size:5px;color:var(--teal)">OWNED: ${owned}</div>`:''}<div class="si-cost rarity-${c.rarity}">${c.rarity.toUpperCase()}</div><div class="si-cost">${c.cost} ⚖️</div><button class="btn sm full ${G.gold<c.cost?'disabled':''}" onclick="buyItem('${c.id}')" ${G.gold<c.cost?'disabled':''}>BUY</button></div>`;}).join('');}
   else if(shopTab==='avatars'){
   html+='<div style="font-family:var(--pixel);font-size:5px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);padding:8px;margin-bottom:10px;line-height:1.8">🎭 CITIZENS, Equip one to gain their passive bonus. Collect more by playing or spending gold.</div>';
@@ -3636,7 +3678,7 @@ function renderShop(){
     {key:'president',label:'🏠 PRESIDENTS'},
     {key:'scotus_justice',label:'⚖️ SCOTUS JUSTICES'},
     {key:'modern_political',label:'🏛️ POLITICAL FIGURES'},
-    {key:'ultra_mythic',label:'🌟 ULTRA MYTHIC'},
+    {key:'ultra_mythic',label:'🌟 ULTRA MYTHIC — Required for Final Boss'},
     {key:'interest_group',label:'🤝 INTEREST GROUPS'},
     {key:'media',label:'📺 MEDIA FIGURES'},
     {key:'historical',label:'📜 FOUNDING ERA'},
@@ -3656,6 +3698,7 @@ function renderShop(){
       const lvlReq=a.minLevel||1;
       const lvlOk=G.level>=lvlReq;
       const canBuy=a.cost>0&&G.gold>=a.cost&&a.unlockMethod==='gold'&&lvlOk;
+      const lvlTag2=lvlReq>1&&!owned?`<div style="font-family:var(--pixel);font-size:4px;color:${lvlOk?'var(--teal)':'var(--red)'};margin-bottom:3px">${lvlOk?'✓ LVL '+lvlReq+' MET':'🔒 LVL '+lvlReq+' REQUIRED'}</div>`:'';
       const isMythic=a.rarity==='mythic'||a.rarity==='ultra_mythic';
       html+=`<div class="shop-item ${owned?'owned':''} ${eq?'equipped':''}" style="${isMythic?'border-color:#ff406060;':''}">
         <div style="display:block;margin:0 auto 8px;width:64px;height:64px;border-radius:50%;overflow:visible;${isMythic?'filter:drop-shadow(0 0 10px #ff4060)':''}">
@@ -3663,6 +3706,7 @@ function renderShop(){
         <div class="si-name">${a.name}</div>
         <div class="si-cost rarity-${a.rarity}">${a.rarity.toUpperCase()}</div>
         <div class="si-desc">${a.desc}</div>
+        ${lvlTag2||''}
         ${a.passive?'<div style="font-family:var(--pixel);font-size:4px;color:var(--teal);margin-top:3px;line-height:1.6">⚡ '+a.passive.label+'</div>':''}
         ${eq?'<div style="font-family:var(--cinzel);font-size:9px;color:var(--gold)">✓ EQUIPPED</div>':
           owned?`<button class="btn green sm full" onclick="equipAvatar('${a.id}')">EQUIP</button>`:
