@@ -3865,10 +3865,50 @@ function renderProfile(){
   <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:14px"><span style="color:var(--text2)">Best Streak</span><span style="font-family:var(--inter);font-weight:600;color:var(--gold)">${G.maxStreak}</span></div>`;
 })()
   document.getElementById('profile-gear').innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);padding:8px;text-align:center;flex:1"><div style="font-size:24px">${weapon.icon}</div><div style="font-family:var(--pixel);font-size:4px;color:var(--gold);margin-top:3px">${weapon.name}</div></div><div style="background:var(--bg2);border:1px solid var(--border);padding:8px;text-align:center;flex:1"><div style="font-size:24px">${armor.icon}</div><div style="font-family:var(--pixel);font-size:4px;color:var(--gold);margin-top:3px">${armor.name}</div></div>`;
-  const achData=[{id:'first_win',icon:'⚖️',name:'First Ruling'},{id:'collector5',icon:'📜',name:'Case Collector'},{id:'level5',icon:'🏛️',name:'Counselor'},{id:'level10',icon:'⭐',name:'Justice'},{id:'streak5',icon:'🔥',name:'On a Roll'},{id:'no_hint',icon:'🧠',name:'No Amicus'},{id:'madison_card',icon:'📜',name:'Father of the Constitution'},{id:'scotus_case',icon:'⚖️',name:'Case Brief'},{id:'complete_unit',icon:'🏛️',name:'Unit Mastered'},{id:'rich',icon:'⚖️',name:'Appropriations'},{id:'final_boss',icon:'🌟',name:'Constitutional'},{id:'all_avatars',icon:'🎭',name:'We the People'}];
-  document.getElementById('profile-achievements').innerHTML=achData.map(a=>{const earned=G.achievements.includes(a.id);return `<div style="background:var(--bg2);border:1px solid ${earned?'var(--gold2)':'var(--border)'};padding:9px;text-align:center;${earned?'':'opacity:.3;filter:grayscale(1)'}"><div style="font-size:22px;margin-bottom:3px">${a.icon}</div><div style="font-family:var(--pixel);font-size:4px;color:var(--text)">${a.name}</div></div>`;}).join('');
+  const achData=[
+    {id:'first_win',    icon:'⚖️', name:'First Ruling',           req:'Win your first argument'},
+    {id:'collector5',   icon:'📜', name:'Case Collector',          req:'Collect 5 case briefs'},
+    {id:'level5',       icon:'🏛️', name:'Counselor',               req:'Reach Level 5'},
+    {id:'level10',      icon:'⭐', name:'Associate Justice',       req:'Reach Level 10'},
+    {id:'streak5',      icon:'🔥', name:'On a Roll',               req:'Build a 5-answer streak'},
+    {id:'no_hint',      icon:'🧠', name:'No Amicus',               req:'Win a battle without using a hint'},
+    {id:'madison_card', icon:'📜', name:'Father of the Constitution', req:'Collect the Federalist No. 10 case brief'},
+    {id:'scotus_case',  icon:'⚖️', name:'Constitutional Scholar',  req:'Collect any SCOTUS case brief'},
+    {id:'complete_unit',icon:'🏛️', name:'Unit Mastered',           req:'Complete every challenge in any unit'},
+    {id:'rich',         icon:'💰', name:'Appropriations',          req:'Accumulate 5,000 gold'},
+    {id:'final_boss',   icon:'🌟', name:'Founding Legend',         req:'Defeat the College Board'},
+    {id:'all_avatars',  icon:'🎭', name:'We the People',           req:'Unlock 5 or more citizens'},
+  ];
+  document.getElementById('profile-achievements').innerHTML=achData.map(a=>{
+    const earned=G.achievements.includes(a.id);
+    return `<div onclick="toggleAchDetail('${a.id}')"
+      style="background:var(--bg2);border:1px solid ${earned?'var(--gold2)':'var(--border)'};
+      padding:9px;text-align:center;cursor:pointer;position:relative;transition:border-color .2s;
+      ${earned?'':'opacity:.45;filter:grayscale(1)'}">
+      <div style="font-size:22px;margin-bottom:3px">${a.icon}</div>
+      <div style="font-family:var(--pixel);font-size:4px;color:${earned?'var(--gold)':'var(--text)'}">${a.name}</div>
+      ${earned?'<div style="font-family:var(--pixel);font-size:3px;color:var(--green);margin-top:2px">✓ EARNED</div>':''}
+      <div id="ach-detail-${a.id}" style="display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
+        background:var(--bg2);border:1px solid var(--gold2);padding:8px 10px;width:140px;
+        font-family:var(--pixel);font-size:4px;color:var(--text2);line-height:1.8;
+        z-index:50;text-align:center;margin-bottom:4px;white-space:normal">
+        <div style="color:var(--gold);margin-bottom:3px">${a.name}</div>
+        ${a.req}
+      </div>
+    </div>`;
+  }).join('');
 }
 // ─── ACHIEVEMENTS ───
+function toggleAchDetail(id){
+  const el=document.getElementById('ach-detail-'+id);
+  if(!el)return;
+  // Close all others first
+  document.querySelectorAll('[id^="ach-detail-"]').forEach(d=>{
+    if(d.id!=='ach-detail-'+id)d.style.display='none';
+  });
+  el.style.display=el.style.display==='block'?'none':'block';
+}
+
 function closeCompletion(){
   document.getElementById('completion-overlay').style.display='none';
 }
