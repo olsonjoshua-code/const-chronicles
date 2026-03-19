@@ -3109,12 +3109,31 @@ function showFinalBossCutscene(ep){
 function backToBattleHall(){showScreen('map');}
 function renderTownBattleHall(){renderMap();}
 function renderEraScreen(ep){
+  const isBoss=!!ep.isFinalBoss;
   document.getElementById('era-header').innerHTML=`
     <button class="btn sm" onclick="showScreen('map')" style="margin-bottom:12px">← Back to Units</button>
-    <div style="font-family:var(--cinzel);font-size:13px;color:var(--gold);letter-spacing:.08em;margin-bottom:4px">${ep.icon} ${ep.name}</div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:14px">${ep.standards}</div>`;
+    <div style="font-family:var(--cinzel);font-size:13px;color:${isBoss?'var(--gold)':'var(--gold)'};letter-spacing:.08em;margin-bottom:4px">${ep.icon} ${ep.name}</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:14px">${isBoss?'Equip Ron Paul or Mises to deal damage!':ep.standards}</div>`;
   const list=document.getElementById('era-enemy-list');
   if(!ep.eras||!ep.eras.length){list.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:14px">Content loading...</div>';return;}
+  // Final boss — skip era selection, go straight to enemy list
+  if(isBoss){
+    const era=ep.eras[0];
+    const en=era.enemies[0];
+    const beaten=G.beatenEnemies.includes(en.id);
+    list.innerHTML=`<div style="text-align:center;padding:20px 0">
+      <div style="font-size:72px;margin-bottom:12px;filter:drop-shadow(0 0 20px gold)">${en.sprite}</div>
+      <div style="font-family:var(--cinzel);font-size:16px;color:var(--gold);margin-bottom:4px">${en.name}</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:6px">${en.title}</div>
+      <div style="font-size:12px;color:var(--gold);margin-bottom:16px">${en.rarityStars}</div>
+      <div style="font-family:var(--pixel);font-size:5px;color:var(--text2);max-width:280px;margin:0 auto 16px;line-height:1.8;border:1px solid var(--border);padding:12px;background:var(--bg2)">${en.fact}</div>
+      <div style="font-family:var(--pixel);font-size:5px;color:${beaten?'var(--green)':'var(--red)'};margin-bottom:16px">${beaten?'✓ DEFEATED — FOUNDING LEGEND!':'⚠️ Only Ron Paul or Mises can deal damage'}</div>
+      <button class="btn green full" onclick="startBattle('ep6','final_reckoning','college_board_boss')" style="max-width:280px;margin:0 auto;display:block;font-size:13px">
+        ${beaten?'⚔️ REMATCH THE COLLEGE BOARD':'⚔️ FACE THE COLLEGE BOARD'}
+      </button>
+    </div>`;
+    return;
+  }
   list.innerHTML=ep.eras.map(era=>{
     const unlocked=G.unlockedEras.includes(era.id)||era.alwaysUnlocked;
     const beaten=era.enemies.filter(e=>G.beatenEnemies.includes(e.id)).length;
@@ -3123,7 +3142,7 @@ function renderEraScreen(ep){
       onclick="${unlocked?`selectEra('${ep.id}','${era.id}')`:''}"
       onmouseover="${unlocked?"this.style.borderColor='var(--gold)'":''}"
       onmouseout="${unlocked?`this.style.borderColor='${complete?"var(--green)":"var(--border)"}'`:''}">
-      <div style="font-size:32px;flex-shrink:0">${era.icon}</div>
+      <div style="font-size:32px;flex-shrink:0">${era.icon||ep.icon}</div>
       <div>
         <div style="font-family:var(--pixel);font-size:6px;color:var(--text);margin-bottom:3px">${era.name}</div>
         <div style="font-size:13px;color:var(--text2)">${era.desc||''}</div>
