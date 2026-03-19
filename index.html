@@ -545,7 +545,10 @@ option{background:var(--bg2)}
       <div class="fighter-name" id="b-player-name">YOU</div>
       <div class="hp-row"><div class="hp-track"><div class="hp-bar p" id="b-player-hp-bar" style="width:100%"></div></div><div class="hp-num" id="b-player-hp-num">50</div></div>
     </div>
-    <div class="vs-txt" style="font-family:var(--cinzel);font-size:11px;color:var(--text3);letter-spacing:.1em">VS</div>
+    <div style="text-align:center">
+      <div class="vs-txt" style="font-family:var(--cinzel);font-size:11px;color:var(--text3);letter-spacing:.1em">VS</div>
+      <div id="hud-difficulty" style="font-family:var(--pixel);font-size:4px;margin-top:2px"></div>
+    </div>
     <div class="enemy-side">
       <div class="fighter-name" id="b-enemy-name">ENEMY</div>
       <div class="hp-row rev"><div class="hp-track"><div class="hp-bar e" id="b-enemy-hp-bar" style="width:100%"></div></div><div class="hp-num" id="b-enemy-hp-num">30</div></div>
@@ -679,6 +682,16 @@ option{background:var(--bg2)}
       <button class="btn sm" onclick="confirmRestart()" style="border-color:var(--red);color:var(--red)">🔄 RESTART</button>
       <button class="btn sm" onclick="goToLoginFromProfile()" style="border-color:var(--text3);color:var(--text3)">← LOGIN</button>
     </div>
+  </div>
+  <!-- Difficulty selector -->
+  <div style="background:var(--bg2);border:1px solid var(--border);padding:10px 12px;margin-bottom:12px">
+    <div style="font-family:var(--cinzel);font-size:10px;color:var(--text3);margin-bottom:8px;letter-spacing:.08em">⚔️ DIFFICULTY — changes take effect next battle</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px" id="diff-btns">
+      <button onclick="setDifficulty('easy')" id="diff-easy" class="btn sm full" style="font-size:9px">🌿 EASY</button>
+      <button onclick="setDifficulty('normal')" id="diff-normal" class="btn sm full" style="font-size:9px">⚔️ NORMAL</button>
+      <button onclick="setDifficulty('hard')" id="diff-hard" class="btn sm full" style="font-size:9px">💀 HARD</button>
+    </div>
+    <div id="diff-desc" style="font-family:var(--inter);font-size:11px;color:var(--text2);margin-top:8px;line-height:1.6;text-align:center"></div>
   </div>
   <div id="profile-header" style="text-align:center;padding-bottom:1rem;border-bottom:1px solid var(--border);margin-bottom:1rem"></div>
   <div id="profile-stats"></div>
@@ -1399,6 +1412,35 @@ const AVATAR_DEFS = [
     <text x="20" y="9.5" text-anchor="middle" font-size="4" fill="#ffd700">$</text>
     <rect x="15" y="22" width="10" height="1.5" rx="0.5" fill="#ffd700"/>`})},
 
+  {id:'mr_olson', name:'Mr. Olson', cat:'legendary', rarity:'legendary', cost:0, unlockMethod:'special', badge:'🏛️',
+   desc:'The architect of Constitutional Chronicles. AP Gov teacher, quest-giver, and keeper of the Republic.',
+   passive:{stat:'xpBonus', value:0.25, label:'+25% XP — knowledge is power'},
+   portrait:()=>makeMedallion({bg:'#0a0c14',ring:'#c9a84c',ring2:'#a8863a',face:`
+    <ellipse cx="12.5" cy="16" rx="1.8" ry="2.2" fill="#c8956a"/>
+    <ellipse cx="27.5" cy="16" rx="1.8" ry="2.2" fill="#c8956a"/>
+    <circle cx="20" cy="15" r="7.5" fill="#c8956a"/>
+    <ellipse cx="17" cy="10" rx="2.5" ry="1.5" fill="rgba(255,255,255,0.12)" transform="rotate(-20 17 10)"/>
+    <ellipse cx="20" cy="27" rx="9" ry="5.5" fill="#1a2a3a"/>
+    <rect x="13" y="22" width="14" height="8" fill="#1a2a3a"/>
+    <rect x="16" y="22" width="8" height="3" fill="#f0f0f0"/>
+    <polygon points="20,25 16,22 18,22" fill="#2a4a8a"/>
+    <polygon points="20,25 24,22 22,22" fill="#2a4a8a"/>
+    <rect x="13.2" y="12.5" width="7.2" height="5.2" rx="1.8" fill="none" stroke="#1a0800" stroke-width="1.4"/>
+    <rect x="19.6" y="12.5" width="7.2" height="5.2" rx="1.8" fill="none" stroke="#1a0800" stroke-width="1.4"/>
+    <line x1="20.5" y1="14.8" x2="19.5" y2="14.8" stroke="#1a0800" stroke-width="1.1"/>
+    <line x1="13.2" y1="14.8" x2="11.2" y2="15.8" stroke="#1a0800" stroke-width="1"/>
+    <line x1="26.8" y1="14.8" x2="28.8" y2="15.8" stroke="#1a0800" stroke-width="1"/>
+    <ellipse cx="17.5" cy="15.5" rx="1.2" ry="1.3" fill="#1a0a00"/>
+    <ellipse cx="22.5" cy="15.5" rx="1.2" ry="1.3" fill="#1a0a00"/>
+    <circle cx="18" cy="15" r="0.4" fill="white"/>
+    <circle cx="23" cy="15" r="0.4" fill="white"/>
+    <path d="M13.5 19.5 Q14.5 22.5 20 23.5 Q25.5 22.5 26.5 19.5 Q24 21.5 20 22 Q16 21.5 13.5 19.5Z" fill="#2a1a0a"/>
+    <path d="M16.5 18 Q18.5 19.5 20 19 Q21.5 19.5 23.5 18 Q22 20 20 19.5 Q18 20 16.5 18Z" fill="#2a1a0a"/>
+    <path d="M17.5 19 Q20 20.5 22.5 19" stroke="#a06030" stroke-width="0.7" fill="none"/>
+    <rect x="13.5" y="29" width="13" height="4.5" rx="0.8" fill="#c9a84c"/>
+    <text x="20" y="32.5" text-anchor="middle" font-size="2.8" fill="#0a0800" font-family="serif" font-weight="bold">MR. OLSON</text>
+   `})},
+
   {id:'mises', name:'Ludwig von Mises', cat:'ultra_mythic', rarity:'ultra_mythic', cost:9999, unlockMethod:'gold', badge:'📕',
    desc:'Human Action, the intellectual foundation of liberty. Equip Mises OR Ron Paul to defeat the final boss.',
    passive:{stat:'all', value:1, label:'ALL stats boosted, Human Action'},
@@ -1430,13 +1472,191 @@ const WEAPONS=[
 
 // ═══════════════ EPISODES (shell, data filled below) ═══════════════
 const EPISODES=[
+  {id:'ep0',num:0,name:'Training Grounds',period:'Master the Vocabulary',icon:'🎓',standards:'Essential AP Gov Key Terms',coming:false,
+   eras:[
+    {id:'training_unit1',name:'Unit 1 — Foundations',alwaysUnlocked:true,icon:'📜',desc:'Constitutional principles & democracy vocab',
+     enemies:[{
+      id:'train_unit1',name:'Foundations Drill',sprite:'📜',type:'training',
+      title:'Unit 1 Key Terms',rarity:'common',rarityStars:'★★☆☆☆',
+      hp:30,xpReward:60,goldReward:150,givePack:false,unlockAvatar:null,
+      standard:'LO 1.1–1.7',
+      fact:'Mastering Unit 1 vocabulary is essential — these terms appear on nearly every AP Gov FRQ.',
+      questions:[
+        {q:'The idea that government authority comes from the people, who consent to be governed',opts:['Popular sovereignty','Natural rights','Republicanism','Social contract'],a:0},
+        {q:'Rights that people are born with that cannot be taken away by government',opts:['Natural rights','Civil liberties','Enumerated rights','Popular sovereignty'],a:0},
+        {q:'A system where citizens elect representatives to make decisions on their behalf',opts:['Republicanism','Democracy','Federalism','Pluralism'],a:0},
+        {q:'An agreement among members of society to form a government and give up some freedoms in exchange for protection',opts:['Social contract','Popular sovereignty','Natural rights','Compact theory'],a:0},
+        {q:'The principle that government power is restricted by law, individual rights, and a constitution',opts:['Limited government','Separation of powers','Checks and balances','Federalism'],a:0},
+        {q:'The division of government power among legislative, executive, and judicial branches',opts:['Separation of powers','Federalism','Checks and balances','Enumerated powers'],a:0},
+        {q:'The system by which each branch of government can limit the power of the other branches',opts:['Checks and balances','Separation of powers','Federalism','Judicial review'],a:0},
+        {q:'The division of power between a national government and state governments',opts:['Federalism','Separation of powers','Devolution','Confederalism'],a:0},
+        {q:'Groups of citizens united by a common interest that may conflict with the rights of others or the whole community',opts:['Factions','Interest groups','Political parties','Coalitions'],a:0},
+        {q:'The power of courts to declare laws and executive actions unconstitutional',opts:['Judicial review','Judicial activism','Judicial restraint','Statutory interpretation'],a:0},
+        {q:'The philosophical basis for government — life, liberty, and property — as articulated by John Locke',opts:['Natural rights','Civil liberties','Unalienable rights','Popular sovereignty'],a:0},
+        {q:'Government derives its just powers from the consent of the governed — this principle is called',opts:['Popular sovereignty','Social contract','Republicanism','Natural law'],a:0},
+      ]
+     }]},
+    {id:'training_unit2',name:'Unit 2 — Branches',alwaysUnlocked:false,icon:'🏛️',desc:'Powers, Congress, Presidency & Courts vocab',
+     enemies:[{
+      id:'train_unit2',name:'Institutions Drill',sprite:'🏛️',type:'training',
+      title:'Unit 2 Key Terms',rarity:'common',rarityStars:'★★☆☆☆',
+      hp:35,xpReward:70,goldReward:175,givePack:false,unlockAvatar:null,
+      standard:'LO 2.1–2.16',
+      fact:'Understanding the branches and their powers is the foundation of AP Gov FRQ analysis.',
+      questions:[
+        {q:'Powers specifically listed in the Constitution and granted to Congress',opts:['Enumerated powers','Implied powers','Inherent powers','Reserved powers'],a:0},
+        {q:'Powers not explicitly listed but suggested by the necessary and proper clause',opts:['Implied powers','Enumerated powers','Concurrent powers','Discretionary powers'],a:0},
+        {q:'The constitutional provision allowing Congress to make all laws necessary and proper to carry out its duties',opts:['Necessary and proper clause','Commerce clause','Supremacy clause','Elastic clause'],a:0,hint:'Also called the elastic clause'},
+        {q:'Congress monitoring and reviewing the activities of executive branch agencies',opts:['Congressional oversight','Appropriations','Legislative veto','Advice and consent'],a:0},
+        {q:'The complex system of agencies and departments that implement laws',opts:['Bureaucracy','Cabinet','Executive office','Civil service'],a:0},
+        {q:'The freedom of bureaucrats and agencies to make choices within the limits set by law',opts:['Discretionary authority','Implied powers','Delegated authority','Rule making'],a:0},
+        {q:'The president\'s constitutional power to reject legislation passed by Congress',opts:['Veto','Pocket veto','Line-item veto','Executive order'],a:0},
+        {q:'The formal process by which the House charges and Senate tries a federal official for misconduct',opts:['Impeachment','Censure','Expulsion','Recall'],a:0},
+        {q:'When judges interpret the Constitution broadly, often expanding rights or government power',opts:['Judicial activism','Judicial restraint','Strict constructionism','Originalism'],a:0},
+        {q:'When judges defer to the elected branches and interpret the Constitution narrowly',opts:['Judicial restraint','Judicial activism','Judicial review','Loose constructionism'],a:0},
+        {q:'Federal grants given to states for specific purposes with strings attached',opts:['Categorical grants','Block grants','Revenue sharing','Matching grants'],a:0},
+        {q:'Federal grants given to states with few restrictions on how money is spent',opts:['Block grants','Categorical grants','Revenue sharing','Formula grants'],a:0},
+      ]
+     }]},
+    {id:'training_unit3',name:'Unit 3 — Civil Liberties',alwaysUnlocked:false,icon:'⚖️',desc:'Rights, liberties & equality vocab',
+     enemies:[{
+      id:'train_unit3',name:'Liberties Drill',sprite:'⚖️',type:'training',
+      title:'Unit 3 Key Terms',rarity:'common',rarityStars:'★★☆☆☆',
+      hp:40,xpReward:80,goldReward:200,givePack:false,unlockAvatar:null,
+      standard:'LO 3.1–3.12',
+      fact:'Civil liberties and civil rights questions appear on virtually every AP Gov exam.',
+      questions:[
+        {q:'The constitutional requirement that the government follow fair procedures before depriving someone of life, liberty, or property',opts:['Due process','Equal protection','Selective incorporation','Civil liberties'],a:0},
+        {q:'The 14th Amendment requirement that government treat similarly situated people the same way',opts:['Equal protection','Due process','Civil rights','Affirmative action'],a:0},
+        {q:'The process by which the Supreme Court has applied most Bill of Rights protections to state governments',opts:['Selective incorporation','Due process','Equal protection','Federalism'],a:0},
+        {q:'The First Amendment prohibition on government laws respecting an establishment of religion',opts:['Establishment clause','Free exercise clause','Separation of church and state','Lemon test'],a:0},
+        {q:'The First Amendment protection of individuals\' rights to practice their religion',opts:['Free exercise clause','Establishment clause','Freedom of religion','Lemon test'],a:0},
+        {q:'Government censorship of expression before it is published or broadcast',opts:['Prior restraint','Censorship','Libel','Clear and present danger'],a:0},
+        {q:'Nonverbal communication protected by the First Amendment, such as wearing armbands or burning flags',opts:['Symbolic speech','Protected speech','Expressive conduct','Political speech'],a:0},
+        {q:'Protections against government interference with individual freedoms',opts:['Civil liberties','Civil rights','Natural rights','Constitutional rights'],a:0},
+        {q:'The legal rights of individuals to equal treatment under the law regardless of race, gender, etc.',opts:['Civil rights','Civil liberties','Equal protection','Due process'],a:0},
+        {q:'Policies that give preferential treatment to minorities or women to remedy past discrimination',opts:['Affirmative action','Equal protection','Civil rights','Compensatory justice'],a:0},
+        {q:'The principle that certain speech can be banned only if it poses an immediate danger',opts:['Clear and present danger','Prior restraint','Symbolic speech','Preferred freedoms'],a:0},
+        {q:'The Supreme Court test for Establishment Clause cases: purpose, effect, and entanglement',opts:['Lemon test','Clear and present danger test','Balancing test','Rational basis test'],a:0},
+      ]
+     }]},
+    {id:'training_unit4',name:'Unit 4 — Ideology',alwaysUnlocked:false,icon:'🗳️',desc:'Opinion, ideology & political culture vocab',
+     enemies:[{
+      id:'train_unit4',name:'Ideology Drill',sprite:'🗳️',type:'training',
+      title:'Unit 4 Key Terms',rarity:'common',rarityStars:'★★☆☆☆',
+      hp:42,xpReward:85,goldReward:210,givePack:false,unlockAvatar:null,
+      standard:'LO 4.1–4.10',
+      fact:'Understanding how public opinion forms and changes is key to analyzing elections and policy.',
+      questions:[
+        {q:'The process by which individuals develop their political values and beliefs',opts:['Political socialization','Political culture','Ideology formation','Political learning'],a:0},
+        {q:'A consistent set of beliefs about the proper role of government in society',opts:['Ideology','Political culture','Political socialization','Partisanship'],a:0},
+        {q:'The belief in government action to promote equality, individual rights, and social welfare',opts:['Liberalism','Conservatism','Libertarianism','Progressivism'],a:0},
+        {q:'The belief in limited government, free markets, traditional values, and individual responsibility',opts:['Conservatism','Liberalism','Libertarianism','Authoritarianism'],a:0},
+        {q:'The belief in maximum individual freedom and minimal government intervention in both economic and personal life',opts:['Libertarianism','Conservatism','Liberalism','Anarchism'],a:0},
+        {q:'Widely shared values and beliefs about government, politics, and society in a country',opts:['Political culture','Public opinion','Political socialization','Civic culture'],a:0},
+        {q:'The aggregation of individual attitudes about political issues, candidates, and institutions',opts:['Public opinion','Political culture','Political socialization','Mass opinion'],a:0},
+        {q:'Scientific surveys designed to measure public opinion on political issues',opts:['Polling','Sampling','Exit polls','Survey research'],a:0},
+        {q:'A person\'s psychological attachment to a political party',opts:['Party identification','Partisanship','Party loyalty','Partisan alignment'],a:0},
+        {q:'The process by which government officials decide which problems to address and what solutions to adopt',opts:['Policy making','Agenda setting','Incrementalism','Issue framing'],a:0},
+        {q:'The process of bringing issues to the attention of government and the public',opts:['Agenda setting','Policy making','Issue framing','Political priming'],a:0},
+        {q:'The way in which issues are presented can influence how people think about them',opts:['Framing','Agenda setting','Priming','Political socialization'],a:0},
+      ]
+     }]},
+    {id:'training_unit5',name:'Unit 5 — Participation',alwaysUnlocked:false,icon:'🌐',desc:'Parties, elections & interest groups vocab',
+     enemies:[{
+      id:'train_unit5',name:'Participation Drill',sprite:'🌐',type:'training',
+      title:'Unit 5 Key Terms',rarity:'common',rarityStars:'★★☆☆☆',
+      hp:45,xpReward:90,goldReward:225,givePack:false,unlockAvatar:null,
+      standard:'LO 5.1–5.12',
+      fact:'Elections, parties, and interest groups connect citizens to government — the key to Unit 5.',
+      questions:[
+        {q:'Institutions that connect citizens to government, including parties, media, elections, and interest groups',opts:['Linkage institutions','Political parties','Interest groups','Civil society'],a:0},
+        {q:'Organizations that seek to control government by nominating and electing candidates',opts:['Political parties','Interest groups','PACs','Linkage institutions'],a:0},
+        {q:'Organizations that try to influence government policy without running candidates for office',opts:['Interest groups','Political parties','PACs','Lobbying groups'],a:0},
+        {q:'Organizations that raise and spend money to elect or defeat candidates, subject to federal limits',opts:['PACs','Super PACs','Interest groups','527 organizations'],a:0},
+        {q:'Independent expenditure committees that can raise unlimited money but cannot coordinate with campaigns',opts:['Super PACs','PACs','Interest groups','Dark money groups'],a:0},
+        {q:'Elections in which voters choose party nominees for the general election',opts:['Primaries','Caucuses','General elections','Runoff elections'],a:0},
+        {q:'The system by which each state gets electors equal to its congressional representation to elect the president',opts:['Electoral college','Popular vote','Proportional representation','Winner-take-all'],a:0},
+        {q:'The redrawing of congressional district lines after each census based on population changes',opts:['Reapportionment','Redistricting','Gerrymandering','Apportionment'],a:0},
+        {q:'The redrawing of district boundaries within a state after reapportionment',opts:['Redistricting','Reapportionment','Gerrymandering','Realignment'],a:0},
+        {q:'Drawing district lines to give one party an electoral advantage',opts:['Gerrymandering','Redistricting','Reapportionment','Packing'],a:0},
+        {q:'When one party draws districts to concentrate the opposing party\'s voters into a few districts',opts:['Packing','Cracking','Gerrymandering','Redistricting'],a:0},
+        {q:'When one party draws districts to spread the opposing party\'s voters across many districts, diluting their power',opts:['Cracking','Packing','Gerrymandering','Reapportionment'],a:0},
+      ]
+     }]},
+   ],
+   timeline:[]},
+
   {id:'ep1',num:1,name:'Foundations of American Democracy',period:'1776–1789',icon:'📜',standards:'LO 1.1–1.9 · 15–22% of AP Exam',coming:false,eras:[],timeline:[]},
   {id:'ep2',num:2,name:'Interactions Among Branches',period:'Congress, Executive, Courts',icon:'🏛️',standards:'LO 2.1–2.15 · 25–36% of AP Exam, Congress, Presidency, Courts',coming:true,eras:[],timeline:[]},
   {id:'ep3',num:3,name:'Civil Liberties & Civil Rights',period:'Bill of Rights & Beyond',icon:'⚖️',standards:'LO 3.1–3.12 · 13–18% of AP Exam',coming:true,eras:[],timeline:[]},
   {id:'ep4',num:4,name:'Political Ideologies & Beliefs',period:'Left, Right & Center',icon:'🗳️',standards:'LO 4.1–4.10 · 10–15% of AP Exam',coming:true,eras:[],timeline:[]},
   {id:'ep5',num:5,name:'Political Participation',period:'Voting, Parties & Media',icon:'🌐',standards:'LO 5.1–5.12 · 20–27% of AP Exam',coming:true,eras:[],timeline:[]},
 
-  {id:'ep6',num:6,name:'The Ultimate Reckoning',period:'Face the Final Boss',icon:'⚔️',standards:'Complete all units to unlock',coming:false,isFinalBoss:true,
+  {id:'ep6_scotus',num:6,name:'SCOTUS Gauntlet',period:'Landmark Cases',icon:'⚖️',standards:'Master the Required SCOTUS Cases',coming:false,
+   eras:[
+    {id:'scotus_gauntlet_era',name:'Landmark Cases',alwaysUnlocked:false,icon:'⚖️',desc:'Facts, holdings, reasoning and constitutional principles',
+     enemies:[{
+      id:'scotus_gauntlet',name:'The SCOTUS Gauntlet',sprite:'⚖️',type:'boss',
+      title:'All Required Cases',rarity:'legendary',rarityStars:'★★★★☆',
+      hp:80,xpReward:300,goldReward:600,givePack:true,unlockAvatar:null,
+      standard:'Required SCOTUS Cases',
+      fact:'The AP exam requires knowledge of 15 required SCOTUS cases. Know the facts, holding, reasoning, and constitutional principle of each.',
+      questions:[
+        {q:'Which case established that the Supreme Court has the power to declare laws unconstitutional?',opts:['Marbury v. Madison','McCulloch v. Maryland','Gibbons v. Ogden','Fletcher v. Peck'],a:0},
+        {q:'Marbury v. Madison established which constitutional principle?',opts:['Judicial review','Federalism','Separation of powers','Checks and balances'],a:0},
+        {q:'Which case held that Congress has broad power to charter a national bank under implied powers?',opts:['McCulloch v. Maryland','Marbury v. Madison','Gibbons v. Ogden','US v. Lopez'],a:0},
+        {q:'McCulloch v. Maryland established that states cannot tax federal institutions based on which principle?',opts:['Federal supremacy','Judicial review','Enumerated powers','Commerce clause'],a:0},
+        {q:'Which case held that students do not shed constitutional rights at the schoolhouse gate?',opts:['Tinker v. Des Moines','Engel v. Vitale','Schenck v. US','Brandenburg v. Ohio'],a:0},
+        {q:'In Tinker v. Des Moines, students wearing black armbands to protest Vietnam was ruled to be',opts:['Protected symbolic speech','Unprotected speech','Disruptive conduct','Prior restraint'],a:0},
+        {q:'Which case held that school-sponsored prayer violates the Establishment Clause?',opts:['Engel v. Vitale','Tinker v. Des Moines','Wisconsin v. Yoder','Lemon v. Kurtzman'],a:0},
+        {q:'Which case created the "clear and present danger" test for limiting free speech?',opts:['Schenck v. United States','Brandenburg v. Ohio','Tinker v. Des Moines','Gitlow v. New York'],a:0},
+        {q:'Which case held that the Second Amendment protects an individual right to possess firearms?',opts:['District of Columbia v. Heller','McDonald v. Chicago','US v. Miller','Caetano v. Massachusetts'],a:0},
+        {q:'Which case incorporated the Second Amendment to apply to state governments?',opts:['McDonald v. City of Chicago','DC v. Heller','US v. Miller','Caetano v. Massachusetts'],a:0},
+        {q:'Which case held that the 4th Amendment requires police to have a warrant to search a home?',opts:['Mapp v. Ohio','Terry v. Ohio','Katz v. US','Weeks v. US'],a:0},
+        {q:'Mapp v. Ohio applied which constitutional protection to state criminal proceedings?',opts:['Exclusionary rule','Miranda rights','Right to counsel','Double jeopardy'],a:0},
+        {q:'Which case held that suspects must be informed of their rights before police interrogation?',opts:['Miranda v. Arizona','Gideon v. Wainwright','Mapp v. Ohio','Escobedo v. Illinois'],a:0},
+        {q:'Which case held that states must provide attorneys to defendants who cannot afford one?',opts:['Gideon v. Wainwright','Miranda v. Arizona','Powell v. Alabama','Argersinger v. Hamlin'],a:0},
+        {q:'Which case struck down laws prohibiting same-sex marriage as unconstitutional?',opts:['Obergefell v. Hodges','Lawrence v. Texas','Romer v. Evans','US v. Windsor'],a:0},
+        {q:'Brown v. Board of Education overturned which earlier case that established "separate but equal"?',opts:['Plessy v. Ferguson','Korematsu v. US','Dred Scott v. Sandford','Lochner v. New York'],a:0},
+        {q:'Which case held that racial segregation in public schools violated the Equal Protection Clause?',opts:['Brown v. Board of Education','Plessy v. Ferguson','Regents v. Bakke','Swann v. Charlotte'],a:0},
+        {q:'Citizens United v. FEC held that political spending by corporations is protected by which amendment?',opts:['First Amendment','Fourth Amendment','Fifth Amendment','Fourteenth Amendment'],a:0},
+        {q:'Which case limited Congress\'s use of the Commerce Clause by striking down the Gun-Free School Zones Act?',opts:['United States v. Lopez','McCulloch v. Maryland','Gibbons v. Ogden','NFIB v. Sebelius'],a:0},
+        {q:'Shaw v. Reno held that racial gerrymandering must survive which level of judicial scrutiny?',opts:['Strict scrutiny','Rational basis','Intermediate scrutiny','Compelling interest'],a:0},
+      ]
+     }]},
+   ],timeline:[]},
+
+  {id:'ep7_docs',num:7,name:'Documents Challenge',period:'Foundational Texts',icon:'📜',standards:'Master the Required Foundational Documents',coming:false,
+   eras:[
+    {id:'docs_challenge_era',name:'Foundational Documents',alwaysUnlocked:false,icon:'📜',desc:'Identify documents from descriptions and quotes',
+     enemies:[{
+      id:'docs_gauntlet',name:'The Documents Challenge',sprite:'📜',type:'boss',
+      title:'All Required Documents',rarity:'legendary',rarityStars:'★★★★☆',
+      hp:80,xpReward:300,goldReward:600,givePack:true,unlockAvatar:null,
+      standard:'Required Foundational Documents',
+      fact:'AP Gov requires knowledge of 9 foundational documents. Know their authors, arguments, and historical significance.',
+      questions:[
+        {q:'This document argued that a large republic with many factions is better than a small one because factions will cancel each other out',opts:['Federalist No. 10','Federalist No. 51','Brutus No. 1','Articles of Confederation'],a:0},
+        {q:'James Madison wrote this essay to argue that "ambition must be made to counteract ambition" through separation of powers',opts:['Federalist No. 51','Federalist No. 10','Federalist No. 78','Anti-Federalist No. 1'],a:0},
+        {q:'This Anti-Federalist essay warned that the new Constitution would lead to tyranny and destroy state governments',opts:['Brutus No. 1','Federalist No. 10','Federalist No. 51','Common Sense'],a:0},
+        {q:'This document declared that "all men are created equal" and listed grievances against King George III',opts:['Declaration of Independence','Articles of Confederation','The Constitution','Common Sense'],a:0},
+        {q:'This document established a weak central government with no executive, no federal courts, and no power to tax',opts:['Articles of Confederation','Declaration of Independence','The Constitution','Federalist No. 10'],a:0},
+        {q:'The first ten amendments to the Constitution protecting individual rights from government interference',opts:['Bill of Rights','Declaration of Independence','Articles of Confederation','Magna Carta'],a:0},
+        {q:'This founding document begins "We the People" and establishes the framework of the federal government',opts:['The Constitution','Articles of Confederation','Declaration of Independence','Bill of Rights'],a:0},
+        {q:'Alexander Hamilton argued in this essay that the Supreme Court would be the "least dangerous branch"',opts:['Federalist No. 78','Federalist No. 51','Federalist No. 10','Federalist No. 70'],a:0},
+        {q:'This letter argued that the Constitution needed a Bill of Rights and that the federal judiciary was too powerful',opts:['Brutus No. 1','Federalist No. 10','Anti-Federalist Papers','Letters of a Federal Farmer'],a:0},
+        {q:'Which document first articulated the principle that governments derive their just powers from the consent of the governed?',opts:['Declaration of Independence','The Constitution','Federalist No. 51','Articles of Confederation'],a:0},
+        {q:'The argument that separation of powers prevents tyranny was central to which document?',opts:['Federalist No. 51','Federalist No. 10','Brutus No. 1','The Constitution'],a:0},
+        {q:'Which document replaced the Articles of Confederation and created a stronger national government?',opts:['The Constitution','Federalist No. 10','Declaration of Independence','Northwest Ordinance'],a:0},
+        {q:'Madison argued in this document that factions are inevitable in a free society but can be controlled through a large republic',opts:['Federalist No. 10','Federalist No. 51','Brutus No. 1','Federalist No. 78'],a:0},
+        {q:'The phrase "necessary and proper" giving Congress implied powers appears in which document?',opts:['The Constitution','Articles of Confederation','Federalist No. 51','Declaration of Independence'],a:0},
+        {q:'Which foundational document protects freedom of speech, religion, press, assembly and petition?',opts:['Bill of Rights','The Constitution','Declaration of Independence','Articles of Confederation'],a:0},
+      ]
+     }]},
+   ],timeline:[]},
+
+  {id:'ep6',num:8,name:'The Ultimate Reckoning',period:'Face the Final Boss',icon:'⚔️',standards:'Complete all units to unlock',coming:false,isFinalBoss:true,
    eras:[{
     id:'final_reckoning',name:'The Final Reckoning',
     enemies:[{
@@ -1447,7 +1667,7 @@ const EPISODES=[
       title:'The Ultimate Bureaucratic Overlord',
       rarity:'legendary',
       rarityStars:'★★★★★',
-      hp:120,
+      hp:400,
       xpReward:500,
       goldReward:1000,
       givePack:true,
@@ -1487,7 +1707,7 @@ const EPISODES=[
 ];
 
 // ═══════════════ UNIT 1 DATA ═══════════════
-EPISODES[0].eras=[
+EPISODES[1].eras=[
   {id:'founding_docs',name:'The Founding Documents',icon:'📜',alwaysUnlocked:true,
    desc:'The philosophical foundations, from Locke to the Constitution.',
    enemies:[
@@ -1691,7 +1911,7 @@ EPISODES[0].eras=[
    ]},
 ];
 
-EPISODES[0].timeline=[
+EPISODES[1].timeline=[
   {year:'1689',title:"Locke's Two Treatises",figure:'declaration',sprite:'📖',desc:"Natural rights and social contract theory, Jefferson draws directly from these ideas 87 years later."},
   {year:'1776',title:'Declaration of Independence',figure:'declaration',sprite:'🦅',desc:"Jefferson declares independence and articulates the philosophical basis for American government, equality, natural rights, popular sovereignty."},
   {year:'1781',title:'Articles of Confederation',figure:'articles_conf',sprite:'📋',desc:"America's first constitution creates a deliberately weak national government, too weak, it turns out."},
@@ -2780,9 +3000,9 @@ EPISODES[4].timeline = [
 // ═══════════════ GAME STATE ═══════════════
 let G=null,BT={},currentScreen="login",shopTab="weapons",lbSyncInterval=null,lbTab="all",tdPeriodFilter="all",tdSort="score",tdSortDir=-1;
 function defaultState(){
-  return {name:'',avatarId:'scholar',level:1,xp:0,score:0,gold:0,packs:0,hp:50,maxHp:50,
-    collection:[],beatenEnemies:[],unlockedEras:[],unlockedEpisodes:['ep1'],
-    unlockedAvatars:['scholar','advocate','senator'],
+  return {name:'',avatarId:'scholar',level:1,xp:0,score:0,gold:0,packs:0,hp:50,maxHp:50,difficulty:'easy',seenNarratives:[],
+    collection:[],beatenEnemies:[],unlockedEras:[],unlockedEpisodes:['ep0'],
+    unlockedAvatars:['scholar','advocate','senator','mr_olson'],
     ownedWeapons:['quill'],ownedArmors:['none'],equippedWeapon:'quill',equippedArmor:'none',
     inventory:{},achievements:[],wins:0,losses:0,qCorrect:0,qTotal:0,
     currentStreak:0,maxStreak:0,noHintWins:0,activeXpBoost:false,activeGoldBoost:false,
@@ -2806,6 +3026,20 @@ function loadSave(){
       G=JSON.parse(s);
       // Migrate: add battleStreak if missing
       if(G.battleStreak===undefined)G.battleStreak=0;
+      if(!G.difficulty)G.difficulty='easy';
+      if(!G.seenNarratives)G.seenNarratives=[];
+      if(!G.unlockedAvatars.includes('mr_olson'))G.unlockedAvatars.push('mr_olson');
+      // Migrate: ensure ep0 is in unlockedEpisodes for existing saves
+      if(!G.unlockedEpisodes.includes('ep0'))G.unlockedEpisodes.push('ep0');
+      // Migrate: if ep0 not complete yet, lock ep1 behind it
+      const ep0Done=(function(){
+        const ep0=EPISODES.find(e=>e.id==='ep0');
+        if(!ep0)return true; // safety
+        return (ep0.eras||[]).every(era=>era.enemies.every(e=>G.beatenEnemies.includes(e.id)));
+      })();
+      if(!ep0Done&&G.unlockedEpisodes.includes('ep1')){
+        G.unlockedEpisodes=G.unlockedEpisodes.filter(id=>id!=='ep1');
+      }
       // Migrate: reset avatarId if it no longer exists in AVATAR_DEFS
       const validIds=AVATAR_DEFS.filter(a=>a.portrait).map(a=>a.id);
       if(!validIds.includes(G.avatarId))G.avatarId='scholar';
@@ -3036,7 +3270,7 @@ function renderMap(){
 
   list.innerHTML=EPISODES.map(ep=>{
     const isBoss=!!ep.isFinalBoss;
-    const unlocked=G.unlockedEpisodes.includes(ep.id)&&G.level>=1;
+    const unlocked=(ep.num===0)||(G.unlockedEpisodes.includes(ep.id)&&G.level>=1);
     const coming=ep.coming;
     const eras=ep.eras||[];
     const beaten=eras.reduce((n,era)=>n+era.enemies.filter(e=>G.beatenEnemies.includes(e.id)).length,0);
@@ -3051,22 +3285,182 @@ function renderMap(){
     return `<div class="unit-card ${coming||!unlocked?'locked':''} ${complete?'complete':''}" style="${bossCardStyle}" onclick="${clickFn}">
       <div class="unit-icon" style="${isBoss&&unlocked?'font-size:32px;filter:drop-shadow(0 0 8px gold)':''}">${ep.icon}</div>
       <div class="unit-info">
-        <div class="unit-name" style="${isBoss?'color:var(--gold)':''}">${'UNIT '+ep.num+(isBoss?' — ':',')+ep.name.toUpperCase()}</div>
+        <div class="unit-name" style="${isBoss?'color:var(--gold)':ep.num===0?'color:var(--teal)':''}">${ep.num===0?'🎓 '+ep.name.toUpperCase():isBoss?'⚔️ '+ep.name.toUpperCase():'UNIT '+ep.num+' — '+ep.name.toUpperCase()}</div>
         <div class="unit-sub">${ep.standards}</div>
-        ${unlocked&&!coming?`<div class="unit-prog" style="${isBoss?'color:var(--gold)':''}">${isBoss?'Equip Ron Paul or Mises to deal damage!':beaten+'/'+total+' challenges complete'}</div>`:''}
-        ${!unlocked&&!coming?`<div style="font-size:12px;color:var(--text3)">${isBoss?'Complete all units to unlock':'Complete Unit '+(ep.num-1)+' to unlock'}</div>`:''}
+        ${unlocked&&!coming?`<div class="unit-prog" style="${isBoss?'color:var(--gold)':ep.num===0?'color:var(--teal)':''}">${isBoss?'Equip Ron Paul or Mises to deal damage!':beaten+'/'+total+' challenges complete'}</div>`:''}
+        ${!unlocked&&!coming?`<div style="font-size:12px;color:var(--text3)">${isBoss?'Complete all units to unlock':ep.num===0?'':ep.num===1?'Complete Training Grounds to unlock':'Complete Unit '+(ep.num-1)+' to unlock'}</div>`:''}
       </div>
       <div class="unit-badge" style="${bStyle}">${bTxt}</div>
     </div>`;
   }).join('');
 }
+// ── CHAPTER NARRATIVES ──
+const CHAPTER_NARRATIVES={
+  ep0:{
+    npc:'mr_olson',
+    npcName:'Mr. Olson',
+    npcTitle:'AP Gov Teacher & Quest-Giver',
+    title:'Welcome to the Republic',
+    lines:[
+      "Welcome, Citizen. Before you can serve this Republic, you must speak its language.",
+      "I've seen students try to fight their way through constitutional law without knowing the vocabulary. It doesn't end well.",
+      "Complete your training first. Learn the terms. Master the definitions. Then — and only then — will the gates of Unit 1 open.",
+      "The Republic is counting on you. Don't let me down."
+    ]
+  },
+  ep1:{
+    npc:'madison_av',
+    npcName:'James Madison',
+    npcTitle:'Father of the Constitution',
+    title:'The Founding Era Begins',
+    lines:[
+      "The year is 1787. The Articles of Confederation have collapsed. Thirteen states bicker and drift apart.",
+      "We gather in Philadelphia with an impossible task — build a government strong enough to survive, yet restrained enough to remain free.",
+      "The documents we write here will define a nation for centuries. Study them well, Citizen.",
+      "The fate of the great experiment in self-governance rests on those who understand it. That must be you."
+    ]
+  },
+  ep2:{
+    npc:'hamilton_av',
+    npcName:'Alexander Hamilton',
+    npcTitle:'Federalist & First Treasury Secretary',
+    title:'The Battle for Power',
+    lines:[
+      "The Constitution is ratified. But ink on parchment means nothing without enforcement.",
+      "Congress claims the power of the purse. The President commands the army. The Courts interpret the law.",
+      "These branches were designed to fight each other — ambition counteracting ambition. Only by understanding this system can you navigate it.",
+      "Energy in the executive is essential to good government. Are you ready to prove it?"
+    ]
+  },
+  ep3:{
+    npc:'thurgood',
+    npcName:'Thurgood Marshall',
+    npcTitle:'Associate Justice, U.S. Supreme Court',
+    title:'The Fight for Liberty',
+    lines:[
+      "The Constitution promised liberty. But for too many Americans, that promise went unkept for generations.",
+      "Civil liberties protect the individual from the government. Civil rights protect the individual from discrimination.",
+      "These are not abstract principles — they are the difference between justice and oppression.",
+      "Study the cases. Know the holdings. Understand what was won, and what it cost to win it."
+    ]
+  },
+  ep4:{
+    npc:'aoc',
+    npcName:'Alexandria Ocasio-Cortez',
+    npcTitle:'U.S. Representative, NY-14',
+    title:'The Battle of Ideas',
+    lines:[
+      "Politics isn't just about who wins elections. It's about who shapes what people believe is possible.",
+      "Political socialization, ideology, public opinion — these are the invisible forces that move governments.",
+      "Understanding how people form their political beliefs is how you understand why democracies make the decisions they do.",
+      "Knowledge is power. Let's get to work."
+    ]
+  },
+  ep5:{
+    npc:'ron_paul',
+    npcName:'Ron Paul',
+    npcTitle:'Congressman & Champion of Liberty',
+    title:'The Voice of the People',
+    lines:[
+      "Liberty is not given by governments. It is exercised by citizens who understand their rights and demand them.",
+      "Linkage institutions — parties, interest groups, media, elections — these are how the people's voice reaches power.",
+      "Or how it gets distorted, filtered, and ignored. Know the system, Citizen.",
+      "An educated citizenry is a vital requisite for our survival as a free people. That's what this is about."
+    ]
+  },
+  ep6_scotus:{
+    npc:'scott_horton',
+    npcName:'Scott Horton',
+    npcTitle:'Constitutional Law Expert',
+    title:'The SCOTUS Gauntlet',
+    lines:[
+      "The Supreme Court is the final word on what the Constitution means — and that word has changed dramatically over two centuries.",
+      "Every landmark case before you represents a moment when the Court defined the limits of government power.",
+      "Facts. Holding. Reasoning. Constitutional principle. Know all four for every case.",
+      "The AP exam will test you on these. I will test you harder. Begin."
+    ]
+  },
+  ep7_docs:{
+    npc:'jefferson',
+    npcName:'Thomas Jefferson',
+    npcTitle:'Author of the Declaration',
+    title:'The Documents Challenge',
+    lines:[
+      "Words have power. The documents of the American founding shaped the laws, the courts, and the minds of a nation.",
+      "Federalist No. 10. Brutus No. 1. The Declaration. The Constitution itself. Each made arguments that still echo today.",
+      "Can you identify an argument by its logic alone? Can you match a passage to its author?",
+      "Prove that you have studied these texts — not merely seen them."
+    ]
+  },
+};
+
 function selectEpisode(epId){
   const ep=EPISODES.find(e=>e.id===epId);if(!ep||ep.coming)return;
-  if(ep.isFinalBoss){
-    showFinalBossCutscene(ep);
+  if(ep.isFinalBoss){showFinalBossCutscene(ep);return;}
+  // Show narrative if first time entering this episode
+  const narrative=CHAPTER_NARRATIVES[epId];
+  if(narrative&&!G.seenNarratives){G.seenNarratives=[];}
+  if(narrative&&!G.seenNarratives.includes(epId)){
+    showChapterNarrative(epId,narrative,ep);
     return;
   }
   renderEraScreen(ep);showScreen('era');
+}
+
+function showChapterNarrative(epId,n,ep){
+  const npcDef=AVATAR_DEFS.find(a=>a.id===n.npc);
+  const portrait=npcDef?getMedallionSVG(n.npc,90):'<div style="font-size:64px">🏛️</div>';
+  let lineIdx=0;
+  const overlay=document.createElement('div');
+  overlay.id='narrative-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:950;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center';
+
+  function render(){
+    const isLast=lineIdx>=n.lines.length-1;
+    overlay.innerHTML=`
+      <div style="font-family:var(--cinzel);font-size:9px;color:var(--text3);letter-spacing:.15em;margin-bottom:20px">— CHAPTER ${EPISODES.indexOf(ep)+1} —</div>
+      <div style="font-family:var(--cinzel);font-size:18px;color:var(--gold);margin-bottom:6px;letter-spacing:.06em">${n.title}</div>
+      <div style="font-family:var(--inter);font-size:11px;color:var(--text3);margin-bottom:24px;font-style:italic">${n.npcTitle}</div>
+      <div style="width:90px;height:90px;border-radius:50%;overflow:hidden;margin:0 auto 16px;border:2px solid var(--gold2);filter:drop-shadow(0 0 16px rgba(201,168,76,.4))">${portrait}</div>
+      <div style="font-family:var(--cinzel);font-size:12px;color:var(--gold);margin-bottom:20px">${n.npcName}</div>
+      <div style="max-width:380px;margin:0 auto 28px;background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--gold);padding:18px 20px">
+        <div style="font-family:var(--inter);font-size:14px;color:var(--text);line-height:1.8;font-style:italic">"${n.lines[lineIdx]}"</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        ${lineIdx>0?'<button onclick="window._narrativePrev()" style="font-family:var(--cinzel);font-size:10px;background:transparent;border:1px solid var(--text3);color:var(--text3);padding:8px 16px;cursor:pointer">← BACK</button>':''}
+        <button onclick="window._narrativeNext()" style="font-family:var(--cinzel);font-size:12px;background:${isLast?'var(--gold)':'transparent'};border:2px solid var(--gold);color:${isLast?'var(--bg)':'var(--gold)'};padding:10px 24px;cursor:pointer;letter-spacing:.06em">
+          ${isLast?'⚔️ BEGIN':'NEXT →'}
+        </button>
+        <button onclick="window._narrativeSkip()" style="font-family:var(--cinzel);font-size:9px;background:transparent;border:1px solid var(--border);color:var(--text3);padding:8px 14px;cursor:pointer">SKIP</button>
+      </div>
+      <div style="font-family:var(--pixel);font-size:4px;color:var(--text3);margin-top:16px">${lineIdx+1} / ${n.lines.length}</div>
+    `;
+  }
+
+  window._narrativeNext=function(){
+    if(lineIdx<n.lines.length-1){lineIdx++;render();}
+    else{
+      if(!G.seenNarratives)G.seenNarratives=[];
+      if(!G.unlockedAvatars.includes('mr_olson'))G.unlockedAvatars.push('mr_olson');
+      G.seenNarratives.push(epId);
+      save();
+      overlay.remove();
+      renderEraScreen(ep);showScreen('era');
+    }
+  };
+  window._narrativePrev=function(){if(lineIdx>0){lineIdx--;render();}};
+  window._narrativeSkip=function(){
+    if(!G.seenNarratives)G.seenNarratives=[];
+      if(!G.unlockedAvatars.includes('mr_olson'))G.unlockedAvatars.push('mr_olson');
+    G.seenNarratives.push(epId);
+    save();
+    overlay.remove();
+    renderEraScreen(ep);showScreen('era');
+  };
+
+  render();
+  document.body.appendChild(overlay);
+  SFX.stopBattle();
 }
 
 function showFinalBossCutscene(ep){
@@ -3181,6 +3575,11 @@ function checkEraUnlocks(){
       if(prevDone&&!G.unlockedEras.includes(era.id)){G.unlockedEras.push(era.id);showMapNotif('NEW SECTION: '+era.name.toUpperCase()+'!');}
     });
     const epDone=ep.eras.every(era=>era.enemies.every(e=>G.beatenEnemies.includes(e.id)));
+    // Special: ep0 (Training) unlocks ep1, regardless of order
+    if(epDone&&ep.id==='ep0'&&!G.unlockedEpisodes.includes('ep1')){
+      G.unlockedEpisodes.push('ep1');
+      showMapNotif('🎓 TRAINING COMPLETE! Unit 1 unlocked!');
+    }
     if(epDone&&EPISODES[idx+1]&&!G.unlockedEpisodes.includes(EPISODES[idx+1].id)){
       G.unlockedEpisodes.push(EPISODES[idx+1].id);EPISODES[idx+1].coming=false;
       if(EPISODES[idx+1].eras[0])G.unlockedEras.push(EPISODES[idx+1].eras[0].id);
@@ -3190,8 +3589,26 @@ function checkEraUnlocks(){
 }
 function showMapNotif(msg){const el=document.getElementById('map-notification');if(el){el.textContent='★ '+msg+' ★';el.style.display='block';setTimeout(()=>el.style.display='none',4000);}}
 // ─── BATTLE ───
-const ENEMY_ATTACK_TABLE={ep1:{min:2,max:4,wrongBonus:3},ep2:{min:3,max:6,wrongBonus:4},ep3:{min:5,max:8,wrongBonus:5},ep4:{min:7,max:11,wrongBonus:6},ep5:{min:10,max:15,wrongBonus:8}};
-function getEnemyAttack(epId,isWrong){var t=ENEMY_ATTACK_TABLE[epId]||ENEMY_ATTACK_TABLE.ep1;var b=Math.floor(Math.random()*(t.max-t.min+1))+t.min;return isWrong?b+t.wrongBonus:b;}
+// Base = Easy mode values. Normal = ×1.35, Hard = ×1.8
+const ENEMY_ATTACK_TABLE={
+  ep0:{min:2,max:3,wrongBonus:2},
+  ep1:{min:3,max:5,wrongBonus:3},
+  ep2:{min:5,max:8,wrongBonus:4},
+  ep3:{min:7,max:11,wrongBonus:5},
+  ep4:{min:9,max:14,wrongBonus:6},
+  ep5:{min:12,max:18,wrongBonus:8},
+  ep6_scotus:{min:13,max:20,wrongBonus:9},
+  ep7_docs:{min:13,max:20,wrongBonus:9},
+  ep6:{min:15,max:25,wrongBonus:10},
+};
+function getEnemyAttack(epId,isWrong){
+  var mapped=ENEMY_ATTACK_TABLE[epId]?epId:epId==='ep6'?'ep6':'ep1';
+  var t=ENEMY_ATTACK_TABLE[mapped]||ENEMY_ATTACK_TABLE.ep1;
+  var b=Math.floor(Math.random()*(t.max-t.min+1))+t.min;
+  var raw=isWrong?b+t.wrongBonus:b;
+  var dm=G&&G.difficulty==='hard'?1.8:G&&G.difficulty==='normal'?1.35:1.0;
+  return Math.max(1,Math.round(raw*dm));
+}
 function getPlayerAgility(){
   var base=G.agility||0;
   var passive=getAvatarPassive();
@@ -3262,7 +3679,7 @@ function startBattle(epId,eraId,enemyId){
   BT={epId,eraId,enemyId,enemy,enemyHp:scaledHp,enemyMaxHp:scaledHp,combo:G.battleStreak,hintUsed:false,
     earnedXP:0,earnedGold:0,earnedScore:0,askedQ:[],currentQ:null,hintText:'',action:'',
     log:enemy.name+' challenges your civic knowledge!',weaponBonus:weapon.dmgBonus||0,armorBonus:armor.defBonus||0,
-    lastEpId:epId,lastEraId:eraId,lastEnemyId:enemyId,_battleOver:false};
+    lastEpId:epId,lastEraId:eraId,lastEnemyId:enemyId,_battleOver:false,_pendingWin:false,_pendingLoss:false};
   var wnb=document.getElementById('b-weapon-name-bar');if(wnb)wnb.textContent=weapon.name;var wib=document.getElementById('b-weapon-icon');if(wib)wib.textContent=weapon.icon;
   var dpEl=document.getElementById('b-dodge-pct');if(dpEl)dpEl.textContent=Math.round(getDodgeChance()*100)+'% dodge';
   var anb=document.getElementById('b-armor-name-bar');if(anb)anb.textContent=armor.name;var aib=document.getElementById('b-armor-icon');if(aib)aib.textContent=armor.icon;
@@ -3273,6 +3690,15 @@ function startBattle(epId,eraId,enemyId){
 }
 function renderBattle(){
   const en=BT.enemy;if(!en)return;
+  // Show difficulty in HUD
+  var diffEl=document.getElementById('hud-difficulty');
+  if(diffEl){
+    var diffLabels={easy:'🌿 EASY',normal:'⚔️ NORMAL',hard:'💀 HARD'};
+    var diffColors={easy:'var(--green)',normal:'var(--gold)',hard:'var(--red)'};
+    var d=G.difficulty||'easy';
+    diffEl.textContent=diffLabels[d]||'';
+    diffEl.style.color=diffColors[d]||'var(--text3)';
+  }
   // Clear sequence + hide next turn button, re-enable actions
   ['seq-player','seq-enemy'].forEach(function(id){
     var el=document.getElementById(id);if(el)el.style.display='none';
@@ -3375,7 +3801,8 @@ function answerShuffled(idx){
   var armor=ARMORS.find(function(a){return a.id===G.equippedArmor;})||ARMORS[0];
   var dodged=tryDodge();
   var baseDmg=getEnemyAttack(BT.epId,false);
-  var netDmg=Math.max(1,baseDmg-(armor.defBonus||0)-getPassiveDefBonus());
+  var armorEff=G&&G.difficulty==='hard'?0.5:G&&G.difficulty==='normal'?0.7:1.0;
+  var netDmg=Math.max(1,Math.round(baseDmg-((armor.defBonus||0)+getPassiveDefBonus())*armorEff));
 
   // Store for use in sequence
   BT._pendingDodge=dodged;
@@ -3395,7 +3822,7 @@ function answerShuffled(idx){
   // Go to battle screen, sequence plays out here
   setTimeout(function(){
     showScreen('battle');
-    applyAnswerResult(isCorrect,q);  // Step 1: player result shown immediately
+    applyAnswerResult(isCorrect,q);  // sets _pendingWin/_pendingLoss
     setBattleActionsDisabled(true);
 
     var enemyEl=document.getElementById('b-enemy-sprite');
@@ -3406,6 +3833,7 @@ function answerShuffled(idx){
     var nd=BT._pendingNetDmg;
     var isDodge=BT._pendingDodge;
     var wasWrong=!isCorrect;
+    var enemyDied=BT._pendingWin;
 
     function setSeqEnemy(msg,color,bg){
       if(!seqEnemy)return;
@@ -3413,7 +3841,19 @@ function answerShuffled(idx){
       seqEnemy.textContent=msg;
     }
 
-    // Step 2: Enemy attack at 1.8s, enough time to read player result
+    // If enemy died — short pause then go straight to victory, no counter-attack
+    if(enemyDied){
+      setTimeout(function(){
+        if(BT._battleOver)return;
+        BT._battleOver=true;
+        setBattleActionsDisabled(true);
+        var ntb=document.getElementById('next-turn-btn');if(ntb)ntb.style.display='none';
+        endBattle(true);
+      },1000);
+      return;
+    }
+
+    // Enemy still alive — play full attack sequence
     setTimeout(function(){
       if(isDodge){
         if(enemyEl){enemyEl.classList.remove('enemy-attacking');void enemyEl.offsetWidth;enemyEl.classList.add('enemy-attacking');}
@@ -3426,7 +3866,6 @@ function answerShuffled(idx){
       } else {
         SFX.attack();
         if(enemyEl){enemyEl.classList.remove('enemy-attacking');void enemyEl.offsetWidth;enemyEl.classList.add('enemy-attacking');}
-        // Impact lands 400ms after lunge starts
         setTimeout(function(){
           G.hp=Math.max(0,G.hp-nd);
           if(playerEl){playerEl.classList.remove('player-hit');void playerEl.offsetWidth;playerEl.classList.add('player-hit');}
@@ -3437,16 +3876,18 @@ function answerShuffled(idx){
           BT.log=eName+' strikes '+pName+' for '+nd+' damage!';
           updateHeader();
           setTimeout(function(){if(enemyEl)enemyEl.classList.remove('enemy-attacking');if(playerEl)playerEl.classList.remove('player-hit');},700);
-          if(G.hp<=0&&!BT._battleOver){BT._battleOver=true;setTimeout(function(){endBattle(false);},1000);}
+          if(G.hp<=0&&!BT._battleOver){BT._battleOver=true;setBattleActionsDisabled(true);setTimeout(function(){endBattle(false);},800);}
         },400);
       }
     },1800);
 
-    // Step 3: Wrong answer extra counter at 3.0s
+    // Wrong answer counter at 3.0s
     if(wasWrong){
       var wrongDmg=getEnemyAttack(BT.epId,true);
-      var wrongNet=Math.max(1,wrongDmg-(BT._pendingArmor.defBonus||0));
+      var armorEff2=G&&G.difficulty==='hard'?0.5:G&&G.difficulty==='normal'?0.7:1.0;
+      var wrongNet=Math.max(1,Math.round(wrongDmg-(BT._pendingArmor.defBonus||0)*armorEff2));
       setTimeout(function(){
+        if(BT._battleOver)return;
         G.hp=Math.max(0,G.hp-wrongNet);
         if(playerEl){playerEl.classList.remove('player-hit');void playerEl.offsetWidth;playerEl.classList.add('player-hit');}
         if(enemyEl){enemyEl.classList.remove('enemy-attacking');void enemyEl.offsetWidth;enemyEl.classList.add('enemy-attacking');}
@@ -3455,15 +3896,20 @@ function answerShuffled(idx){
         setSeqEnemy('❌ Wrong answer! '+eName+' counters, -'+wrongNet+' HP!','#ff6b6b','rgba(192,57,43,.2)');
         BT.log='Wrong! '+eName+' counters '+pName+' for '+wrongNet+'!';
         updateHeader();
-        if(G.hp<=0&&!BT._battleOver){BT._battleOver=true;setTimeout(function(){endBattle(false);},1000);}
+        if(G.hp<=0&&!BT._battleOver){BT._battleOver=true;setBattleActionsDisabled(true);setTimeout(function(){endBattle(false);},800);}
         setTimeout(function(){if(playerEl)playerEl.classList.remove('player-hit');if(enemyEl)enemyEl.classList.remove('enemy-attacking');},700);
       },3000);
     }
 
-    // Step 4: Next Turn button at 3.0s (correct) or 4.2s (wrong)
+    // Next Turn button at 3.0s (correct) or 4.2s (wrong)
     var totalDelay=wasWrong?4200:3000;
     setTimeout(function(){
       if(BT._battleOver)return;
+      if(BT._pendingLoss){
+        BT._battleOver=true;setBattleActionsDisabled(true);
+        setTimeout(function(){endBattle(false);},500);
+        return;
+      }
       var ntb=document.getElementById('next-turn-btn');
       if(ntb)ntb.style.display='block';
     },totalDelay);
@@ -3475,7 +3921,8 @@ function applyAnswerResult(correct,q){
   const isFinalBoss=en&&en.isFinalBoss;
   const hasEconomist=G.avatarId==='ron_paul'||G.avatarId==='mises';
   if(correct){
-    let dmg=8+Math.floor(Math.random()*5)+Math.floor(G.level/2)+BT.weaponBonus+getPassiveDmgBonus();
+    var diffPlayerMult=G.difficulty==='normal'?0.75:G.difficulty==='hard'?0.55:1.0;
+    let dmg=Math.max(1,Math.floor((4+Math.floor(Math.random()*4)+Math.floor(G.level/2)+BT.weaponBonus+getPassiveDmgBonus())*diffPlayerMult));
     if(!correct)SFX.wrong();
     var seqPl=document.getElementById('seq-player');
     var enEl=document.getElementById('b-enemy-sprite');
@@ -3528,18 +3975,11 @@ function applyAnswerResult(correct,q){
     updateComboPips(); // reset pips immediately on wrong answer
     BT.log='Wrong! Correct: '+q.opts[q.a];
   }
-  if(BT.enemyHp<=0&&!BT._battleOver){
-    BT._battleOver=true;
-    setBattleActionsDisabled(true);
-    // Clear next turn button if showing
-    var ntb2=document.getElementById('next-turn-btn');if(ntb2)ntb2.style.display='none';
-    setTimeout(function(){endBattle(true);},600);
-  } else if(G.hp<=0&&!BT._battleOver){
-    BT._battleOver=true;
-    setBattleActionsDisabled(true);
-    var ntb2=document.getElementById('next-turn-btn');if(ntb2)ntb2.style.display='none';
-    setTimeout(function(){endBattle(false);},600);
-  }
+  // Don't set _battleOver here — let the sequence finish first
+  // The sequence timeouts will check and call endBattle when ready
+  // Just mark a pending win/loss so Next Turn shows victory instead
+  if(BT.enemyHp<=0)BT._pendingWin=true;
+  if(G.hp<=0)BT._pendingLoss=true;
 }
 function useHint(){if(BT.hintUsed)return;const q=BT.currentQ||getQ();BT.currentQ=q;BT.hintUsed=true;BT.earnedScore=Math.max(0,BT.earnedScore-5);BT.hintText=q.hint||'No hint available.';renderBattle();if(currentScreen==='trivia')renderTriviaScreen();}
 function usePotion(){
@@ -3590,12 +4030,19 @@ function endBattle(won){
   const en=BT.enemy;
   if(won){
     BT.earnedXP+=en.xpReward;
-    var xpMult=1+getPassiveXpBonus();BT.earnedXP=Math.round(BT.earnedXP*xpMult);
+    var xpMult=1+getPassiveXpBonus();
+    var diffXpMult=G.difficulty==='normal'?1.0:G.difficulty==='hard'?1.5:0.8;
+    BT.earnedXP=Math.round(BT.earnedXP*xpMult*diffXpMult);
     let gold=en.goldReward;
-    var goldMult=1+getPassiveGoldBonus();gold=Math.round(gold*goldMult);
+    var goldMult=1+getPassiveGoldBonus();
+    var diffGoldMult=G.difficulty==='normal'?1.0:G.difficulty==='hard'?1.5:0.8;
+    gold=Math.round(gold*goldMult*diffGoldMult);
     if(G.activeGoldBoost){gold=Math.floor(gold*2);G.activeGoldBoost=false;}
     if(!BT.hintUsed){BT.earnedXP+=10;BT.earnedScore+=10;G.noHintWins++;}
     BT.earnedScore+=25;G.wins++;G.score+=BT.earnedScore;G.gold+=gold+BT.earnedGold;
+    var hpPct=G.maxHp>0?G.hp/G.maxHp:0;
+    var survivalBonus=hpPct>=0.75?25:hpPct>=0.5?15:hpPct>=0.25?10:0;
+    BT.earnedScore+=survivalBonus;
     if(en.givePack)G.packs++;
     if(!G.beatenEnemies.includes(BT.enemyId))G.beatenEnemies.push(BT.enemyId);
     // Always add to beaten list; add to collection on first win
@@ -3615,7 +4062,8 @@ function endBattle(won){
       : en.name+' has been defeated by your constitutional knowledge!';
     let rows=`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:14px"><span>XP Earned</span><span style="font-family:var(--pixel);font-size:6px;color:var(--gold)">+${BT.earnedXP}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:14px"><span>Credits</span><span style="font-family:var(--pixel);font-size:6px;color:var(--gold)">+${gold+BT.earnedGold} ⚖️</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:14px"><span>Score</span><span style="font-family:var(--pixel);font-size:6px;color:var(--gold)">+${BT.earnedScore}</span></div>`;
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:14px"><span>Score</span><span style="font-family:var(--pixel);font-size:6px;color:var(--gold)">+${BT.earnedScore}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:14px"><span>HP Remaining</span><span style="font-family:var(--pixel);font-size:6px;color:${hpPct>=0.75?'var(--text3)':hpPct>=0.5?'var(--teal)':hpPct>=0.25?'var(--gold)':'var(--red)'}">${Math.round(hpPct*100)}% — ${survivalBonus>10?'+'+survivalBonus+' bonus!':'base'}</span></div>`;
     if(!BT.hintUsed)rows+=`<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:14px"><span>No-Hint Bonus!</span><span style="font-family:var(--pixel);font-size:6px;color:var(--green)">+10 XP</span></div>`;
     if(newCard)rows+=`<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:14px"><span>New Card!</span><span>${en.sprite} ${en.name}</span></div>`;
     document.getElementById('rewards-list').innerHTML=rows;
@@ -3821,7 +4269,8 @@ function openCard(id){
 function rechallenge(enemyId){for(const ep of EPISODES){for(const era of (ep.eras||[])){const en=era.enemies.find(e=>e.id===enemyId);if(en){startBattle(ep.id,era.id,enemyId);return;}}}}
 // ─── PROFILE ───
 function renderProfile(){
-  checkAchievements(); // retroactively credit any missed achievements
+  checkAchievements();
+  updateDifficultyUI();
   const rank=getRank();const acc=G.qTotal>0?Math.round(G.qCorrect/G.qTotal*100):0;
   const weapon=WEAPONS.find(w=>w.id===G.equippedWeapon)||WEAPONS[0];const armor=ARMORS.find(a=>a.id===G.equippedArmor)||ARMORS[0];
   document.getElementById('profile-header').innerHTML=`<div style="width:110px;height:110px;display:block;margin:0 auto 12px;border-radius:50%;overflow:visible;filter:drop-shadow(0 0 16px rgba(201,168,76,.4))">${getMedallionSVG(G.avatarId,110)}</div><div style="font-family:var(--pixel);font-size:9px;color:var(--gold)">${G.name}</div><div style="font-size:18px;color:var(--teal);margin-top:4px">${rank.name}</div><div style="font-family:var(--pixel);font-size:6px;color:var(--blue);margin-top:4px">Level ${G.level} · ${G.xp} XP</div><div style="font-family:var(--pixel);font-size:5px;color:var(--text2);margin-top:6px">❤️ ${G.hp}/${G.maxHp} &nbsp; ⚖️ ${G.gold}</div>`;
@@ -3996,6 +4445,39 @@ function goToLoginFromProfile(){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('login-screen').classList.add('active');
   SFX.playTitle();
+}
+
+function setDifficulty(d){
+  G.difficulty=d;
+  save();
+  updateDifficultyUI();
+  var msgs={
+    easy:'Full damage dealt. Reduced enemy attacks. Less XP/gold. Great for learning the content.',
+    normal:'Balanced challenge. 75% player damage. 35% stronger enemies. Standard XP/gold.',
+    hard:'High stakes. 55% player damage. 80% stronger enemies. 1.5× XP and gold rewards!'
+  };
+  notify('Difficulty set to '+d.toUpperCase()+'!','green');
+}
+
+function updateDifficultyUI(){
+  if(!G)return;
+  var d=G.difficulty||'easy';
+  var colors={easy:'var(--green)',normal:'var(--gold)',hard:'var(--red)'};
+  var descs={
+    easy:'Full damage dealt • Reduced enemy attacks • 0.8× XP and gold • Focus on learning the content!',
+    normal:'75% player damage • Enemies hit 35% harder • Standard XP and gold rewards',
+    hard:'55% player damage • Enemies hit 80% harder • 1.5× XP and gold • You will need potions!'
+  };
+  ['easy','normal','hard'].forEach(function(diff){
+    var btn=document.getElementById('diff-'+diff);
+    if(!btn)return;
+    btn.style.borderColor=diff===d?colors[diff]:'var(--border)';
+    btn.style.color=diff===d?colors[diff]:'var(--text3)';
+    btn.style.opacity=diff===d?'1':'0.5';
+    btn.style.fontWeight=diff===d?'bold':'normal';
+  });
+  var desc=document.getElementById('diff-desc');
+  if(desc)desc.textContent=descs[d]||'';
 }
 
 function toggleMusic(){
