@@ -235,6 +235,12 @@ body::after{
 .combo-pips{display:flex;gap:4px}
 .pip{width:10px;height:10px;border:1px solid var(--border2);background:transparent;border-radius:50%}
 .pip.on{background:var(--gold);border-color:var(--gold);box-shadow:0 0 8px rgba(201,168,76,.6)}
+.pip.on.t3{background:#ff6600;border-color:#ff6600;box-shadow:0 0 10px rgba(255,102,0,.7)}
+.pip.on.t6{background:#ff2200;border-color:#ff2200;box-shadow:0 0 10px rgba(255,34,0,.8)}
+.pip.on.t9{background:#ff00ff;border-color:#ff00ff;box-shadow:0 0 12px rgba(255,0,255,.9);animation:pulse .5s infinite}
+.pip.t3{border-color:#ff660040}
+.pip.t6{border-color:#ff220040}
+.pip.t9{border-color:#ff00ff40}
 .combo-txt{font-family:var(--cinzel);font-size:9px;color:var(--gold);letter-spacing:.05em}
 
 .battle-log{
@@ -570,7 +576,11 @@ option{background:var(--bg2)}
   </div>
   <div class="combo-row">
     <div class="combo-label">ARGUMENT</div>
-    <div class="combo-pips"><div class="pip" id="pip0"></div><div class="pip" id="pip1"></div><div class="pip" id="pip2"></div><div class="pip" id="pip3"></div><div class="pip" id="pip4"></div></div>
+    <div class="combo-pips">
+      <div class="pip" id="pip0"></div><div class="pip" id="pip1"></div><div class="pip t3" id="pip2"></div>
+      <div class="pip" id="pip3"></div><div class="pip" id="pip4"></div><div class="pip t6" id="pip5"></div>
+      <div class="pip" id="pip6"></div><div class="pip" id="pip7"></div><div class="pip t9" id="pip8"></div>
+    </div>
     <div class="combo-txt" id="combo-txt"></div>
   </div>
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-family:var(--pixel);font-size:4px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);padding:5px 8px">
@@ -3264,7 +3274,25 @@ function renderBattle(){
   const bs=document.getElementById('b-player-sprite');if(bs)bs.innerHTML=getMedallionSVG(G.avatarId,78);
   const wd=document.getElementById('b-weapon-display');const cw=WEAPONS.find(w=>w.id===(G.equippedWeapon||'quill'))||WEAPONS[0];if(wd)wd.textContent=cw.icon;
 }
-function updateComboPips(){for(let i=0;i<5;i++){const p=document.getElementById('pip'+i);if(p)p.className='pip'+(BT.combo>i?' on':'');}document.getElementById('combo-txt').textContent=BT.combo>=1?`×${BT.combo} STREAK!`:'';}
+function updateComboPips(){
+  for(let i=0;i<9;i++){
+    const p=document.getElementById('pip'+i);
+    if(!p)continue;
+    let cls='pip';
+    if(i===2)cls+=' t3';
+    else if(i===5)cls+=' t6';
+    else if(i===8)cls+=' t9';
+    if(BT.combo>i)cls+=' on';
+    p.className=cls;
+  }
+  const ct=document.getElementById('combo-txt');
+  if(!ct)return;
+  if(BT.combo>=9)     {ct.textContent='🔥🔥🔥 ×'+BT.combo+' MAX POWER — 3× DMG!';ct.style.color='#ff00ff';}
+  else if(BT.combo>=6){ct.textContent='🔥🔥 ×'+BT.combo+' ON FIRE — 2× DMG!';ct.style.color='#ff2200';}
+  else if(BT.combo>=3){ct.textContent='🔥 ×'+BT.combo+' STREAK — 1.5× DMG!';ct.style.color='#ff6600';}
+  else if(BT.combo>=1){ct.textContent='×'+BT.combo+' streak';ct.style.color='var(--gold)';}
+  else               {ct.textContent='';ct.style.color='var(--gold)';}
+}
 function getQ(){
   const en=BT.enemy;if(!en||!en.questions)return null;
   // Ensure askedQMap exists (handles old saves that don't have it)
@@ -3433,9 +3461,10 @@ function applyAnswerResult(correct,q){
     if(BT.action==='defend'){
       const heal=10+Math.floor(Math.random()*8)+getPassiveHealBonus();
       G.hp=Math.min(G.maxHp,G.hp+heal);BT.combo=Math.min(9,BT.combo+1);G.battleStreak=BT.combo;
+      updateComboPips();
       BT.log='Correct! Restored '+heal+' HP!';spawnDmg('+'+heal,'heal');
       updateHpBars();
-      showSeqPl('🛡️ '+pn+' studies hard, +'+heal+' HP restored!','var(--green)','rgba(39,174,96,.1)');
+      showSeqPl('🛡️ '+pn+' studies hard — +'+heal+' HP restored!','var(--green)','rgba(39,174,96,.1)');
     } else if(BT.action==='special'){
       dmg=Math.floor(dmg*2.5);BT.enemyHp=Math.max(0,BT.enemyHp-dmg);BT.combo=0;G.battleStreak=0;
       if(enEl){enEl.style.filter='brightness(3) sepia(1) hue-rotate(180deg)';setTimeout(function(){if(enEl)enEl.style.filter='';},500);}
@@ -3455,14 +3484,19 @@ function applyAnswerResult(correct,q){
       }
       BT.enemyHp=Math.max(0,BT.enemyHp-dmg);BT.combo=Math.min(9,BT.combo+1);G.battleStreak=BT.combo;
       if(enEl){enEl.style.filter='brightness(2.5) sepia(1) hue-rotate(180deg)';setTimeout(function(){if(enEl)enEl.style.filter='';},400);}
-      BT.log='Correct! '+dmg+' damage!'+(BT.combo>=3?' STREAK x'+BT.combo+'!':'');
+      updateComboPips(); // update immediately so player sees tier change
+      var smsg=streakMult>=3?' 🔥🔥🔥 3× MAX POWER!':streakMult>=2?' 🔥🔥 2× DOUBLE DAMAGE!':streakMult>1?' 🔥 1.5× STREAK BONUS!':'';
+      var scolor=BT.combo>=9?'#ff00ff':BT.combo>=6?'#ff2200':BT.combo>=3?'#ff6600':'var(--teal)';
+      BT.log='Correct! '+dmg+' damage!'+smsg;
       spawnDmg('-'+dmg,'dmg');
       updateHpBars();
-      showSeqPl('⚡ '+pn+' attacks '+en2+', HIT! -'+dmg+' HP!'+(BT.combo>=3?' STREAK x'+BT.combo+'!':''),'var(--teal)','rgba(26,188,156,.08)');
+      showSeqPl('⚡ '+pn+' attacks '+en2+' — HIT! -'+dmg+' HP!'+smsg,scolor,'rgba(26,188,156,.08)');
     }
     BT.earnedXP+=5;BT.earnedGold+=3;BT.earnedScore+=10;
   } else {
     BT.combo=0;
+    G.battleStreak=0;
+    updateComboPips(); // reset pips immediately on wrong answer
     BT.log='Wrong! Correct: '+q.opts[q.a];
   }
   if(BT.enemyHp<=0&&!BT._battleOver){
