@@ -74,6 +74,14 @@ body::after{
 @keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-60px)}}
 @keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
 @keyframes glowPulse{0%,100%{box-shadow:0 0 10px rgba(201,168,76,.3)}50%{box-shadow:0 0 30px rgba(201,168,76,.6)}}
+@keyframes enemyAttack{0%{transform:translateX(0) scale(1)}25%{transform:translateX(-18px) scale(1.15)}50%{transform:translateX(8px) scale(1.08)}75%{transform:translateX(-6px) scale(1.04)}100%{transform:translateX(0) scale(1)}}
+@keyframes playerHit{0%{transform:translateX(0);filter:brightness(1)}20%{transform:translateX(10px);filter:brightness(3) sepia(1) hue-rotate(-30deg)}50%{transform:translateX(-8px);filter:brightness(2) sepia(1)}80%{transform:translateX(4px);filter:brightness(1.5)}100%{transform:translateX(0);filter:brightness(1)}}
+@keyframes playerDodge{0%{transform:translateY(0)}30%{transform:translateY(-12px)}60%{transform:translateY(4px)}100%{transform:translateY(0)}}
+@keyframes screenShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.enemy-attacking{animation:enemyAttack 0.5s ease-in-out;}
+.player-hit{animation:playerHit 0.5s ease-in-out;}
+.player-dodge{animation:playerDodge 0.4s ease-in-out;}
+.screen-shake{animation:screenShake 0.4s ease-in-out;}
 
 /* ── GAME HEADER ── */
 #game-header{
@@ -510,13 +518,6 @@ option{background:var(--bg2)}
   <div id="era-enemy-list"></div>
 </div>
 
-<!-- BATTLE HALL (era/unit select) — replaces old era-screen -->
-<div id="era-screen" class="screen">
-  <div id="era-header"></div>
-  <div id="era-enemy-list"></div>
-</div>
-
-
 <!-- BATTLE -->
 <div id="battle-screen" class="screen">
   <div class="battle-hud">
@@ -552,6 +553,7 @@ option{background:var(--bg2)}
     <span style="margin-left:auto" id="b-armor-name">No Protection</span>
     <span id="b-armor-icon" style="font-size:16px">🩲</span>
   </div>
+  <div id="battle-event" style="display:none;background:rgba(192,57,43,.12);border-left:3px solid var(--red);padding:8px 12px;margin-bottom:6px;font-family:var(--pixel);font-size:5px;color:var(--red);line-height:1.8;animation:fadeIn .2s"></div>
   <div class="battle-log" id="battle-log">Choose your argument...</div>
   <div class="action-grid">
     <button class="act-btn" onclick="doAction('attack')" id="btn-attack"><span class="act-icon">⚡</span><span class="act-title">Quiz Attack</span><span class="act-sub">Correct answer deals damage</span></button>
@@ -3068,6 +3070,8 @@ function startBattle(epId,eraId,enemyId){
 }
 function renderBattle(){
   const en=BT.enemy;if(!en)return;
+  const evEl=document.getElementById('battle-event');
+  if(evEl)evEl.style.display='none';
   const pHp=Math.max(0,G.hp/G.maxHp*100);const eHp=Math.max(0,BT.enemyHp/BT.enemyMaxHp*100);
   document.getElementById('b-player-name').textContent=G.name;document.getElementById('b-enemy-name').textContent=en.name.toUpperCase();
   const pb=document.getElementById('b-player-hp-bar');if(pb){pb.style.width=pHp+'%';pb.className='hp-bar p'+(pHp<25?' crit':pHp<50?' warn':'');}
@@ -3138,12 +3142,51 @@ function answerShuffled(idx){
   var dodged=tryDodge();
   var baseDmg=getEnemyAttack(BT.epId,false);
   var netDmg=Math.max(1,baseDmg-(armor.defBonus||0)-getPassiveDefBonus());
-  if(dodged){spawnDmg('DODGE!','heal');BT.log='You dodged the attack!';}
-  else{G.hp=Math.max(0,G.hp-netDmg);spawnDmg('-'+netDmg,'dmg');}
+
+  // ── ENEMY ATTACK ANIMATION ──
+  var enemyEl=document.getElementById('b-enemy-sprite');
+  var playerEl=document.getElementById('b-player-sprite');
+  var arenaEl=document.querySelector('.battle-arena');
+  var eventEl=document.getElementById('battle-event');
+
+  if(dodged){
+    // Dodge — enemy lunges, player hops away
+    if(enemyEl){enemyEl.classList.remove('enemy-attacking');void enemyEl.offsetWidth;enemyEl.classList.add('enemy-attacking');}
+    if(playerEl){playerEl.classList.remove('player-dodge');void playerEl.offsetWidth;playerEl.classList.add('player-dodge');}
+    spawnDmg('DODGE!','heal');
+    BT.log='You dodged the attack!';
+    if(eventEl){eventEl.style.display='block';eventEl.style.borderColor='var(--teal)';eventEl.style.color='var(--teal)';eventEl.style.background='rgba(26,188,156,.1)';eventEl.textContent='💨 '+BT.enemy.name.toUpperCase()+' ATTACKS — YOU DODGED!';}
+    setTimeout(function(){if(enemyEl)enemyEl.classList.remove('enemy-attacking');if(playerEl)playerEl.classList.remove('player-dodge');},600);
+  } else {
+    // Enemy lunges + player takes hit
+    if(enemyEl){enemyEl.classList.remove('enemy-attacking');void enemyEl.offsetWidth;enemyEl.classList.add('enemy-attacking');}
+    setTimeout(function(){
+      G.hp=Math.max(0,G.hp-netDmg);
+      if(playerEl){playerEl.classList.remove('player-hit');void playerEl.offsetWidth;playerEl.classList.add('player-hit');}
+      if(arenaEl){arenaEl.classList.remove('screen-shake');void arenaEl.offsetWidth;arenaEl.classList.add('screen-shake');}
+      spawnDmg('-'+netDmg,'dmg');
+      if(eventEl){eventEl.style.display='block';eventEl.style.borderColor='var(--red)';eventEl.style.color='var(--red)';eventEl.style.background='rgba(192,57,43,.1)';eventEl.textContent='⚔️ '+BT.enemy.name.toUpperCase()+' STRIKES FOR '+netDmg+' DAMAGE!';}
+      setTimeout(function(){
+        if(enemyEl)enemyEl.classList.remove('enemy-attacking');
+        if(playerEl)playerEl.classList.remove('player-hit');
+        if(arenaEl)arenaEl.classList.remove('screen-shake');
+      },600);
+    },180);
+  }
+
   if(!isCorrect){
     var wrongDmg=getEnemyAttack(BT.epId,true);
     var wrongNet=Math.max(1,wrongDmg-(armor.defBonus||0));
-    setTimeout(function(){G.hp=Math.max(0,G.hp-wrongNet);spawnDmg('-'+wrongNet+' WRONG!','dmg');updateHeader();renderBattle();if(G.hp<=0)setTimeout(function(){endBattle(false);},800);},600);
+    setTimeout(function(){
+      G.hp=Math.max(0,G.hp-wrongNet);
+      if(playerEl){playerEl.classList.remove('player-hit');void playerEl.offsetWidth;playerEl.classList.add('player-hit');}
+      if(arenaEl){arenaEl.classList.remove('screen-shake');void arenaEl.offsetWidth;arenaEl.classList.add('screen-shake');}
+      spawnDmg('-'+wrongNet,'dmg');
+      if(eventEl){eventEl.style.display='block';eventEl.style.borderColor='var(--red)';eventEl.style.color='#e74c3c';eventEl.style.background='rgba(192,57,43,.15)';eventEl.textContent='❌ WRONG! '+BT.enemy.name.toUpperCase()+' COUNTERS FOR +'+wrongNet+' DAMAGE!';}
+      updateHeader();renderBattle();
+      if(G.hp<=0)setTimeout(function(){endBattle(false);},800);
+      setTimeout(function(){if(playerEl)playerEl.classList.remove('player-hit');if(arenaEl)arenaEl.classList.remove('screen-shake');},600);
+    },700);
   }
   G.qTotal++;if(isCorrect){G.qCorrect++;G.currentStreak++;if(G.currentStreak>G.maxStreak)G.maxStreak=G.currentStreak;}else G.currentStreak=0;
   BT.currentQ=null;BT.hintText='';
@@ -3153,18 +3196,25 @@ function applyAnswerResult(correct,q){
   const en=BT.enemy;
   if(correct){
     let dmg=3+Math.floor(Math.random()*4)+Math.floor(G.level/3)+BT.weaponBonus+getPassiveDmgBonus();
+    var evEl=document.getElementById('battle-event');
+    var enEl=document.getElementById('b-enemy-sprite');
     if(BT.action==='defend'){
       const heal=10+Math.floor(Math.random()*8)+getPassiveHealBonus();
       G.hp=Math.min(G.maxHp,G.hp+heal);BT.combo=Math.min(5,BT.combo+1);
       BT.log='✅ Correct! Restored '+heal+' HP!';spawnDmg('+'+heal,'heal');
+      if(evEl){evEl.style.display='block';evEl.style.borderColor='var(--green)';evEl.style.color='var(--green)';evEl.style.background='rgba(39,174,96,.1)';evEl.textContent='🛡️ STUDY GUARD! +'+heal+' HP RESTORED!';}
     } else if(BT.action==='special'){
       dmg=Math.floor(dmg*2.5);BT.enemyHp=Math.max(0,BT.enemyHp-dmg);BT.combo=0;
+      if(enEl){enEl.style.filter='brightness(3) sepia(1) hue-rotate(180deg)';setTimeout(function(){if(enEl)enEl.style.filter='';},500);}
       BT.log='⚖️ PRECEDENT STRIKE! '+dmg+' damage!';spawnDmg('-'+dmg,'dmg');
+      if(evEl){evEl.style.display='block';evEl.style.borderColor='var(--gold)';evEl.style.color='var(--gold)';evEl.style.background='rgba(201,168,76,.1)';evEl.textContent='⚖️ PRECEDENT STRIKE! '+dmg+' DAMAGE!';}
     } else {
       if(BT.combo>=3)dmg=Math.floor(dmg*1.7);
       BT.enemyHp=Math.max(0,BT.enemyHp-dmg);BT.combo=Math.min(5,BT.combo+1);
+      if(enEl){enEl.style.filter='brightness(2) sepia(1) hue-rotate(180deg)';setTimeout(function(){if(enEl)enEl.style.filter='';},400);}
       BT.log='✅ Correct! '+dmg+' damage!'+(BT.combo>=3?' STREAK ×'+BT.combo+'!':'');
       spawnDmg('-'+dmg,'dmg');
+      if(evEl){evEl.style.display='block';evEl.style.borderColor='var(--teal)';evEl.style.color='var(--teal)';evEl.style.background='rgba(26,188,156,.08)';evEl.textContent='✅ CORRECT! '+dmg+' DAMAGE!'+(BT.combo>=3?' STREAK ×'+BT.combo+'!':'');}
     }
     BT.earnedXP+=5;BT.earnedGold+=3;BT.earnedScore+=10;
   } else {
