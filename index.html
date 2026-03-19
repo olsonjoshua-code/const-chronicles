@@ -1591,7 +1591,7 @@ const EPISODES=[
   {id:'ep2',num:2,name:'Interactions Among Branches',period:'Congress, Executive, Courts',icon:'🏛️',standards:'LO 2.1–2.15 · 25–36% of AP Exam, Congress, Presidency, Courts',coming:true,eras:[],timeline:[]},
   {id:'ep3',num:3,name:'Civil Liberties & Civil Rights',period:'Bill of Rights & Beyond',icon:'⚖️',standards:'LO 3.1–3.12 · 13–18% of AP Exam',coming:true,eras:[],timeline:[]},
   {id:'ep4',num:4,name:'Political Ideologies & Beliefs',period:'Left, Right & Center',icon:'🗳️',standards:'LO 4.1–4.10 · 10–15% of AP Exam',coming:true,eras:[],timeline:[]},
-  {id:'ep5',num:5,name:'Political Participation',period:'Voting, Parties & Media',icon:'🌐',standards:'LO 5.1–5.12 · 20–27% of AP Exam',coming:true,eras:[],timeline:[]},
+  {id:'ep5',num:5,name:'Political Participation',period:'Voting, Parties & Media',icon:'🌐',standards:'LO 5.1–5.12 · 20–27% of AP Exam',coming:false,eras:[],timeline:[]},
 
   {id:'ep6_scotus',num:6,name:'SCOTUS Gauntlet',period:'Landmark Cases',icon:'⚖️',standards:'Master the Required SCOTUS Cases',coming:false,
    eras:[
@@ -3029,6 +3029,23 @@ function loadSave(){
       if(!G.difficulty)G.difficulty='easy';
       if(!G.seenNarratives)G.seenNarratives=[];
       if(!G.unlockedAvatars.includes('mr_olson'))G.unlockedAvatars.push('mr_olson');
+      // Migrate: fix stale coming:true on all episodes (mark all as coming:false in EPISODES array)
+      EPISODES.forEach(ep=>{ if(!ep.isFinalBoss) ep.coming=false; });
+      // Migrate: unlock any episode whose enemies are all beaten
+      EPISODES.forEach((ep,i)=>{
+        if(ep.isFinalBoss||ep.id==='ep0')return;
+        const allBeaten=(ep.eras||[]).length>0&&(ep.eras||[]).every(era=>era.enemies.every(e=>G.beatenEnemies.includes(e.id)));
+        if(allBeaten&&!G.unlockedEpisodes.includes(ep.id))G.unlockedEpisodes.push(ep.id);
+        // Also unlock the NEXT episode if this one is done
+        if(allBeaten&&EPISODES[i+1]&&!EPISODES[i+1].isFinalBoss&&!G.unlockedEpisodes.includes(EPISODES[i+1].id)){
+          G.unlockedEpisodes.push(EPISODES[i+1].id);
+        }
+      });
+      // Migrate: unlock ep5 specifically if ep4 is done
+      const ep4=EPISODES.find(e=>e.id==='ep4');
+      if(ep4&&(ep4.eras||[]).every(era=>era.enemies.every(e=>G.beatenEnemies.includes(e.id)))){
+        if(!G.unlockedEpisodes.includes('ep5'))G.unlockedEpisodes.push('ep5');
+      }
       // Migrate: ensure ep0 is in unlockedEpisodes for existing saves
       if(!G.unlockedEpisodes.includes('ep0'))G.unlockedEpisodes.push('ep0');
       // Migrate: if ep0 not complete yet, lock ep1 behind it
@@ -3442,6 +3459,23 @@ function showChapterNarrative(epId,n,ep){
     else{
       if(!G.seenNarratives)G.seenNarratives=[];
       if(!G.unlockedAvatars.includes('mr_olson'))G.unlockedAvatars.push('mr_olson');
+      // Migrate: fix stale coming:true on all episodes (mark all as coming:false in EPISODES array)
+      EPISODES.forEach(ep=>{ if(!ep.isFinalBoss) ep.coming=false; });
+      // Migrate: unlock any episode whose enemies are all beaten
+      EPISODES.forEach((ep,i)=>{
+        if(ep.isFinalBoss||ep.id==='ep0')return;
+        const allBeaten=(ep.eras||[]).length>0&&(ep.eras||[]).every(era=>era.enemies.every(e=>G.beatenEnemies.includes(e.id)));
+        if(allBeaten&&!G.unlockedEpisodes.includes(ep.id))G.unlockedEpisodes.push(ep.id);
+        // Also unlock the NEXT episode if this one is done
+        if(allBeaten&&EPISODES[i+1]&&!EPISODES[i+1].isFinalBoss&&!G.unlockedEpisodes.includes(EPISODES[i+1].id)){
+          G.unlockedEpisodes.push(EPISODES[i+1].id);
+        }
+      });
+      // Migrate: unlock ep5 specifically if ep4 is done
+      const ep4=EPISODES.find(e=>e.id==='ep4');
+      if(ep4&&(ep4.eras||[]).every(era=>era.enemies.every(e=>G.beatenEnemies.includes(e.id)))){
+        if(!G.unlockedEpisodes.includes('ep5'))G.unlockedEpisodes.push('ep5');
+      }
       G.seenNarratives.push(epId);
       save();
       overlay.remove();
@@ -3452,6 +3486,23 @@ function showChapterNarrative(epId,n,ep){
   window._narrativeSkip=function(){
     if(!G.seenNarratives)G.seenNarratives=[];
       if(!G.unlockedAvatars.includes('mr_olson'))G.unlockedAvatars.push('mr_olson');
+      // Migrate: fix stale coming:true on all episodes (mark all as coming:false in EPISODES array)
+      EPISODES.forEach(ep=>{ if(!ep.isFinalBoss) ep.coming=false; });
+      // Migrate: unlock any episode whose enemies are all beaten
+      EPISODES.forEach((ep,i)=>{
+        if(ep.isFinalBoss||ep.id==='ep0')return;
+        const allBeaten=(ep.eras||[]).length>0&&(ep.eras||[]).every(era=>era.enemies.every(e=>G.beatenEnemies.includes(e.id)));
+        if(allBeaten&&!G.unlockedEpisodes.includes(ep.id))G.unlockedEpisodes.push(ep.id);
+        // Also unlock the NEXT episode if this one is done
+        if(allBeaten&&EPISODES[i+1]&&!EPISODES[i+1].isFinalBoss&&!G.unlockedEpisodes.includes(EPISODES[i+1].id)){
+          G.unlockedEpisodes.push(EPISODES[i+1].id);
+        }
+      });
+      // Migrate: unlock ep5 specifically if ep4 is done
+      const ep4=EPISODES.find(e=>e.id==='ep4');
+      if(ep4&&(ep4.eras||[]).every(era=>era.enemies.every(e=>G.beatenEnemies.includes(e.id)))){
+        if(!G.unlockedEpisodes.includes('ep5'))G.unlockedEpisodes.push('ep5');
+      }
     G.seenNarratives.push(epId);
     save();
     overlay.remove();
@@ -3575,15 +3626,28 @@ function checkEraUnlocks(){
       if(prevDone&&!G.unlockedEras.includes(era.id)){G.unlockedEras.push(era.id);showMapNotif('NEW SECTION: '+era.name.toUpperCase()+'!');}
     });
     const epDone=ep.eras.every(era=>era.enemies.every(e=>G.beatenEnemies.includes(e.id)));
-    // Special: ep0 (Training) unlocks ep1, regardless of order
+    // Special: ep0 (Training) unlocks ep1
     if(epDone&&ep.id==='ep0'&&!G.unlockedEpisodes.includes('ep1')){
       G.unlockedEpisodes.push('ep1');
       showMapNotif('🎓 TRAINING COMPLETE! Unit 1 unlocked!');
     }
+    // Special: ep5 done unlocks SCOTUS Gauntlet and Docs Challenge together
+    if(epDone&&ep.id==='ep5'){
+      if(!G.unlockedEpisodes.includes('ep6_scotus')){G.unlockedEpisodes.push('ep6_scotus');showMapNotif('⚖️ SCOTUS GAUNTLET UNLOCKED!');}
+      if(!G.unlockedEpisodes.includes('ep7_docs')){G.unlockedEpisodes.push('ep7_docs');showMapNotif('📜 DOCUMENTS CHALLENGE UNLOCKED!');}
+    }
+    // ep6_scotus done unlocks docs (if not already)
+    if(epDone&&ep.id==='ep6_scotus'&&!G.unlockedEpisodes.includes('ep7_docs')){
+      G.unlockedEpisodes.push('ep7_docs');showMapNotif('📜 DOCUMENTS CHALLENGE UNLOCKED!');
+    }
     if(epDone&&EPISODES[idx+1]&&!G.unlockedEpisodes.includes(EPISODES[idx+1].id)){
-      G.unlockedEpisodes.push(EPISODES[idx+1].id);EPISODES[idx+1].coming=false;
-      if(EPISODES[idx+1].eras[0])G.unlockedEras.push(EPISODES[idx+1].eras[0].id);
-      showMapNotif('UNIT '+EPISODES[idx+1].num+' UNLOCKED!');
+      EPISODES[idx+1].coming=false;
+      // Don't double-handle scotus/docs/final boss here
+      if(!['ep6_scotus','ep7_docs','ep6'].includes(EPISODES[idx+1].id)){
+        G.unlockedEpisodes.push(EPISODES[idx+1].id);
+        if(EPISODES[idx+1].eras&&EPISODES[idx+1].eras[0])G.unlockedEras.push(EPISODES[idx+1].eras[0].id);
+        showMapNotif('UNIT '+EPISODES[idx+1].num+' UNLOCKED!');
+      }
     }
   });save();
 }
