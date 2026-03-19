@@ -297,7 +297,7 @@ body::after{
 .si-desc{font-family:var(--inter);font-size:11px;color:var(--text2);margin-bottom:6px;line-height:1.4}
 .si-cost{font-family:var(--cinzel);font-size:9px;color:var(--gold);margin-bottom:6px;letter-spacing:.05em}
 .si-stat{font-family:var(--inter);font-size:10px;color:var(--teal);margin-bottom:6px;font-weight:600}
-.rarity-common{color:var(--text2)}.rarity-uncommon{color:var(--green)}.rarity-rare{color:var(--blue)}.rarity-epic{color:var(--purple)}.rarity-legendary{color:var(--gold)}.rarity-ultra_mythic{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,.6)}.rarity-mythic{background:linear-gradient(90deg,#ff4060,#c9a84c,#ff4060);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 2s linear infinite;font-weight:700}
+.rarity-common{color:var(--text2)}.rarity-uncommon{color:var(--green)}.rarity-rare{color:var(--blue)}.rarity-epic{color:var(--purple)}.rarity-legendary{color:var(--gold)}.rarity-mythic{background:linear-gradient(90deg,#ff4060,#c9a84c,#ff4060);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 2s linear infinite;font-weight:700}
 
 /* ── COLLECTION ── */
 .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
@@ -379,7 +379,6 @@ option{background:var(--bg2)}
       <div class="hud-stat">⚖️<span id="hud-gold">0</span></div>
       <div class="hud-stat">❤️<span id="hud-hp">50</span></div>
       <div class="hud-stat">📦<span id="hud-packs">0</span></div>
-      <button onclick="manualSave()" style="font-family:var(--cinzel);font-size:7px;letter-spacing:.05em;background:transparent;border:1px solid var(--green2);color:var(--green2);padding:4px 8px;cursor:pointer;white-space:nowrap">💾</button>
     </div>
   </div>
 </div>
@@ -417,12 +416,11 @@ option{background:var(--bg2)}
     <div style="margin-top:6px">
       <input class="unlock-input" id="login-teacher-code" placeholder="TEACHER CODE (optional)..." maxlength="12"
         style="font-size:11px;text-align:center;opacity:.4;transition:opacity .2s"
-        onfocus="this.style.opacity='1'" onblur="this.style.opacity=this.value?'1':'.4'"
         oninput="this.value=this.value.toUpperCase()"
         onkeydown="if(event.key==='Enter')checkTeacherCodeAndAdvance()">
     </div>
     <div id="login-error-1" style="font-family:var(--pixel);font-size:5px;color:var(--red);min-height:14px;margin:6px 0;text-align:center"></div>
-    <button class="btn green full" onclick="goToLoginStep2()">▶ NEXT</button>
+    <button class="btn green full" onclick="goToLoginStep2()">&#9654; NEXT</button>
   </div>
 
   <!-- STEP 2: ENTER NAME -->
@@ -492,32 +490,19 @@ option{background:var(--bg2)}
   <button class="btn green full" onclick="createCharacter()">⚖ BEGIN CIVIC JOURNEY</button>
 </div>
 
-<!-- TOWN -->
+<!-- MAP -->
 <div id="map-screen" class="screen">
-  <div id="map-notification" style="display:none;background:rgba(64,200,120,0.1);border:2px solid var(--green);padding:10px;font-family:var(--pixel);font-size:6px;color:var(--green);margin-bottom:10px;text-align:center"></div>
-  <!-- Town canvas -->
-  <div style="position:relative;width:100%;max-width:548px;margin:0 auto">
-    <canvas id="town-canvas" width="548" height="420" style="width:100%;display:block;image-rendering:pixelated;border:2px solid var(--border2);cursor:pointer"></canvas>
-    <!-- Building labels that appear on hover -->
-    <div id="town-tooltip" style="display:none;position:absolute;background:var(--bg2);border:1px solid var(--gold);padding:6px 10px;font-family:var(--pixel);font-size:5px;color:var(--gold);pointer-events:none;z-index:10;white-space:nowrap"></div>
-  </div>
-  <!-- Town status bar -->
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg2);border:1px solid var(--border2);margin-top:4px;font-family:var(--pixel);font-size:5px">
-    <span id="town-location-label" style="color:var(--teal)">⚖ CONSTITUTION CITY</span>
-    <span id="town-hp-label" style="color:var(--gold)"></span>
-  </div>
-  <!-- Save overlay button -->
-  <div style="margin-top:6px;text-align:right">
-    <button onclick="manualSave()" style="font-family:var(--cinzel);font-size:9px;letter-spacing:.08em;background:rgba(39,174,96,.1);border:1px solid var(--green2);color:var(--green2);padding:8px 16px;cursor:pointer">💾 SAVE GAME</button>
-  </div>
+  <div id="map-notification" style="display:none;background:rgba(64,200,120,0.1);border:2px solid var(--green);padding:10px;font-family:var(--pixel);font-size:6px;color:var(--green);margin-bottom:10px"></div>
+  <div style="font-family:var(--pixel);font-size:7px;color:var(--teal);text-align:center;margin-bottom:12px">⚖ SELECT UNIT ⚖</div>
+  <div id="unit-list"></div>
+  <button class="btn blue full" onclick="openTimeline()" style="margin-top:8px">📜 FOUNDATIONAL DOCUMENTS</button>
 </div>
 
-<!-- BATTLE HALL (era/unit select) — replaces old era-screen -->
+<!-- ERA/SECTION SELECT -->
 <div id="era-screen" class="screen">
   <div id="era-header"></div>
   <div id="era-enemy-list"></div>
 </div>
-
 
 <!-- BATTLE -->
 <div id="battle-screen" class="screen">
@@ -591,12 +576,8 @@ option{background:var(--bg2)}
   </div>
   <div id="new-card-reveal" style="display:none"></div>
   <button class="btn green full" id="open-pack-btn" style="display:none" onclick="goToPackThenEra()">📦 OPEN YOUR BRIEF!</button>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-    <button class="btn green full" onclick="manualSave()" style="border-color:var(--green);color:var(--green)">💾 SAVE</button>
-    <button class="btn full" onclick="returnToCurrentEra()">▶ CONTINUE</button>
-  </div>
-  <button class="btn sm full" onclick="rematch()" style="margin-top:6px;border-color:var(--text3);color:var(--text3)">↺ REMATCH</button>
-  <button class="btn sm full" onclick="returnToTown()" style="margin-top:4px;border-color:var(--blue);color:var(--blue)">🏛️ RETURN TO TOWN</button>
+  <button class="btn full" onclick="returnToCurrentEra()">▶ CONTINUE</button>
+  <button class="btn sm full" onclick="rematch()" style="margin-top:4px">↺ REMATCH</button>
 </div>
 
 <!-- SHOP -->
@@ -633,7 +614,7 @@ option{background:var(--bg2)}
     <div style="display:flex;gap:6px">
       <button class="btn green sm" onclick="manualSave()">💾 SAVE</button>
       <button class="btn sm" onclick="openLeaderboard()" style="border-color:var(--purple);color:var(--purple)">🏆 BOARD</button>
-      <button class="btn sm" onclick="returnToTown()" style="border-color:var(--blue);color:var(--blue)">🏛️ TOWN</button>
+      <button class="btn sm" onclick="returnToTitle()" style="border-color:var(--text3);color:var(--text3)">🏠 TITLE</button>
     </div>
   </div>
   <div id="profile-header" style="text-align:center;padding-bottom:1rem;border-bottom:1px solid var(--border);margin-bottom:1rem"></div>
@@ -729,7 +710,7 @@ option{background:var(--bg2)}
 </div>
 
 <div id="bottom-nav" style="display:grid">
-  <button class="bn-btn active" id="nav-map" onclick="showScreen('map')"><span class="bn-icon">🏛️</span>TOWN</button>
+  <button class="bn-btn active" id="nav-map" onclick="showScreen('map')"><span class="bn-icon">🗺️</span>UNITS</button>
   <button class="bn-btn" id="nav-shop" onclick="showScreen('shop')"><span class="bn-icon">⚖️</span>ARMORY</button>
   <button class="bn-btn" id="nav-pack" onclick="showScreen('pack')"><span class="bn-icon">📦</span>BRIEFS<span class="bn-badge" id="pack-badge" style="display:none">!</span></button>
   <button class="bn-btn" id="nav-collection" onclick="showScreen('collection')"><span class="bn-icon">📜</span>CODEX</button>
@@ -776,13 +757,13 @@ function makeMedallion(cfg){
 }
 
 // Each avatar returns SVG content for a 40x40 viewBox circle portrait
-// passive: {stat, value} — applied automatically when this avatar is equipped
-// stat options: agility, defBonus, healBonus, dmgBonus, xpBonus, goldBonus
 const AVATAR_DEFS = [
-  // ══ STARTERS ══
+  // STARTERS
   {id:'scholar', name:'The Scholar', cat:'starter', rarity:'common', cost:0, unlockMethod:'starter', badge:'🎓',
-   desc:'A student of constitutional law', passive:null,
-   portrait: () => makeMedallion({bg:'#0d1a2e', ring:'#c9a84c', ring2:'#a8863a', face:`
+   desc:'A student of constitutional law',
+   portrait: () => makeMedallion({
+    bg:'#0d1a2e', ring:'#c9a84c', ring2:'#a8863a',
+    face:`
       <circle cx="20" cy="17" r="6" fill="#f5c8a0"/>
       <ellipse cx="20" cy="24" rx="8" ry="5" fill="#1a3060"/>
       <rect x="14" y="20" width="12" height="6" fill="#1a3060"/>
@@ -790,11 +771,14 @@ const AVATAR_DEFS = [
       <ellipse cx="22" cy="16" rx="1.2" ry="1.5" fill="#2c1a0e"/>
       <path d="M18 19 Q20 20 22 19" stroke="#c8836a" stroke-width="0.8" fill="none"/>
       <ellipse cx="20" cy="12.5" rx="6" ry="3" fill="#4a3728"/>
-      <rect x="16" y="22" width="8" height="1.5" rx="0.5" fill="#c9a84c"/>`})},
+      <rect x="16" y="22" width="8" height="1.5" rx="0.5" fill="#c9a84c"/>
+    `})},
 
   {id:'advocate', name:'The Advocate', cat:'starter', rarity:'common', cost:0, unlockMethod:'starter', badge:'⚖️',
-   desc:'A passionate defender of rights', passive:null,
-   portrait: () => makeMedallion({bg:'#100d1e', ring:'#c9a84c', ring2:'#a8863a', face:`
+   desc:'A passionate defender of rights',
+   portrait: () => makeMedallion({
+    bg:'#100d1e', ring:'#c9a84c', ring2:'#a8863a',
+    face:`
       <circle cx="20" cy="17" r="6" fill="#c8834a"/>
       <ellipse cx="20" cy="24" rx="8" ry="5" fill="#1a1a3e"/>
       <rect x="14" y="20" width="12" height="6" fill="#1a1a3e"/>
@@ -802,11 +786,14 @@ const AVATAR_DEFS = [
       <ellipse cx="22" cy="16" rx="1.2" ry="1.5" fill="#1a1a1a"/>
       <path d="M18 19 Q20 20.5 22 19" stroke="#a06040" stroke-width="0.8" fill="none"/>
       <ellipse cx="20" cy="12" rx="6.5" ry="3.5" fill="#2a1a0a"/>
-      <path d="M14 22 L13 26 M26 22 L27 26" stroke="#c8834a" stroke-width="1.2"/>`})},
+      <path d="M14 22 L13 26 M26 22 L27 26" stroke="#c8834a" stroke-width="1.2"/>
+    `})},
 
   {id:'senator', name:'The Senator', cat:'starter', rarity:'common', cost:0, unlockMethod:'starter', badge:'🏛️',
-   desc:'A representative of the people', passive:null,
-   portrait: () => makeMedallion({bg:'#0e0a08', ring:'#c9a84c', ring2:'#a8863a', face:`
+   desc:'A representative of the people',
+   portrait: () => makeMedallion({
+    bg:'#0e0a08', ring:'#c9a84c', ring2:'#a8863a',
+    face:`
       <circle cx="20" cy="17" r="6" fill="#e8b890"/>
       <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#8b0000"/>
       <rect x="14" y="20" width="12" height="7" fill="#8b0000"/>
@@ -814,12 +801,15 @@ const AVATAR_DEFS = [
       <ellipse cx="22" cy="16" rx="1.2" ry="1.4" fill="#3a1a0a"/>
       <path d="M18 19.5 Q20 20.5 22 19.5" stroke="#c8836a" stroke-width="0.8" fill="none"/>
       <ellipse cx="20" cy="12" rx="5.5" ry="3" fill="#8b4513"/>
-      <rect x="17" y="9" width="6" height="2" rx="1" fill="#c9a84c"/>`})},
+      <rect x="17" y="9" width="6" height="2" rx="1" fill="#c9a84c"/>
+    `})},
 
-  // ══ ARCHETYPES ══
+  // ARCHETYPE UNLOCKABLES
   {id:'judge', name:'The Judge', cat:'archetype', rarity:'rare', cost:1200, unlockMethod:'gold', badge:'🔨',
-   desc:'Interpreter of the Constitution', passive:{stat:'healBonus', value:8, label:'+8 HP on correct defend'},
-   portrait: () => makeMedallion({bg:'#080810', ring:'#c9a84c', ring2:'#a8863a', face:`
+   desc:'Interpreter of the Constitution',
+   portrait: () => makeMedallion({
+    bg:'#080810', ring:'#c9a84c', ring2:'#a8863a',
+    face:`
       <circle cx="20" cy="17" r="6" fill="#d4b890"/>
       <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#0a0a1e"/>
       <rect x="14" y="20" width="12" height="7" fill="#0a0a1e"/>
@@ -827,371 +817,270 @@ const AVATAR_DEFS = [
       <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
       <path d="M17.5 19.5 Q20 20 22.5 19.5" stroke="#b08060" stroke-width="0.8" fill="none"/>
       <ellipse cx="20" cy="11.5" rx="7" ry="4" fill="#e8e0d0"/>
-      <rect x="14" y="9" width="12" height="3" rx="1.5" fill="#e8e0d0"/>`})},
+      <rect x="14" y="9" width="12" height="3" rx="1.5" fill="#e8e0d0"/>
+    `})},
 
   {id:'journalist', name:'The Journalist', cat:'archetype', rarity:'uncommon', cost:500, unlockMethod:'gold', badge:'📰',
-   desc:'The pen is mightier than the sword', passive:{stat:'xpBonus', value:0.15, label:'+15% XP per battle'},
-   portrait: () => makeMedallion({bg:'#0a0c08', ring:'#c9a84c', ring2:'#a8863a', face:`
-      <circle cx="20" cy="17" r="6" fill="#e8c8a0"/>
-      <ellipse cx="20" cy="25" rx="8" ry="5" fill="#1a2a1a"/>
-      <rect x="14" y="20" width="12" height="7" fill="#1a2a1a"/>
-      <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
-      <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
-      <path d="M17.5 19 Q20 20 22.5 19" stroke="#b0906a" stroke-width="0.8" fill="none"/>
-      <rect x="14" y="9" width="12" height="8" rx="1" fill="#f5ead8" opacity="0.9"/>
-      <rect x="15" y="10.5" width="8" height="0.8" fill="#1a1a1a" opacity="0.5"/>
-      <rect x="15" y="12" width="6" height="0.8" fill="#1a1a1a" opacity="0.5"/>`})},
+   desc:'Holding power accountable',
+   portrait: () => makeMedallion({
+    bg:'#0e140a', ring:'#c9a84c', ring2:'#a8863a',
+    face:`
+      <circle cx="20" cy="17" r="6" fill="#d4956a"/>
+      <ellipse cx="20" cy="25" rx="8" ry="5" fill="#2a4020"/>
+      <rect x="14" y="20" width="12" height="7" fill="#2a4020"/>
+      <ellipse cx="18" cy="16" rx="1.2" ry="1.5" fill="#2c1a0a"/>
+      <ellipse cx="22" cy="16" rx="1.2" ry="1.5" fill="#2c1a0a"/>
+      <path d="M18 19.5 Q20 20.5 22 19.5" stroke="#a06040" stroke-width="0.8" fill="none"/>
+      <ellipse cx="20" cy="12" rx="5.5" ry="3" fill="#3c2c1a"/>
+      <rect x="22" y="14" width="4" height="3" rx="0.5" fill="#c9a84c" opacity="0.8"/>
+    `})},
 
   {id:'activist', name:'The Activist', cat:'archetype', rarity:'uncommon', cost:600, unlockMethod:'gold', badge:'✊',
-   desc:'Change comes from the streets', passive:{stat:'agility', value:5, label:'+5 Agility (10% dodge)'},
-   portrait: () => makeMedallion({bg:'#100808', ring:'#c9a84c', ring2:'#a8863a', face:`
-      <circle cx="20" cy="17" r="6" fill="#a06040"/>
-      <ellipse cx="20" cy="25" rx="8" ry="5" fill="#3a0a0a"/>
-      <rect x="14" y="20" width="12" height="7" fill="#3a0a0a"/>
-      <ellipse cx="18" cy="16" rx="1.2" ry="1.5" fill="#1a1a1a"/>
-      <ellipse cx="22" cy="16" rx="1.2" ry="1.5" fill="#1a1a1a"/>
-      <path d="M18 19 Q20 20.5 22 19" stroke="#804020" stroke-width="0.8" fill="none"/>
-      <ellipse cx="20" cy="11" rx="6" ry="3.5" fill="#1a0a0a"/>
-      <path d="M25 20 L27 14 M28 19 L27 14" stroke="#a06040" stroke-width="1.2"/>`})},
+   desc:'Fighting for civil liberties',
+   portrait: () => makeMedallion({
+    bg:'#140a0a', ring:'#c9a84c', ring2:'#a8863a',
+    face:`
+      <circle cx="20" cy="17" r="6" fill="#f0c8b0"/>
+      <ellipse cx="20" cy="25" rx="8" ry="5" fill="#800020"/>
+      <rect x="14" y="20" width="12" height="7" fill="#800020"/>
+      <ellipse cx="18" cy="16" rx="1.2" ry="1.5" fill="#2a1a2a"/>
+      <ellipse cx="22" cy="16" rx="1.2" ry="1.5" fill="#2a1a2a"/>
+      <path d="M18 19.5 Q20 21 22 19.5" stroke="#c8908a" stroke-width="0.8" fill="none"/>
+      <ellipse cx="20" cy="11.5" rx="6" ry="3.5" fill="#6a4a8a"/>
+    `})},
 
-  {id:'anarchist', name:'The Anarchist', cat:'archetype', rarity:'rare', cost:1500, unlockMethod:'gold', badge:'Ⓐ',
-   desc:'No gods, no masters — maximum agility', passive:{stat:'agility', value:12, label:'+12 Agility (24% dodge)'},
-   portrait: () => makeMedallion({bg:'#0a0808', ring:'#8b0000', ring2:'#600000', face:`
-      <circle cx="20" cy="17" r="6" fill="#c09070"/>
-      <ellipse cx="20" cy="25" rx="8" ry="5" fill="#1a0a0a"/>
-      <rect x="14" y="20" width="12" height="7" fill="#1a0a0a"/>
-      <ellipse cx="18" cy="16" rx="1.2" ry="1.5" fill="#0a0a0a"/>
-      <ellipse cx="22" cy="16" rx="1.2" ry="1.5" fill="#0a0a0a"/>
-      <path d="M17 20 Q20 21 23 20" stroke="#804040" stroke-width="0.8" fill="none"/>
-      <circle cx="20" cy="12" r="4" fill="none" stroke="#8b0000" stroke-width="1.2"/>
-      <text x="20" y="13.5" text-anchor="middle" font-size="5" fill="#8b0000" font-weight="bold">Ⓐ</text>`})},
-
-  // ══ HISTORICAL / LEGENDARY ══
+  // HISTORICAL — unlocked by collecting their card
   {id:'madison_av', name:'James Madison', cat:'historical', rarity:'legendary', cost:0, unlockMethod:'card:fed10', badge:'📜',
-   desc:'Father of the Constitution — unlock by collecting Federalist No. 10',
-   passive:{stat:'xpBonus', value:0.25, label:'+25% XP — Father of the Constitution'},
-   portrait:()=>makeMedallion({bg:'#0a0c18',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6" fill="#e8c8a0"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#1a1a3a"/>
-    <rect x="14" y="20" width="12" height="7" fill="#1a1a3a"/>
-    <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <path d="M17.5 19.5 Q20 20.5 22.5 19.5" stroke="#b09070" stroke-width="0.8" fill="none"/>
-    <path d="M14 10 Q15 6 20 7 Q25 6 26 10 Q22 8 20 9 Q18 8 14 10Z" fill="#e8e0d0"/>
-    <path d="M14 10 Q13 14 14 16" fill="#e8e0d0"/>
-    <path d="M26 10 Q27 14 26 16" fill="#e8e0d0"/>`})},
+   desc:'Collect the Federalist No. 10 card to unlock',
+   portrait: () => makeMedallion({
+    bg:'#08100e', ring:'#e8c870', ring2:'#c9a84c', worn:true,
+    face:`
+      <circle cx="20" cy="17" r="6" fill="#e8d0b0"/>
+      <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#0a1020"/>
+      <rect x="14" y="20" width="12" height="7" fill="#0a1020"/>
+      <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+      <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+      <path d="M17.5 19.5 Q20 20.5 22.5 19.5" stroke="#b09070" stroke-width="0.8" fill="none"/>
+      <ellipse cx="20" cy="11" rx="7.5" ry="4.5" fill="#e8e0d0"/>
+      <path d="M12 13 Q14 8 20 7 Q26 8 28 13" fill="#e8e0d0"/>
+    `})},
 
   {id:'hamilton_av', name:'Alexander Hamilton', cat:'historical', rarity:'legendary', cost:0, unlockMethod:'card:fed51', badge:'🪶',
-   desc:'Architect of American finance — unlock by collecting Federalist No. 51',
-   passive:{stat:'goldBonus', value:0.3, label:'+30% gold earned per battle'},
-   portrait:()=>makeMedallion({bg:'#0c0a06',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6" fill="#e0c090"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#1a1400"/>
-    <rect x="14" y="20" width="12" height="7" fill="#1a1400"/>
-    <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <path d="M17.5 19.5 Q20 20.5 22.5 19.5" stroke="#b09060" stroke-width="0.8" fill="none"/>
-    <path d="M14 10 Q15 5 20 6 Q25 5 26 10 Q24 7 20 8 Q16 7 14 10Z" fill="#c8b880"/>
-    <path d="M26 10 Q28 15 26 18" fill="none" stroke="#c8b880" stroke-width="1.5"/>`})},
+   desc:'Collect the Federalist No. 51 card to unlock',
+   portrait: () => makeMedallion({
+    bg:'#0a1008', ring:'#e8c870', ring2:'#c9a84c', worn:true,
+    face:`
+      <circle cx="20" cy="17" r="6" fill="#e0c8a0"/>
+      <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#0a1808"/>
+      <rect x="14" y="20" width="12" height="7" fill="#0a1808"/>
+      <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+      <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+      <path d="M18 19.5 Q20 20.5 22 19.5" stroke="#b09060" stroke-width="0.8" fill="none"/>
+      <ellipse cx="20" cy="11" rx="7" ry="4" fill="#c8b070"/>
+      <path d="M13 13 Q14 8 20 7 Q26 8 27 13" fill="#c8b070"/>
+      <path d="M26 10 L30 5" stroke="#e8e0d0" stroke-width="1.2"/>
+    `})},
 
   {id:'marshall_av', name:'Chief Justice Marshall', cat:'historical', rarity:'legendary', cost:0, unlockMethod:'card:mcculloch', badge:'⚖️',
-   desc:'Established judicial review — unlock by collecting McCulloch v. Maryland',
-   passive:{stat:'defBonus', value:5, label:'+5 Defense — the law is supreme'},
-   portrait:()=>makeMedallion({bg:'#080810',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6" fill="#d4b890"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#0a0a1e"/>
-    <rect x="14" y="20" width="12" height="7" fill="#0a0a1e"/>
-    <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
-    <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
-    <path d="M17.5 19.5 Q20 20 22.5 19.5" stroke="#b08060" stroke-width="0.8" fill="none"/>
-    <ellipse cx="20" cy="11.5" rx="7" ry="4" fill="#e8e0d0"/>
-    <rect x="13" y="9" width="14" height="3" rx="1.5" fill="#e8e0d0"/>
-    <rect x="17" y="22" width="6" height="1.5" rx="0.5" fill="#c9a84c"/>`})},
+   desc:'Collect the McCulloch card to unlock',
+   portrait: () => makeMedallion({
+    bg:'#080808', ring:'#e8c870', ring2:'#c9a84c', worn:true,
+    face:`
+      <circle cx="20" cy="17" r="6" fill="#d4b890"/>
+      <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#080808"/>
+      <rect x="14" y="20" width="12" height="7" fill="#080808"/>
+      <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+      <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+      <path d="M17.5 20 Q20 21 22.5 20" stroke="#a08060" stroke-width="0.8" fill="none"/>
+      <ellipse cx="20" cy="11" rx="7.5" ry="4.5" fill="#e8e0d0"/>
+      <rect x="13" y="9" width="14" height="3" rx="1.5" fill="#e8e0d0"/>
+    `})},
 
-  {id:'brutus', name:'Brutus', cat:'historical', rarity:'legendary', cost:0, unlockMethod:'card:marbury2', badge:'📜',
-   desc:'Anti-Federalist No. 1 — unlock by collecting Marbury v. Madison. The Constitution needs a Bill of Rights.',
-   passive:{stat:'defBonus', value:6, label:'+6 Defense — check federal power'},
-   portrait:()=>makeMedallion({bg:'#0a0c08',ring:'#8b6914',ring2:'#6b5010',face:`
-    <circle cx="20" cy="17" r="6" fill="#c8a870"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#1a2a1a"/>
-    <rect x="14" y="20" width="12" height="7" fill="#1a2a1a"/>
-    <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <path d="M17.5 19.5 Q20 20.5 22.5 19.5" stroke="#a08050" stroke-width="0.8" fill="none"/>
-    <path d="M13 10 Q14 5 20 6 Q26 5 27 10 Q23 7 20 8 Q17 7 13 10Z" fill="#e8d8a0"/>
-    <path d="M13 10 Q11 14 13 17" fill="none" stroke="#e8d8a0" stroke-width="2"/>
-    <path d="M27 10 Q29 14 27 17" fill="none" stroke="#e8d8a0" stroke-width="2"/>
-    <rect x="16" y="22" width="8" height="1.5" rx="0.5" fill="#8b6914"/>
-   `})},
+  // LEGENDARY
+  {id:'chief_justice', name:'Chief Justice', cat:'legendary', rarity:'legendary', cost:6000, unlockMethod:'gold', badge:'🌟',
+   desc:'The highest judicial authority — 6,000 credits',
+   portrait: () => makeMedallion({
+    bg:'#060408', ring:'#f0d060', ring2:'#c9a84c', worn:true,
+    face:`
+      <circle cx="20" cy="17" r="6.5" fill="#e8d8c0"/>
+      <ellipse cx="20" cy="25.5" rx="9" ry="5.5" fill="#060408"/>
+      <rect x="13" y="20" width="14" height="8" fill="#060408"/>
+      <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+      <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+      <path d="M17 20 Q20 21.5 23 20" stroke="#b09878" stroke-width="0.9" fill="none"/>
+      <ellipse cx="20" cy="10.5" rx="8" ry="5" fill="#f0ece8"/>
+      <rect x="12" y="8" width="16" height="3.5" rx="1.5" fill="#f0ece8"/>
+      <path d="M17 24 L15 29 M23 24 L25 29" stroke="#f0d060" stroke-width="1.2"/>
+    `})},
 
-  {id:'potus', name:'Commander POTUS', cat:'legendary', rarity:'legendary', cost:6000, unlockMethod:'gold', badge:'🇺🇸',
-   desc:'The executive power shall be vested in a President', passive:{stat:'dmgBonus', value:8, label:'+8 Attack — executive power'},
-   portrait:()=>makeMedallion({bg:'#080c18',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6" fill="#e8c8a0"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#00205b"/>
-    <rect x="14" y="20" width="12" height="7" fill="#00205b"/>
-    <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <path d="M17.5 19.5 Q20 20.5 22.5 19.5" stroke="#b09070" stroke-width="0.8" fill="none"/>
-    <ellipse cx="20" cy="11.5" rx="5.5" ry="3" fill="#c8b880"/>
-    <rect x="17" y="8" width="6" height="2" rx="1" fill="#c9a84c"/>
-    <rect x="15" y="22" width="10" height="1.5" rx="0.5" fill="#c9a84c"/>`})},
+  {id:'potus', name:'Commander POTUS', cat:'legendary', rarity:'legendary', cost:8000, unlockMethod:'gold', badge:'🇺🇸',
+   desc:'The executive power personified — 8,000 credits',
+   portrait: () => makeMedallion({
+    bg:'#04060e', ring:'#e8c870', ring2:'#c9a84c', worn:true,
+    face:`
+      <circle cx="20" cy="17" r="6" fill="#f0d0b0"/>
+      <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#00205b"/>
+      <rect x="14" y="20" width="12" height="7" fill="#00205b"/>
+      <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+      <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+      <path d="M18 19.5 Q20 20.5 22 19.5" stroke="#c09878" stroke-width="0.8" fill="none"/>
+      <ellipse cx="20" cy="12" rx="6" ry="3.5" fill="#c0a060"/>
+      <path d="M14 12 Q14 8 20 6.5 Q26 8 26 12" fill="#c0a060"/>
+      <rect x="17" y="21" width="6" height="1.2" fill="#c9a84c"/>
+    `})},
 
-  {id:'college_board', name:'The College Board', cat:'legendary', rarity:'legendary', cost:5000, unlockMethod:'gold', badge:'📋',
-   desc:'A nonprofit with $1.5 billion in revenue — your AP score is their product',
-   passive:{stat:'xpBonus', value:0.2, label:'+20% XP — suffering builds character'},
-   portrait:()=>makeMedallion({bg:'#030305',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="16" r="6" fill="#1a1a2a"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#0a0a14"/>
-    <rect x="14" y="20" width="12" height="7" fill="#0a0a14"/>
-    <ellipse cx="17.5" cy="15" rx="1.4" ry="1.6" fill="#ff0000"/>
-    <ellipse cx="22.5" cy="15" rx="1.4" ry="1.6" fill="#ff0000"/>
-    <path d="M16 20 Q20 18 24 20" stroke="#8b0000" stroke-width="1.2" fill="none"/>
-    <rect x="13" y="8" width="14" height="9" rx="1" fill="#0d0d1a" stroke="#c9a84c" stroke-width="0.8"/>
-    <text x="20" y="12" text-anchor="middle" font-size="3.5" fill="#c9a84c" font-weight="bold">AP</text>
-    <text x="20" y="15.5" text-anchor="middle" font-size="2.8" fill="#ff4444">$1,500</text>
-    <path d="M15 22 L14 27 M25 22 L26 27" stroke="#1a1a2a" stroke-width="1"/>
-    <circle cx="20" cy="7" r="1.5" fill="#c9a84c" opacity="0.6"/>
-   `})},
-
-  {id:'jefferson', name:'Thomas Jefferson', cat:'historical', rarity:'legendary', cost:0, unlockMethod:'card:declaration', badge:'🦅',
-   desc:'Author of the Declaration — unlock by collecting the Declaration of Independence',
-   passive:{stat:'xpBonus', value:0.2, label:'+20% XP — life, liberty, pursuit of happiness'},
-   portrait:()=>makeMedallion({bg:'#0a0c18',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6" fill="#e0c090"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#1a1a3a"/>
-    <rect x="14" y="20" width="12" height="7" fill="#1a1a3a"/>
-    <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <path d="M17.5 19.5 Q20 20.5 22.5 19.5" stroke="#b09060" stroke-width="0.8" fill="none"/>
-    <path d="M14 10 Q15 5 20 6 Q25 5 26 10 Q22 7 20 8 Q18 7 14 10Z" fill="#c8b880"/>
-    <path d="M14 10 Q12 14 14 17" fill="none" stroke="#c8b880" stroke-width="2"/>
-    <path d="M26 10 Q28 14 26 17" fill="none" stroke="#c8b880" stroke-width="2"/>
-    <rect x="16" y="22" width="8" height="1.5" rx="0.5" fill="#c9a84c"/>`})},
-
-  {id:'patrick_henry', name:'Patrick Henry', cat:'historical', rarity:'legendary', cost:0, unlockMethod:'card:bill_of_rights_era2', badge:'🗣️',
-   desc:'Give me liberty or give me death — unlock by completing the Bill of Rights era',
-   passive:{stat:'dmgBonus', value:6, label:'+6 Attack — liberty or death'},
-   portrait:()=>makeMedallion({bg:'#0c0a06',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6" fill="#d4a870"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#2a1a08"/>
-    <rect x="14" y="20" width="12" height="7" fill="#2a1a08"/>
-    <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <path d="M17 20 Q20 21 23 20" stroke="#a07840" stroke-width="0.9" fill="none"/>
-    <path d="M14 10 Q15 5 20 6 Q25 5 26 10 Q22 8 20 9 Q18 8 14 10Z" fill="#c8a060"/>
-    <path d="M14 10 Q12 14 14 17" fill="none" stroke="#c8a060" stroke-width="2"/>
-    <path d="M26 10 Q28 14 26 17" fill="none" stroke="#c8a060" stroke-width="2"/>
-    <rect x="15" y="22" width="10" height="1.5" rx="0.5" fill="#c9a84c"/>`})},
-
-  {id:'deep_state', name:'The Deep State', cat:'legendary', rarity:'legendary', cost:5000, unlockMethod:'gold', badge:'🕵️',
-   desc:'They were here before you and they will be here after you',
-   passive:{stat:'agility', value:10, label:'+10 Agility — you never see them coming'},
-   portrait:()=>makeMedallion({bg:'#030305',ring:'#444460',ring2:'#222230',face:`
-    <circle cx="20" cy="16" r="6" fill="#1a1a2a"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#08080f"/>
-    <rect x="14" y="20" width="12" height="7" fill="#08080f"/>
-    <ellipse cx="17.5" cy="15" rx="1.8" ry="1.6" fill="#0a0a0a"/>
-    <ellipse cx="22.5" cy="15" rx="1.8" ry="1.6" fill="#0a0a0a"/>
-    <rect x="14" y="13" width="12" height="5" rx="1" fill="#0d0d1a"/>
-    <ellipse cx="17.5" cy="15" rx="1" ry="1" fill="#ff0000" opacity="0.6"/>
-    <ellipse cx="22.5" cy="15" rx="1" ry="1" fill="#ff0000" opacity="0.6"/>
-    <path d="M16 20 Q20 19 24 20" stroke="#333350" stroke-width="1" fill="none"/>
-    <path d="M14 8 Q15 5 20 6 Q25 5 26 8 Q22 7 20 7.5 Q18 7 14 8Z" fill="#1a1a2a"/>
-    <path d="M14 8 Q12 11 14 13" fill="none" stroke="#1a1a2a" stroke-width="2"/>
-    <path d="M26 8 Q28 11 26 13" fill="none" stroke="#1a1a2a" stroke-width="2"/>
-    <circle cx="20" cy="29" r="1" fill="#ff0000" opacity="0.4"/>`})},
-
-  {id:'federal_reserve', name:'The Federal Reserve', cat:'legendary', rarity:'legendary', cost:5000, unlockMethod:'gold', badge:'💸',
-   desc:'End the Fed — the institution Ron Paul and Mises dedicated their lives to opposing',
-   passive:{stat:'goldBonus', value:0.35, label:'+35% gold — print money'},
-   portrait:()=>makeMedallion({bg:'#040a04',ring:'#2a6a2a',ring2:'#1a4a1a',face:`
-    <circle cx="20" cy="16" r="6" fill="#1a3a1a"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#0a1a0a"/>
-    <rect x="14" y="20" width="12" height="7" fill="#0a1a0a"/>
-    <ellipse cx="17.5" cy="15" rx="1.2" ry="1.4" fill="#0a1a0a"/>
-    <ellipse cx="22.5" cy="15" rx="1.2" ry="1.4" fill="#0a1a0a"/>
-    <path d="M16.5 19 Q20 20 23.5 19" stroke="#1a4a1a" stroke-width="0.9" fill="none"/>
-    <rect x="13" y="8" width="14" height="10" rx="1" fill="#0d200d" stroke="#2a6a2a" stroke-width="0.8"/>
-    <text x="20" y="12" text-anchor="middle" font-size="4" fill="#2a8a2a" font-weight="bold">FED</text>
-    <text x="20" y="16" text-anchor="middle" font-size="3" fill="#1a6a1a">RESERVE</text>
-    <rect x="16" y="22" width="8" height="1.5" rx="0.5" fill="#2a6a2a"/>`})},
 
   // ══ PRESIDENTS ══
   {id:'washington', name:'George Washington', cat:'president', rarity:'legendary', cost:2000, unlockMethod:'gold', badge:'🎖️',
-   desc:'First in war, first in peace', passive:{stat:'defBonus', value:4, label:'+4 Defense — founding authority'},
-   portrait:()=>makeMedallion({bg:'#0a0c10',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6" fill="#e8c8a0"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#1a2a4a"/>
-    <rect x="14" y="20" width="12" height="7" fill="#1a2a4a"/>
-    <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <path d="M17.5 19.5 Q20 20.5 22.5 19.5" stroke="#b09070" stroke-width="0.8" fill="none"/>
-    <path d="M13 10 Q14 5 20 6 Q26 5 27 10 Q24 7 20 8 Q16 7 13 10Z" fill="#e8e0d0"/>
-    <path d="M13 10 Q11 15 13 18" fill="none" stroke="#e8e0d0" stroke-width="2"/>
-    <path d="M27 10 Q29 15 27 18" fill="none" stroke="#e8e0d0" stroke-width="2"/>`})},
-
-  {id:'teddy', name:'Theodore Roosevelt', cat:'president', rarity:'epic', cost:1800, unlockMethod:'gold', badge:'🦁',
-   desc:'Speak softly and carry a big stick', passive:{stat:'dmgBonus', value:6, label:'+6 Attack — bully pulpit'},
-   portrait:()=>makeMedallion({bg:'#0c0a06',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6.5" fill="#d4a870"/>
-    <ellipse cx="20" cy="25.5" rx="9" ry="5" fill="#3a2010"/>
-    <rect x="13" y="21" width="14" height="7" fill="#3a2010"/>
-    <ellipse cx="17.5" cy="16" rx="1.3" ry="1.5" fill="#1a0a00"/>
-    <ellipse cx="22.5" cy="16" rx="1.3" ry="1.5" fill="#1a0a00"/>
-    <path d="M17 20 Q20 21.5 23 20" stroke="#a07040" stroke-width="1" fill="none"/>
-    <ellipse cx="20" cy="13" rx="6.5" ry="3.5" fill="#8b4513"/>
-    <ellipse cx="17" cy="18" rx="2" ry="1.2" fill="#c0a060" opacity="0.8"/>
-    <ellipse cx="23" cy="18" rx="2" ry="1.2" fill="#c0a060" opacity="0.8"/>
-    <rect x="17.5" y="20" width="5" height="1" rx="0.5" fill="#8b6020"/>`})},
-
-  {id:'jfk', name:'John F. Kennedy', cat:'president', rarity:'epic', cost:1800, unlockMethod:'gold', badge:'🌙',
-   desc:'Ask not what your country can do for you', passive:{stat:'xpBonus', value:0.2, label:'+20% XP — New Frontier'},
-   portrait:()=>makeMedallion({bg:'#060810',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6" fill="#d4b080"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#00205b"/>
-    <rect x="14" y="20" width="12" height="7" fill="#00205b"/>
-    <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <path d="M17.5 19.5 Q20 20.5 22.5 19.5" stroke="#a08050" stroke-width="0.8" fill="none"/>
-    <ellipse cx="20" cy="12" rx="5.5" ry="3" fill="#6b4520"/>
-    <rect x="16" y="22" width="8" height="1.5" rx="0.5" fill="#c9a84c"/>`})},
-
-  {id:'nixon', name:'Richard Nixon', cat:'president', rarity:'rare', cost:1200, unlockMethod:'gold', badge:'🤞',
-   desc:'I am not a crook', passive:{stat:'goldBonus', value:0.15, label:'+15% gold — executive privilege'},
-   portrait:()=>makeMedallion({bg:'#080608',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6.5" fill="#d4a870"/>
-    <ellipse cx="20" cy="25.5" rx="9" ry="5" fill="#1a0a1a"/>
-    <rect x="13" y="21" width="14" height="7" fill="#1a0a1a"/>
-    <ellipse cx="17.5" cy="16" rx="1.3" ry="1.5" fill="#1a1a1a"/>
-    <ellipse cx="22.5" cy="16" rx="1.3" ry="1.5" fill="#1a1a1a"/>
-    <path d="M16 20.5 Q20 21.5 24 20.5" stroke="#a07840" stroke-width="1" fill="none"/>
-    <ellipse cx="20" cy="12" rx="6" ry="3.5" fill="#8b6030"/>
-    <path d="M16 17 Q18 19 20 19 Q22 19 24 17" fill="none" stroke="#804020" stroke-width="0.6"/>`})},
-
-  {id:'obama', name:'Barack Obama', cat:'president', rarity:'epic', cost:1500, unlockMethod:'gold', badge:'🇺🇸',
-   desc:'Yes we can', passive:{stat:'healBonus', value:5, label:'+5 HP on correct defend'},
-   portrait:()=>makeMedallion({bg:'#040810',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6" fill="#7a4020"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#00205b"/>
-    <rect x="14" y="20" width="12" height="7" fill="#00205b"/>
-    <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#1a0a00"/>
-    <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#1a0a00"/>
-    <path d="M17.5 19.5 Q20 20.5 22.5 19.5" stroke="#60300a" stroke-width="0.8" fill="none"/>
-    <ellipse cx="20" cy="12" rx="5.5" ry="3" fill="#2a1a0a"/>
-    <rect x="16" y="22" width="8" height="1.5" rx="0.5" fill="#c9a84c"/>`})},
-
-  {id:'trump', name:'Donald Trump', cat:'president', rarity:'epic', cost:1500, unlockMethod:'gold', badge:'🏗️',
-   desc:'Make the Constitution great again', passive:{stat:'goldBonus', value:0.25, label:'+25% gold — art of the deal'},
-   portrait:()=>makeMedallion({bg:'#0c0808',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6.5" fill="#e8b870"/>
-    <ellipse cx="20" cy="25.5" rx="9" ry="5" fill="#00205b"/>
-    <rect x="13" y="21" width="14" height="7" fill="#00205b"/>
-    <ellipse cx="17.5" cy="16" rx="1.3" ry="1.5" fill="#2a1a0a"/>
-    <ellipse cx="22.5" cy="16" rx="1.3" ry="1.5" fill="#2a1a0a"/>
-    <path d="M16 20.5 Q20 21.5 24 20.5" stroke="#c09050" stroke-width="1" fill="none"/>
-    <path d="M13 12 Q14 7 20 8 Q26 7 27 12 Q24 9 20 10 Q16 9 13 12Z" fill="#e8b030"/>
-    <path d="M13 12 Q11 14 14 16" fill="none" stroke="#e8b030" stroke-width="2"/>`})},
-
-  {id:'karl_marx', name:'Karl Marx', cat:'modern_political', rarity:'rare', cost:1200, unlockMethod:'gold', badge:'☭',
-   desc:'Workers of the world, unite — the ultimate ideological challenger',
-   passive:{stat:'goldBonus', value:0.0, label:'Seize the means of production (no gold bonus — ironic)'},
-   portrait:()=>makeMedallion({bg:'#140404',ring:'#8b0000',ring2:'#600000',face:`
-    <circle cx="20" cy="17" r="6.5" fill="#c09060"/>
-    <ellipse cx="20" cy="25.5" rx="9" ry="5" fill="#2a0404"/>
-    <rect x="13" y="21" width="14" height="7" fill="#2a0404"/>
-    <ellipse cx="17.5" cy="16" rx="1.3" ry="1.5" fill="#1a0a00"/>
-    <ellipse cx="22.5" cy="16" rx="1.3" ry="1.5" fill="#1a0a00"/>
-    <path d="M16 20.5 Q20 21 24 20.5" stroke="#906030" stroke-width="1" fill="none"/>
-    <ellipse cx="20" cy="11" rx="7" ry="5" fill="#3a2010"/>
-    <path d="M13 13 Q14 9 20 10 Q26 9 27 13" fill="none" stroke="#5a3820" stroke-width="2"/>
-    <path d="M13 13 Q11 17 13 20" fill="none" stroke="#5a3820" stroke-width="2.5"/>
-    <path d="M27 13 Q29 17 27 20" fill="none" stroke="#5a3820" stroke-width="2.5"/>
-    <rect x="15" y="22" width="10" height="1.5" rx="0.5" fill="#8b0000"/>
+   desc:'Commander of the Continental Army — Father of the Nation',
+   portrait:()=>makeMedallion({bg:'#080e06',ring:'#c9a84c',ring2:'#a8863a',face:`
+    <circle cx="20" cy="16" r="6.5" fill="#e8d0b0"/>
+    <ellipse cx="20" cy="25" rx="9" ry="5" fill="#1a2a4a"/>
+    <rect x="13" y="20" width="14" height="7" fill="#1a2a4a"/>
+    <ellipse cx="17.5" cy="15" rx="1.2" ry="1.4" fill="#1a1a1a"/>
+    <ellipse cx="22.5" cy="15" rx="1.2" ry="1.4" fill="#1a1a1a"/>
+    <path d="M17 18.5 Q20 19.5 23 18.5" stroke="#b09070" stroke-width="0.8" fill="none"/>
+    <ellipse cx="20" cy="10" rx="8" ry="5" fill="#f0ece8"/>
+    <path d="M12 12 Q12 7 20 5.5 Q28 7 28 12" fill="#f0ece8"/>
+    <rect x="18" y="22" width="4" height="1" fill="#c9a84c"/>
    `})},
 
-  {id:'kash_patel', name:'Kash Patel', cat:'modern_political', rarity:'rare', cost:1200, unlockMethod:'gold', badge:'🎯',
-   desc:'Government gangsters — taking on the administrative state',
-   passive:{stat:'dmgBonus', value:6, label:'+6 Attack — drain the swamp'},
-   portrait:()=>makeMedallion({bg:'#080a0c',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6" fill="#8a5030"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#0a1020"/>
-    <rect x="14" y="20" width="12" height="7" fill="#0a1020"/>
-    <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#1a0a00"/>
-    <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#1a0a00"/>
-    <path d="M17.5 19.5 Q20 20.5 22.5 19.5" stroke="#6a3810" stroke-width="0.8" fill="none"/>
-    <ellipse cx="20" cy="12" rx="5.5" ry="3" fill="#2a1a0a"/>
-    <rect x="16" y="22" width="8" height="1.5" rx="0.5" fill="#c9a84c"/>`})},
+  {id:'lincoln', name:'Abraham Lincoln', cat:'president', rarity:'legendary', cost:2000, unlockMethod:'gold', badge:'🎩',
+   desc:'The Great Emancipator — preserved the Union',
+   portrait:()=>makeMedallion({bg:'#080808',ring:'#c9a84c',ring2:'#a8863a',face:`
+    <circle cx="20" cy="17" r="6" fill="#d4a880"/>
+    <ellipse cx="20" cy="25.5" rx="8.5" ry="5" fill="#1a1a1a"/>
+    <rect x="13.5" y="21" width="13" height="7" fill="#1a1a1a"/>
+    <ellipse cx="17.5" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+    <ellipse cx="22.5" cy="16" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+    <path d="M17.5 19.5 Q20 20 22.5 19.5" stroke="#a07850" stroke-width="0.8" fill="none"/>
+    <path d="M18 20.5 Q20 22 22 20.5" stroke="#6a3a1a" stroke-width="1" fill="none"/>
+    <rect x="15" y="5" width="10" height="7" rx="1" fill="#1a1a1a"/>
+    <rect x="14" y="10" width="12" height="2" rx="0.5" fill="#1a1a1a"/>
+   `})},
+
+  {id:'fdr', name:'Franklin D. Roosevelt', cat:'president', rarity:'epic', cost:1500, unlockMethod:'gold', badge:'♿',
+   desc:'New Deal architect — led America through depression and war',
+   portrait:()=>makeMedallion({bg:'#060c14',ring:'#c9a84c',ring2:'#a8863a',face:`
+    <circle cx="20" cy="16.5" r="6" fill="#e8c8a0"/>
+    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#1a2a3a"/>
+    <rect x="13.5" y="21" width="13" height="7" fill="#1a2a3a"/>
+    <ellipse cx="17.5" cy="15.5" rx="1.2" ry="1.4" fill="#2a1a1a"/>
+    <ellipse cx="22.5" cy="15.5" rx="1.2" ry="1.4" fill="#2a1a1a"/>
+    <path d="M17.5 19 Q20 20 22.5 19" stroke="#b09060" stroke-width="0.8" fill="none"/>
+    <circle cx="18" cy="15.5" r="2" fill="none" stroke="#1a1a1a" stroke-width="0.8"/>
+    <circle cx="22" cy="15.5" r="2" fill="none" stroke="#1a1a1a" stroke-width="0.8"/>
+    <ellipse cx="20" cy="11" rx="5" ry="2.5" fill="#4a3a28"/>
+    <path d="M22 21 L24 27 M18 21 L16 27" stroke="#c8b090" stroke-width="1.2"/>
+   `})},
+
+  {id:'obama', name:'Barack Obama', cat:'president', rarity:'epic', cost:1500, unlockMethod:'gold', badge:'🇺🇸',
+   desc:'44th President — Hope and Change',
+   portrait:()=>makeMedallion({bg:'#040810',ring:'#c9a84c',ring2:'#a8863a',face:`
+    <circle cx="20" cy="16.5" r="6" fill="#8b5e3c"/>
+    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#00205b"/>
+    <rect x="13.5" y="21" width="13" height="7" fill="#00205b"/>
+    <ellipse cx="17.5" cy="15.5" rx="1.2" ry="1.4" fill="#1a1a1a"/>
+    <ellipse cx="22.5" cy="15.5" rx="1.2" ry="1.4" fill="#1a1a1a"/>
+    <path d="M17.5 19 Q20 20.2 22.5 19" stroke="#6a3a20" stroke-width="0.8" fill="none"/>
+    <ellipse cx="20" cy="11.5" rx="5.5" ry="2.8" fill="#5a3a20"/>
+    <rect x="16" y="22" width="8" height="1.2" fill="#c9a84c"/>
+   `})},
+
+  {id:'trump', name:'Donald Trump', cat:'president', rarity:'epic', cost:1500, unlockMethod:'gold', badge:'🏗️',
+   desc:'45th & 47th President — America First',
+   portrait:()=>makeMedallion({bg:'#0e0806',ring:'#c9a84c',ring2:'#a8863a',face:`
+    <circle cx="20" cy="16.5" r="6" fill="#f0c890"/>
+    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#1a1a2e"/>
+    <rect x="13.5" y="21" width="13" height="7" fill="#1a1a2e"/>
+    <ellipse cx="17.5" cy="15.5" rx="1.2" ry="1.4" fill="#1a1a1a"/>
+    <ellipse cx="22.5" cy="15.5" rx="1.2" ry="1.4" fill="#1a1a1a"/>
+    <path d="M17 19.5 Q20 20.5 23 19.5" stroke="#c09060" stroke-width="0.8" fill="none"/>
+    <path d="M13 12 Q14 8 20 9 Q26 8 27 12 Q26 10 20 11 Q14 10 13 12" fill="#d4a840"/>
+    <path d="M14 12 Q16 9 20 10 Q24 9 26 12" fill="#c8982a"/>
+   `})},
 
   // ══ SCOTUS JUSTICES ══
   {id:'rbg', name:'Ruth Bader Ginsburg', cat:'scotus_justice', rarity:'legendary', cost:2500, unlockMethod:'gold', badge:'⚖️',
-   desc:'Fight for the things you care about', passive:{stat:'defBonus', value:6, label:'+6 Defense — Notorious RBG'},
-   portrait:()=>makeMedallion({bg:'#06080e',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="16" r="5.5" fill="#e8c8a8"/>
-    <ellipse cx="20" cy="24.5" rx="8" ry="4.5" fill="#1a1a2a"/>
-    <rect x="14" y="20" width="12" height="7" fill="#1a1a2a"/>
-    <ellipse cx="17.5" cy="15" rx="1.1" ry="1.4" fill="#1a1a1a"/>
-    <ellipse cx="22.5" cy="15" rx="1.1" ry="1.4" fill="#1a1a1a"/>
-    <path d="M17.5 18.5 Q20 19.5 22.5 18.5" stroke="#b0a080" stroke-width="0.8" fill="none"/>
-    <ellipse cx="20" cy="11" rx="5" ry="3" fill="#e8e0d0"/>
-    <rect x="16" y="21" width="8" height="1.5" rx="0.5" fill="#e8e0d0"/>`})},
-
-  {id:'acb', name:'Amy Coney Barrett', cat:'scotus_justice', rarity:'legendary', cost:2500, unlockMethod:'gold', badge:'✝️',
-   desc:'The law is not what judges think it ought to be', passive:{stat:'defBonus', value:6, label:'+6 Defense — originalist shield'},
-   portrait:()=>makeMedallion({bg:'#060810',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="16" r="5.5" fill="#e8c8a8"/>
-    <ellipse cx="20" cy="24.5" rx="8" ry="4.5" fill="#1a0a0a"/>
-    <rect x="14" y="20" width="12" height="7" fill="#1a0a0a"/>
-    <ellipse cx="17.5" cy="15" rx="1.1" ry="1.4" fill="#1a1a1a"/>
-    <ellipse cx="22.5" cy="15" rx="1.1" ry="1.4" fill="#1a1a1a"/>
-    <path d="M17.5 18.5 Q20 19.5 22.5 18.5" stroke="#b09878" stroke-width="0.8" fill="none"/>
-    <path d="M14 11 Q16 7 20 8 Q24 7 26 11 Q22 9 20 10 Q18 9 14 11Z" fill="#6b3a20"/>
-    <path d="M14 11 Q13 14 14 16" fill="none" stroke="#6b3a20" stroke-width="1.5"/>`})},
-
-  {id:'thurgood', name:'Thurgood Marshall', cat:'scotus_justice', rarity:'legendary', cost:2500, unlockMethod:'gold', badge:'✊',
-   desc:'In recognizing the humanity of our fellow beings we pay ourselves the highest tribute',
-   passive:{stat:'dmgBonus', value:7, label:'+7 Attack — justice is power'},
-   portrait:()=>makeMedallion({bg:'#040810',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="16" r="5.5" fill="#5a2a10"/>
+   desc:'The Notorious RBG — champion of equal protection',
+   portrait:()=>makeMedallion({bg:'#08060e',ring:'#e8c870',ring2:'#c9a84c',face:`
+    <circle cx="20" cy="16.5" r="5.5" fill="#e8d0c0"/>
     <ellipse cx="20" cy="24.5" rx="8" ry="4.5" fill="#0a0a1e"/>
     <rect x="14" y="20" width="12" height="7" fill="#0a0a1e"/>
-    <ellipse cx="17.5" cy="15" rx="1.1" ry="1.4" fill="#0a0a0a"/>
-    <ellipse cx="22.5" cy="15" rx="1.1" ry="1.4" fill="#0a0a0a"/>
-    <path d="M17.5 18.5 Q20 19.5 22.5 18.5" stroke="#804020" stroke-width="0.8" fill="none"/>
-    <ellipse cx="20" cy="11" rx="5.5" ry="3" fill="#2a1a0a"/>
-    <rect x="16" y="21.5" width="8" height="1.5" rx="0.5" fill="#c9a84c"/>`})},
+    <ellipse cx="17.5" cy="15.5" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+    <ellipse cx="22.5" cy="15.5" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+    <path d="M17.5 19 Q20 20 22.5 19" stroke="#b09080" stroke-width="0.8" fill="none"/>
+    <ellipse cx="20" cy="11.5" rx="5" ry="3" fill="#e8e0d8"/>
+    <circle cx="17.5" cy="15.5" r="2" fill="none" stroke="#2a1a1a" stroke-width="0.8"/>
+    <circle cx="22.5" cy="15.5" r="2" fill="none" stroke="#2a1a1a" stroke-width="0.8"/>
+    <path d="M16 21 Q20 22.5 24 21" stroke="#e8e0d8" stroke-width="1.5" fill="none"/>
+   `})},
+
+  {id:'acb', name:'Amy Coney Barrett', cat:'scotus_justice', rarity:'legendary', cost:2500, unlockMethod:'gold', badge:'✝️',
+   desc:'Associate Justice — textualist and originalist',
+   portrait:()=>makeMedallion({bg:'#06080e',ring:'#e8c870',ring2:'#c9a84c',face:`
+    <circle cx="20" cy="16.5" r="5.5" fill="#f0d0b8"/>
+    <ellipse cx="20" cy="24.5" rx="8" ry="4.5" fill="#0a0a1e"/>
+    <rect x="14" y="20" width="12" height="7" fill="#0a0a1e"/>
+    <ellipse cx="17.5" cy="15.5" rx="1.1" ry="1.4" fill="#2a1a1a"/>
+    <ellipse cx="22.5" cy="15.5" rx="1.1" ry="1.4" fill="#2a1a1a"/>
+    <path d="M17.5 19 Q20 20 22.5 19" stroke="#b09070" stroke-width="0.8" fill="none"/>
+    <path d="M14 12 Q16 7 20 8 Q24 7 26 12 Q24 10 20 11 Q16 10 14 12" fill="#4a3020"/>
+    <path d="M17 23 L15 27 M23 23 L25 27" stroke="#f0d0b8" stroke-width="1"/>
+   `})},
+
+  {id:'thurgood', name:'Thurgood Marshall', cat:'scotus_justice', rarity:'legendary', cost:2500, unlockMethod:'gold', badge:'✊',
+   desc:'First Black Supreme Court Justice — argued Brown v. Board',
+   portrait:()=>makeMedallion({bg:'#060808',ring:'#e8c870',ring2:'#c9a84c',face:`
+    <circle cx="20" cy="16.5" r="6" fill="#6a3a1a"/>
+    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#0a0a1e"/>
+    <rect x="13.5" y="21" width="13" height="7" fill="#0a0a1e"/>
+    <ellipse cx="17.5" cy="15.5" rx="1.2" ry="1.4" fill="#1a0a0a"/>
+    <ellipse cx="22.5" cy="15.5" rx="1.2" ry="1.4" fill="#1a0a0a"/>
+    <path d="M17.5 19.5 Q20 20.5 22.5 19.5" stroke="#4a2a0a" stroke-width="0.8" fill="none"/>
+    <ellipse cx="20" cy="11.5" rx="5.5" ry="3" fill="#3a2010"/>
+    <rect x="16" y="22" width="8" height="1" fill="#e8c870"/>
+   `})},
 
   {id:'scalia', name:'Antonin Scalia', cat:'scotus_justice', rarity:'epic', cost:1800, unlockMethod:'gold', badge:'📖',
-   desc:'Words mean what they meant when written', passive:{stat:'dmgBonus', value:5, label:'+5 Attack — originalism'},
+   desc:'Originalist icon — the Constitution means what it said in 1789',
    portrait:()=>makeMedallion({bg:'#080608',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="16.5" r="6.5" fill="#d4a870"/>
-    <ellipse cx="20" cy="25.5" rx="9" ry="5" fill="#1a0808"/>
-    <rect x="13" y="21" width="14" height="8" fill="#1a0808"/>
+    <circle cx="20" cy="16.5" r="6.5" fill="#e0c0a0"/>
+    <ellipse cx="20" cy="25.5" rx="9" ry="5" fill="#0a0a1e"/>
+    <rect x="13" y="21" width="14" height="8" fill="#0a0a1e"/>
     <ellipse cx="17" cy="15.5" rx="1.3" ry="1.5" fill="#1a1a1a"/>
     <ellipse cx="23" cy="15.5" rx="1.3" ry="1.5" fill="#1a1a1a"/>
-    <path d="M16.5 19.5 Q20 20.5 23.5 19.5" stroke="#a07840" stroke-width="1" fill="none"/>
-    <circle cx="17" cy="15.5" r="2.2" fill="none" stroke="#1a1a1a" stroke-width="0.8"/>
-    <circle cx="23" cy="15.5" r="2.2" fill="none" stroke="#1a1a1a" stroke-width="0.8"/>
-    <ellipse cx="20" cy="11" rx="6" ry="3.5" fill="#3a2810"/>`})},
+    <path d="M16.5 19.5 Q20 20.5 23.5 19.5" stroke="#a08060" stroke-width="1" fill="none"/>
+    <ellipse cx="20" cy="11" rx="7" ry="4" fill="#e8e0d8"/>
+    <rect x="13" y="9" width="14" height="3" rx="1.5" fill="#e8e0d8"/>
+   `})},
 
-  // ══ MODERN POLITICAL ══
+  // ══ MODERN POLITICAL FIGURES ══
   {id:'aoc', name:'Alexandria Ocasio-Cortez', cat:'modern_political', rarity:'mythic', cost:0, unlockMethod:'beat_all', badge:'🌹',
-   desc:'Unlock by completing all units — the future of the movement',
-   passive:{stat:'xpBonus', value:0.4, label:'+40% XP — the future is now'},
-   portrait:()=>makeMedallion({bg:'#080612',ring:'#ff4060',ring2:'#cc2040',face:`
-    <circle cx="20" cy="16" r="5.5" fill="#9a5030"/>
-    <ellipse cx="20" cy="24.5" rx="8" ry="4.5" fill="#1a0a2a"/>
-    <rect x="14" y="20" width="12" height="7" fill="#1a0a2a"/>
-    <ellipse cx="17.5" cy="15" rx="1.1" ry="1.4" fill="#1a0a00"/>
-    <ellipse cx="22.5" cy="15" rx="1.1" ry="1.4" fill="#1a0a00"/>
-    <path d="M17.5 18.5 Q20 19.5 22.5 18.5" stroke="#804030" stroke-width="0.8" fill="none"/>
-    <path d="M14 10 Q15 6 20 7 Q25 6 26 10 Q22 8 20 9 Q18 8 14 10Z" fill="#1a0a0a"/>
-    <path d="M14 10 Q13 13 14 15" fill="none" stroke="#1a0a0a" stroke-width="1.5"/>
-    <rect x="16" y="21.5" width="8" height="1.5" rx="0.5" fill="#ff4060"/>`})},
+   desc:'⭐ MYTHIC ⭐ Complete ALL units to unlock the Congresswoman from the Bronx',
+   portrait:()=>makeMedallion({bg:'#040810',ring:'#ff4060',ring2:'#cc2040',face:`
+    <defs>
+      <radialGradient id="aocGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#ff406030"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+    </defs>
+    <circle cx="20" cy="20" r="15" fill="url(#aocGlow)" opacity="0.4"/>
+    <circle cx="20" cy="16" r="6" fill="#c87050"/>
+    <ellipse cx="20" cy="24.5" rx="8.5" ry="5" fill="#800020"/>
+    <rect x="13.5" y="20" width="13" height="7" fill="#800020"/>
+    <ellipse cx="17.5" cy="15" rx="1.2" ry="1.5" fill="#1a0a0a"/>
+    <ellipse cx="22.5" cy="15" rx="1.2" ry="1.5" fill="#1a0a0a"/>
+    <path d="M17.5 18.5 Q20 19.5 22.5 18.5" stroke="#a05030" stroke-width="0.9" fill="none"/>
+    <path d="M14 12 Q15 7 20 8 Q25 7 26 12 Q24 9 20 10 Q16 9 14 12" fill="#1a0a0a"/>
+    <path d="M14 12 L13 16 Q14 14 15 16" fill="#1a0a0a"/>
+    <path d="M26 12 L27 16 Q26 14 25 16" fill="#1a0a0a"/>
+    <text x="20" y="35" font-size="5" text-anchor="middle" fill="#ff4060" font-family="serif" font-weight="bold">AOC</text>
+    <circle cx="20" cy="20" r="15.5" fill="none" stroke="#ff4060" stroke-width="0.5" opacity="0.6"/>
+   `})},
 
   {id:'pelosi', name:'Nancy Pelosi', cat:'modern_political', rarity:'rare', cost:1200, unlockMethod:'gold', badge:'🔨',
-   desc:'Speaker of the House — legislative power personified',
-   passive:{stat:'goldBonus', value:0.2, label:'+20% gold — appropriations power'},
+   desc:'Speaker of the House — the most powerful legislator in a generation',
    portrait:()=>makeMedallion({bg:'#06080e',ring:'#c9a84c',ring2:'#a8863a',face:`
     <circle cx="20" cy="16" r="5.5" fill="#e8c8b0"/>
     <ellipse cx="20" cy="24.5" rx="8" ry="4.5" fill="#00205b"/>
@@ -1200,39 +1089,27 @@ const AVATAR_DEFS = [
     <ellipse cx="22.5" cy="15" rx="1.1" ry="1.4" fill="#1a1a1a"/>
     <path d="M17.5 18.5 Q20 19.5 22.5 18.5" stroke="#b09080" stroke-width="0.8" fill="none"/>
     <path d="M15 11 Q16 7 20 8 Q24 7 25 11 Q23 9 20 10 Q17 9 15 11" fill="#c8a870"/>
-    <path d="M15 11 Q14 14 15 15" fill="#c8a870"/>`})},
+    <path d="M15 11 Q14 14 15 15 Q14 13 15 11" fill="#c8a870"/>
+    <path d="M25 11 Q26 14 25 15 Q26 13 25 11" fill="#c8a870"/>
+   `})},
 
-  {id:'massie', name:'Thomas Massie', cat:'modern_political', rarity:'rare', cost:1200, unlockMethod:'gold', badge:'🔧',
-   desc:'The most libertarian member of Congress — reads every bill',
-   passive:{stat:'agility', value:8, label:'+8 Agility (16% dodge)'},
-   portrait:()=>makeMedallion({bg:'#080a06',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6" fill="#c8a070"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#1a2a0a"/>
-    <rect x="14" y="20" width="12" height="7" fill="#1a2a0a"/>
-    <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#2a1a0a"/>
-    <path d="M17.5 19.5 Q20 20.5 22.5 19.5" stroke="#a08050" stroke-width="0.8" fill="none"/>
-    <ellipse cx="20" cy="12" rx="5.5" ry="3" fill="#6b4020"/>
-    <rect x="16" y="22" width="8" height="1.5" rx="0.5" fill="#c9a84c"/>`})},
-
-  {id:'bernie', name:'Bernie Sanders', cat:'modern_political', rarity:'rare', cost:1200, unlockMethod:'gold', badge:'✊',
-   desc:'Not me. Us. — fighting for the 99%',
-   passive:{stat:'healBonus', value:10, label:'+10 HP on correct defend — Medicare for all'},
-   portrait:()=>makeMedallion({bg:'#060810',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6.5" fill="#e0c0a0"/>
-    <ellipse cx="20" cy="25.5" rx="9" ry="5" fill="#1a1a3a"/>
-    <rect x="13" y="21" width="14" height="7" fill="#1a1a3a"/>
-    <ellipse cx="17.5" cy="16" rx="1.3" ry="1.5" fill="#2a2a2a"/>
-    <ellipse cx="22.5" cy="16" rx="1.3" ry="1.5" fill="#2a2a2a"/>
-    <path d="M16 20.5 Q20 21.5 24 20.5" stroke="#b0a080" stroke-width="1" fill="none"/>
-    <ellipse cx="20" cy="11.5" rx="6.5" ry="3.5" fill="#e8e0d0"/>
-    <path d="M14 12 Q15 9 20 10 Q25 9 26 12" fill="none" stroke="#c8c0b0" stroke-width="1.5"/>
-    <rect x="13" y="20" width="14" height="1" rx="0.5" fill="#c8c0b0"/>`})},
+  {id:'mcconnell', name:'Mitch McConnell', cat:'modern_political', rarity:'rare', cost:1200, unlockMethod:'gold', badge:'🐢',
+   desc:'Senate Majority Leader — master of procedural power',
+   portrait:()=>makeMedallion({bg:'#080608',ring:'#c9a84c',ring2:'#a8863a',face:`
+    <circle cx="20" cy="16.5" r="6.5" fill="#e0c8b0"/>
+    <ellipse cx="20" cy="25.5" rx="9" ry="5" fill="#8b0000"/>
+    <rect x="13" y="21" width="14" height="8" fill="#8b0000"/>
+    <ellipse cx="17" cy="15.5" rx="1.3" ry="1.5" fill="#1a1a1a"/>
+    <ellipse cx="23" cy="15.5" rx="1.3" ry="1.5" fill="#1a1a1a"/>
+    <path d="M16.5 19.5 Q20 20.2 23.5 19.5" stroke="#a09080" stroke-width="1" fill="none"/>
+    <circle cx="17" cy="15.5" r="2.2" fill="none" stroke="#1a1a1a" stroke-width="0.8"/>
+    <circle cx="23" cy="15.5" r="2.2" fill="none" stroke="#1a1a1a" stroke-width="0.8"/>
+    <ellipse cx="20" cy="11.5" rx="5" ry="2.5" fill="#c8c0b0"/>
+   `})},
 
   // ══ INTEREST GROUPS ══
   {id:'aclu_rep', name:'The ACLU', cat:'interest_group', rarity:'uncommon', cost:800, unlockMethod:'gold', badge:'🗽',
-   desc:'Defending the Bill of Rights since 1920',
-   passive:{stat:'defBonus', value:3, label:'+3 Defense — civil liberties shield'},
+   desc:'American Civil Liberties Union — defending the Bill of Rights since 1920',
    portrait:()=>makeMedallion({bg:'#040c14',ring:'#c9a84c',ring2:'#a8863a',face:`
     <circle cx="20" cy="16" r="5.5" fill="#d4c0a8"/>
     <ellipse cx="20" cy="24.5" rx="8" ry="4.5" fill="#003380"/>
@@ -1241,11 +1118,11 @@ const AVATAR_DEFS = [
     <ellipse cx="22.5" cy="15" rx="1.1" ry="1.4" fill="#1a1a1a"/>
     <path d="M17.5 18.5 Q20 19.5 22.5 18.5" stroke="#b0a090" stroke-width="0.8" fill="none"/>
     <path d="M17 8 L20 5 L23 8 L22 10 L20 9 L18 10 Z" fill="#c9a84c"/>
-    <rect x="19.2" y="9" width="1.6" height="5" fill="#c9a84c"/>`})},
+    <rect x="19.2" y="9" width="1.6" height="5" fill="#c9a84c"/>
+   `})},
 
   {id:'nra_rep', name:'The NRA', cat:'interest_group', rarity:'uncommon', cost:800, unlockMethod:'gold', badge:'🦅',
-   desc:'2nd Amendment advocacy — shall not be infringed',
-   passive:{stat:'dmgBonus', value:4, label:'+4 Attack — 2nd Amendment power'},
+   desc:'National Rifle Association — 2nd Amendment advocacy and lobbying',
    portrait:()=>makeMedallion({bg:'#0c0606',ring:'#c9a84c',ring2:'#a8863a',face:`
     <circle cx="20" cy="16" r="5.5" fill="#d4b898"/>
     <ellipse cx="20" cy="24.5" rx="8" ry="4.5" fill="#1a0a0a"/>
@@ -1254,11 +1131,11 @@ const AVATAR_DEFS = [
     <ellipse cx="22.5" cy="15" rx="1.1" ry="1.4" fill="#1a1a1a"/>
     <path d="M17.5 18.5 Q20 19.5 22.5 18.5" stroke="#b09878" stroke-width="0.8" fill="none"/>
     <path d="M13 10 Q17 6 20 7 Q23 6 27 10 Q24 8 20 9 Q16 8 13 10" fill="#8b3a00"/>
-    <path d="M15 22 L13 27 M25 22 L27 27" stroke="#d4b898" stroke-width="1"/>`})},
+    <path d="M15 22 L13 27 M25 22 L27 27" stroke="#d4b898" stroke-width="1"/>
+   `})},
 
   {id:'aipac_rep', name:'AIPAC Lobbyist', cat:'interest_group', rarity:'rare', cost:1000, unlockMethod:'gold', badge:'🤝',
-   desc:"One of Washington's most influential lobbying operations",
-   passive:{stat:'goldBonus', value:0.2, label:'+20% gold — lobbying power'},
+   desc:'America\'s pro-Israel lobby — one of the most influential interest groups in Washington',
    portrait:()=>makeMedallion({bg:'#06080c',ring:'#c9a84c',ring2:'#a8863a',face:`
     <circle cx="20" cy="16" r="5.5" fill="#e0c8a8"/>
     <ellipse cx="20" cy="24.5" rx="8" ry="4.5" fill="#003399"/>
@@ -1266,25 +1143,25 @@ const AVATAR_DEFS = [
     <ellipse cx="17.5" cy="15" rx="1.1" ry="1.4" fill="#1a1a1a"/>
     <ellipse cx="22.5" cy="15" rx="1.1" ry="1.4" fill="#1a1a1a"/>
     <path d="M17.5 18.5 Q20 19.5 22.5 18.5" stroke="#b0a080" stroke-width="0.8" fill="none"/>
-    <polygon points="20,6 21.5,10 25.5,10 22.5,12.5 23.5,16.5 20,14 16.5,16.5 17.5,12.5 14.5,10 18.5,10" fill="#c9a84c" opacity="0.9"/>`})},
-
-  {id:'tpusa', name:'Turning Point USA', cat:'interest_group', rarity:'uncommon', cost:800, unlockMethod:'gold', badge:'🎓',
-   desc:'The most dominant conservative student organization in America',
-   passive:{stat:'xpBonus', value:0.15, label:'+15% XP — campus activism'},
-   portrait:()=>makeMedallion({bg:'#080c06',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="16" r="5.5" fill="#e0c8a0"/>
-    <ellipse cx="20" cy="24.5" rx="8" ry="4.5" fill="#0a200a"/>
-    <rect x="14" y="20" width="12" height="7" fill="#0a200a"/>
-    <ellipse cx="17.5" cy="15" rx="1.1" ry="1.4" fill="#1a1a1a"/>
-    <ellipse cx="22.5" cy="15" rx="1.1" ry="1.4" fill="#1a1a1a"/>
-    <path d="M17.5 18.5 Q20 19.5 22.5 18.5" stroke="#b0a080" stroke-width="0.8" fill="none"/>
-    <rect x="16" y="8" width="8" height="6" rx="1" fill="#1a4a1a"/>
-    <text x="20" y="13" text-anchor="middle" font-size="4.5" fill="#c9a84c" font-weight="bold">TP</text>`})},
+    <polygon points="20,6 21.5,10 25.5,10 22.5,12.5 23.5,16.5 20,14 16.5,16.5 17.5,12.5 14.5,10 18.5,10" fill="#c9a84c" opacity="0.9"/>
+   `})},
 
   // ══ MEDIA FIGURES ══
+  {id:'maddow', name:'Rachel Maddow', cat:'media', rarity:'uncommon', cost:700, unlockMethod:'gold', badge:'📡',
+   desc:'MSNBC anchor — long-form investigative political journalism',
+   portrait:()=>makeMedallion({bg:'#060810',ring:'#c9a84c',ring2:'#a8863a',face:`
+    <circle cx="20" cy="16" r="5.5" fill="#e8c8a8"/>
+    <ellipse cx="20" cy="24.5" rx="8" ry="4.5" fill="#1a1a3a"/>
+    <rect x="14" y="20" width="12" height="7" fill="#1a1a3a"/>
+    <ellipse cx="17.5" cy="15" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+    <ellipse cx="22.5" cy="15" rx="1.1" ry="1.4" fill="#1a1a1a"/>
+    <path d="M17.5 18.5 Q20 19.5 22.5 18.5" stroke="#b09870" stroke-width="0.8" fill="none"/>
+    <ellipse cx="20" cy="11.5" rx="5" ry="2.8" fill="#3a2a1a"/>
+    <rect x="22" y="13" width="5" height="2.5" rx="1" fill="#c9a84c" opacity="0.8"/>
+   `})},
+
   {id:'carlson', name:'Tucker Carlson', cat:'media', rarity:'uncommon', cost:700, unlockMethod:'gold', badge:'📺',
    desc:'Conservative commentator — populist right media voice',
-   passive:{stat:'agility', value:4, label:'+4 Agility — never stops moving'},
    portrait:()=>makeMedallion({bg:'#0a0608',ring:'#c9a84c',ring2:'#a8863a',face:`
     <circle cx="20" cy="16" r="5.5" fill="#f0d0b0"/>
     <ellipse cx="20" cy="24.5" rx="8" ry="4.5" fill="#8b0000"/>
@@ -1293,85 +1170,21 @@ const AVATAR_DEFS = [
     <ellipse cx="22.5" cy="15" rx="1.1" ry="1.4" fill="#1a1a1a"/>
     <path d="M17.5 18.5 Q20 19 22.5 18.5" stroke="#c0a080" stroke-width="0.8" fill="none"/>
     <ellipse cx="20" cy="11.5" rx="5" ry="2.5" fill="#c8b090"/>
-    <rect x="17" y="21.5" width="6" height="1" rx="0.5" fill="#c9a84c"/>`})},
+    <rect x="17" y="21.5" width="6" height="1" rx="0.5" fill="#c9a84c"/>
+   `})},
 
-  {id:'dave_smith', name:'Dave Smith', cat:'media', rarity:'rare', cost:1000, unlockMethod:'gold', badge:'🎙️',
-   desc:'Part of the Problem — libertarian comedian and political commentator',
-   passive:{stat:'agility', value:7, label:'+7 Agility — always on the move'},
+  {id:'blitzer', name:'Wolf Blitzer', cat:'media', rarity:'uncommon', cost:700, unlockMethod:'gold', badge:'🐺',
+   desc:'CNN anchor — the Situation Room has been in session since 1990',
    portrait:()=>makeMedallion({bg:'#080608',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6" fill="#c09060"/>
+    <circle cx="20" cy="16.5" r="6" fill="#e0c8a8"/>
     <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#1a1a1a"/>
-    <rect x="14" y="20" width="12" height="7" fill="#1a1a1a"/>
-    <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#1a0a00"/>
-    <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#1a0a00"/>
-    <path d="M17.5 19 Q20 20.5 22.5 19" stroke="#8a6030" stroke-width="0.8" fill="none"/>
-    <ellipse cx="20" cy="12" rx="5.5" ry="3.5" fill="#2a1a0a"/>
-    <circle cx="20" cy="24" r="2" fill="#c9a84c" opacity="0.8"/>
-    <rect x="19.3" y="24" width="1.4" height="4" fill="#c9a84c" opacity="0.6"/>`})},
-
-  {id:'scott_horton', name:'Scott Horton', cat:'media', rarity:'rare', cost:1000, unlockMethod:'gold', badge:'📻',
-   desc:'Antiwar Radio — foreign policy expert and non-interventionist',
-   passive:{stat:'defBonus', value:4, label:'+4 Defense — non-interventionism'},
-   portrait:()=>makeMedallion({bg:'#060808',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="17" r="6" fill="#d4a870"/>
-    <ellipse cx="20" cy="25" rx="8.5" ry="5" fill="#0a1a1a"/>
-    <rect x="14" y="20" width="12" height="7" fill="#0a1a1a"/>
-    <ellipse cx="18" cy="16" rx="1.1" ry="1.4" fill="#1a1a0a"/>
-    <ellipse cx="22" cy="16" rx="1.1" ry="1.4" fill="#1a1a0a"/>
-    <path d="M17.5 19.5 Q20 20.5 22.5 19.5" stroke="#a07840" stroke-width="0.8" fill="none"/>
-    <ellipse cx="20" cy="12" rx="5" ry="3" fill="#4a3010"/>
-    <rect x="16" y="22" width="8" height="1.5" rx="0.5" fill="#c9a84c"/>`})},
-
-  {id:'candace_owens', name:'Candace Owens', cat:'media', rarity:'rare', cost:1000, unlockMethod:'gold', badge:'🎤',
-   desc:'Classically liberal — conservative commentator and activist',
-   passive:{stat:'dmgBonus', value:5, label:'+5 Attack — speaking truth to power'},
-   portrait:()=>makeMedallion({bg:'#06080a',ring:'#c9a84c',ring2:'#a8863a',face:`
-    <circle cx="20" cy="16" r="5.5" fill="#7a4020"/>
-    <ellipse cx="20" cy="24.5" rx="8" ry="4.5" fill="#0a0a1a"/>
-    <rect x="14" y="20" width="12" height="7" fill="#0a0a1a"/>
-    <ellipse cx="17.5" cy="15" rx="1.1" ry="1.4" fill="#0a0a00"/>
-    <ellipse cx="22.5" cy="15" rx="1.1" ry="1.4" fill="#0a0a00"/>
-    <path d="M17.5 18.5 Q20 19.5 22.5 18.5" stroke="#603010" stroke-width="0.8" fill="none"/>
-    <path d="M14 10 Q15 6 20 7 Q25 6 26 10 Q22 8 20 9 Q18 8 14 10Z" fill="#1a0a00"/>
-    <path d="M14 10 Q13 13 14 15" fill="none" stroke="#1a0a00" stroke-width="1.5"/>
-    <rect x="16" y="21.5" width="8" height="1.5" rx="0.5" fill="#c9a84c"/>`})},
-
-  // ══ ULTRA MYTHIC — RON PAUL & MISES ══
-  // Either equipped = can defeat the final boss
-
-  {id:'ron_paul', name:'Ron Paul', cat:'ultra_mythic', rarity:'ultra_mythic', cost:9999, unlockMethod:'gold', badge:'🌟',
-   desc:'Champion of liberty — required to defeat the Final Boss. The only citizen who can expose the Constitution\'s ultimate defender.',
-   passive:{stat:'all', value:1, label:'ALL stats boosted — the Revolution is here'},
-   minLevel:18,
-   portrait:()=>makeMedallion({bg:'#0a0808',ring:'#ffd700',ring2:'#c8a800',face:`
-    <circle cx="20" cy="17" r="6.5" fill="#e8c080"/>
-    <ellipse cx="20" cy="25.5" rx="9" ry="5" fill="#1a0a00"/>
-    <rect x="13" y="21" width="14" height="7" fill="#1a0a00"/>
-    <ellipse cx="17.5" cy="16" rx="1.3" ry="1.5" fill="#2a1a00"/>
-    <ellipse cx="22.5" cy="16" rx="1.3" ry="1.5" fill="#2a1a00"/>
-    <path d="M16 20.5 Q20 21.5 24 20.5" stroke="#c09050" stroke-width="1" fill="none"/>
-    <ellipse cx="20" cy="12" rx="6" ry="3.5" fill="#c8a060"/>
-    <circle cx="20" cy="8" r="3" fill="none" stroke="#ffd700" stroke-width="1"/>
-    <text x="20" y="9.5" text-anchor="middle" font-size="4" fill="#ffd700">$</text>
-    <rect x="15" y="22" width="10" height="1.5" rx="0.5" fill="#ffd700"/>`})},
-
-  {id:'mises', name:'Ludwig von Mises', cat:'ultra_mythic', rarity:'ultra_mythic', cost:9999, unlockMethod:'gold', badge:'📕',
-   desc:'Human Action — the intellectual foundation of liberty. Equip Mises OR Ron Paul to defeat the final boss.',
-   passive:{stat:'all', value:1, label:'ALL stats boosted — Human Action'},
-   minLevel:18,
-   portrait:()=>makeMedallion({bg:'#080608',ring:'#ffd700',ring2:'#c8a800',face:`
-    <circle cx="20" cy="17" r="6.5" fill="#d4a870"/>
-    <ellipse cx="20" cy="25.5" rx="9" ry="5" fill="#1a0808"/>
-    <rect x="13" y="21" width="14" height="7" fill="#1a0808"/>
-    <ellipse cx="17.5" cy="16" rx="1.3" ry="1.5" fill="#2a1a00"/>
-    <ellipse cx="22.5" cy="16" rx="1.3" ry="1.5" fill="#2a1a00"/>
-    <path d="M16 20.5 Q20 21.5 24 20.5" stroke="#a07840" stroke-width="1" fill="none"/>
-    <ellipse cx="20" cy="12" rx="6" ry="3.5" fill="#3a2810"/>
-    <path d="M14 12 Q15 8 20 9 Q25 8 26 12" fill="none" stroke="#5a3820" stroke-width="1.5"/>
-    <circle cx="20" cy="8" r="2" fill="none" stroke="#ffd700" stroke-width="1"/>
-    <text x="20" y="9.5" text-anchor="middle" font-size="3.5" fill="#ffd700">HA</text>
-    <rect x="15" y="22" width="10" height="1.5" rx="0.5" fill="#ffd700"/>`})}
-
+    <rect x="13.5" y="21" width="13" height="7" fill="#1a1a1a"/>
+    <ellipse cx="17.5" cy="15.5" rx="1.2" ry="1.4" fill="#1a1a1a"/>
+    <ellipse cx="22.5" cy="15.5" rx="1.2" ry="1.4" fill="#1a1a1a"/>
+    <path d="M17.5 19.5 Q20 20 22.5 19.5" stroke="#b09870" stroke-width="0.8" fill="none"/>
+    <ellipse cx="20" cy="11.5" rx="5.5" ry="3" fill="#e8e0d0"/>
+    <rect x="17.5" y="20" width="5" height="1" rx="0.5" fill="#e8e0d0"/>
+   `})},
 ];
 const XP_TABLE=[0,100,220,360,520,700,900,1150,1420,1720,2060,2440,2870,3350,3890,4490,5160,5900,6720,7640];
 const WEAPONS=[
@@ -1381,7 +1194,6 @@ const WEAPONS=[
   {id:'gavel',name:'Judge\'s Gavel',icon:'🔨',cost:1600,dmgBonus:15,minLevel:7,desc:'+15 damage — court authority',rarity:'epic'},
   {id:'constitution',name:'The Constitution',icon:'📜',cost:3200,dmgBonus:23,minLevel:11,desc:'+23 damage — supreme law',rarity:'legendary'},
   {id:'sword_justice',name:'Sword of Justice',icon:'⚖️',cost:5500,dmgBonus:32,minLevel:15,desc:'+32 damage — total authority',rarity:'legendary'},
-  {id:'big_stick',name:"TR's Big Stick",icon:'🪵',cost:8000,dmgBonus:45,minLevel:18,desc:'+45 damage — Speak softly and carry a big stick',rarity:'mythic'},
 ];
 
 // ═══════════════ EPISODES (shell — data filled below) ═══════════════
@@ -2696,38 +2508,21 @@ function defaultState(){
     firstName:'',lastName:'',period:null,savedAt:null,lastEpId:null,lastEraId:null,
     askedQMap:{},completionCelebrated:false};  // tracks which questions each enemy has already asked globally
 }
-function manualSave(){
-  save();
-  const saved_at=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  notify('💾 Saved at '+saved_at+' — LVL '+G.level+' · '+G.score+' pts','green');
-}
+function manualSave(){save();notify('Game saved! ✓','green');}
 function save(){
   if(!G)return;G.savedAt=Date.now();
   try{const k=window._loginSaveKey||'apgov_v1_save';localStorage.setItem(k,JSON.stringify(G));localStorage.setItem('apgov_last_key',k);}catch(e){}
 }
 function loadSave(){
-  try{
-    const k=window._loginSaveKey||localStorage.getItem('apgov_last_key')||'apgov_v1_save';
-    const s=localStorage.getItem(k);
-    if(s){
-      G=JSON.parse(s);
-      // Migrate: reset avatarId if it no longer exists in AVATAR_DEFS
-      const validIds=AVATAR_DEFS.filter(a=>a.portrait).map(a=>a.id);
-      if(!validIds.includes(G.avatarId))G.avatarId='scholar';
-      // Remove any unlocked avatars that no longer exist
-      if(G.unlockedAvatars)G.unlockedAvatars=G.unlockedAvatars.filter(id=>validIds.includes(id)||['scholar','advocate','senator'].includes(id));
-      return true;
-    }
-  }catch(e){}
-  return false;
+  try{const k=window._loginSaveKey||localStorage.getItem('apgov_last_key')||'apgov_v1_save';const s=localStorage.getItem(k);if(s){G=JSON.parse(s);return true;}}catch(e){}return false;
 }
 function getSpriteContent(avatarId){
-  const def=AVATAR_DEFS.find(a=>a.id===avatarId&&a.portrait)||AVATAR_DEFS.find(a=>a.cat==='starter')||AVATAR_DEFS[0];
-  return def&&def.portrait?def.portrait():'';
+  const def=AVATAR_DEFS.find(a=>a.id===avatarId)||AVATAR_DEFS[0];
+  return def.portrait();
 }
 function getMedallionSVG(avatarId,size=44){
-  const c=getSpriteContent(avatarId);
-  return '<svg viewBox="0 0 40 40" width="'+size+'" height="'+size+'" style="border-radius:50%;overflow:visible">'+c+'</svg>';
+  const content=getSpriteContent(avatarId);
+  return `<svg viewBox="0 0 40 40" width="${size}" height="${size}" style="border-radius:50%;overflow:visible">${content}</svg>`;
 }
 function renderAllSprites(){
   if(!G)return;
@@ -2740,15 +2535,16 @@ function renderAllSprites(){
 let _loginPeriodSelected=null;
 function selectLoginPeriod(period){
   _loginPeriodSelected=period;
-  ['2','4','guest'].forEach(p=>{
-    const btn=document.getElementById('pd-btn-'+p);
+  ['2','4','guest'].forEach(function(p){
+    var btn=document.getElementById('pd-btn-'+p);
     if(!btn)return;
-    if(p===period){btn.style.borderColor='var(--gold)';btn.style.background='rgba(201,168,76,.1)';}
-    else{btn.style.borderColor='var(--border2)';btn.style.background='var(--bg2)';}
+    if(p===period){
+      btn.style.cssText='padding:'+(p==='guest'?'14':'16')+'px;cursor:pointer;border:2px solid #c9a84c;background:rgba(201,168,76,.12);text-align:center;transition:all .2s';
+    } else {
+      btn.style.cssText='padding:'+(p==='guest'?'14':'16')+'px;cursor:pointer;border:1.5px solid #1e2535;background:#0e1118;text-align:center;transition:all .2s';
+    }
   });
   document.getElementById('login-error-1').textContent='';
-  // Auto-advance after brief highlight so user sees their selection
-  setTimeout(()=>goToLoginStep2(), 280);
 }
 function checkTeacherCodeAndAdvance(){
   const code=document.getElementById('login-teacher-code').value.trim().toUpperCase();
@@ -2868,11 +2664,7 @@ function showScreen(id){
   document.querySelectorAll('.bn-btn').forEach(b=>b.classList.remove('active'));
   const nm={map:'nav-map',shop:'nav-shop',pack:'nav-pack',collection:'nav-collection',profile:'nav-profile'};
   if(nm[id])document.getElementById(nm[id])?.classList.add('active');
-  if(id==='map'){
-    townUpdateStatusBar();
-    setTimeout(()=>{if(!TOWN.animFrame)townInit();else if(!TOWN.canvas)townInit();},50);
-  }
-  if(id==='shop')renderShop();
+  if(id==='map')renderMap();if(id==='shop')renderShop();
   if(id==='collection')renderCollection();if(id==='profile')renderProfile();
   if(id==='pack')renderPackScreen();
 }
@@ -2882,15 +2674,7 @@ function launchGame(){
   updateHeader();renderAllSprites();checkEraUnlocks();showScreen('map');startLbSync();if(G.score>0)pushToSupabase();
 }
 function returnToTitle(){if(G)save();document.getElementById('game-header').style.display='none';document.getElementById('bottom-nav').style.display='none';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('title-screen').classList.add('active');currentScreen='title';}
-function returnToCurrentEra(){
-  if(G.lastEpId&&G.lastEraId){
-    showScreen('era');
-    renderTownBattleHall();
-    setTimeout(()=>selectEra(G.lastEpId,G.lastEraId),50);
-  } else {
-    showScreen('map');
-  }
-}
+function returnToCurrentEra(){if(G.lastEpId&&G.lastEraId){selectEpisode(G.lastEpId);setTimeout(()=>selectEra(G.lastEpId,G.lastEraId),50);}else showScreen('map');}
 function goToPackThenEra(){showScreen('pack');}
 function rematch(){if(BT.lastEpId&&BT.lastEraId&&BT.lastEnemyId)startBattle(BT.lastEpId,BT.lastEraId,BT.lastEnemyId);}
 // ─── HEADER ───
@@ -2943,10 +2727,9 @@ function renderMap(){
     </div>`;}).join('');
 }
 function selectEpisode(epId){const ep=EPISODES.find(e=>e.id===epId);if(!ep||ep.coming)return;renderEraScreen(ep);showScreen('era');}
-function backToBattleHall(){showScreen('era');renderTownBattleHall();}
 function renderEraScreen(ep){
   document.getElementById('era-header').innerHTML=`
-    <button class="btn sm" onclick="backToBattleHall()" style="margin-bottom:12px">← Back to Battle Hall</button>
+    <button class="btn sm" onclick="showScreen('map')" style="margin-bottom:12px">← Back to Units</button>
     <div style="font-family:var(--cinzel);font-size:13px;color:var(--gold);letter-spacing:.08em;margin-bottom:4px">${ep.icon} ${ep.name}</div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:14px">${ep.standards}</div>`;
   const list=document.getElementById('era-enemy-list');
@@ -3006,61 +2789,35 @@ function checkEraUnlocks(){
 }
 function showMapNotif(msg){const el=document.getElementById('map-notification');if(el){el.textContent='★ '+msg+' ★';el.style.display='block';setTimeout(()=>el.style.display='none',4000);}}
 // ─── BATTLE ───
-const ENEMY_ATTACK_TABLE={ep1:{min:5,max:9,wrongBonus:7},ep2:{min:10,max:16,wrongBonus:9},ep3:{min:14,max:22,wrongBonus:11},ep4:{min:19,max:28,wrongBonus:13},ep5:{min:25,max:36,wrongBonus:16}};
-function getEnemyAttack(epId,isWrong){var t=ENEMY_ATTACK_TABLE[epId]||ENEMY_ATTACK_TABLE.ep1;var b=Math.floor(Math.random()*(t.max-t.min+1))+t.min;return isWrong?b+t.wrongBonus:b;}
+// ─── ENEMY ATTACK TABLE (base dmg range per unit) ───
+const ENEMY_ATTACK_TABLE={
+  ep1:{min:5,max:9,wrongBonus:7},
+  ep2:{min:10,max:16,wrongBonus:9},
+  ep3:{min:14,max:22,wrongBonus:11},
+  ep4:{min:19,max:28,wrongBonus:13},
+  ep5:{min:25,max:36,wrongBonus:16},
+};
+function getEnemyAttack(epId,isWrongAnswer){
+  const tbl=ENEMY_ATTACK_TABLE[epId]||ENEMY_ATTACK_TABLE.ep1;
+  const base=Math.floor(Math.random()*(tbl.max-tbl.min+1))+tbl.min;
+  return isWrongAnswer?base+tbl.wrongBonus:base;
+}
 function getPlayerAgility(){
-  var base=G.agility||0;
-  var passive=getAvatarPassive();
-  if(passive&&passive.stat==='agility')base+=passive.value;
-  if(passive&&passive.stat==='all')base+=5;
-  return base;
+  // Base agility 0; cards and avatar passives will add to this in Phase 2
+  return G.agility||0;
 }
-function getAvatarPassive(){
-  if(!G||!G.avatarId)return null;
-  var def=AVATAR_DEFS.find(function(a){return a.id===G.avatarId&&a.portrait;});
-  return def&&def.passive?def.passive:null;
+function tryDodge(){
+  const agility=getPlayerAgility();
+  const dodgeChance=Math.min(0.4,agility*0.02); // 2% per agility point, cap 40%
+  return Math.random()<dodgeChance;
 }
-function getPassiveDmgBonus(){
-  var p=getAvatarPassive();
-  if(!p)return 0;
-  if(p.stat==='dmgBonus')return p.value;
-  if(p.stat==='all')return 8;
-  return 0;
-}
-function getPassiveDefBonus(){
-  var p=getAvatarPassive();
-  if(!p)return 0;
-  if(p.stat==='defBonus')return p.value;
-  if(p.stat==='all')return 8;
-  return 0;
-}
-function getPassiveHealBonus(){
-  var p=getAvatarPassive();
-  if(!p)return 0;
-  if(p.stat==='healBonus')return p.value;
-  if(p.stat==='all')return 10;
-  return 0;
-}
-function getPassiveXpBonus(){
-  var p=getAvatarPassive();
-  if(!p)return 0;
-  if(p.stat==='xpBonus')return p.value;
-  if(p.stat==='all')return 0.3;
-  return 0;
-}
-function getPassiveGoldBonus(){
-  var p=getAvatarPassive();
-  if(!p)return 0;
-  if(p.stat==='goldBonus')return p.value;
-  if(p.stat==='all')return 0.3;
-  return 0;
-}
-function tryDodge(){var ag=getPlayerAgility();var chance=Math.min(0.4,ag*0.02);return Math.random()<chance;}
 function startBattle(epId,eraId,enemyId){
   const ep=EPISODES.find(e=>e.id===epId);const era=ep?.eras?.find(r=>r.id===eraId);const enemy=era?.enemies?.find(e=>e.id===enemyId);
   if(!enemy)return;G.lastEpId=epId;G.lastEraId=eraId;
   const weapon=WEAPONS.find(w=>w.id===G.equippedWeapon)||WEAPONS[0];const armor=ARMORS.find(a=>a.id===G.equippedArmor)||ARMORS[0];
-  const epNum=parseInt(epId.replace('ep',''))||1;const hpScale=1+(epNum-1)*0.8;
+  const epNum=parseInt(epId.replace('ep',''))||1;
+  // HP scales much harder per unit now
+  const hpScale=1+(epNum-1)*0.8;
   const scaledHp=Math.round(enemy.hp*hpScale);
   BT={epId,eraId,enemyId,enemy,enemyHp:scaledHp,enemyMaxHp:scaledHp,combo:0,hintUsed:false,
     earnedXP:0,earnedGold:0,earnedScore:0,askedQ:[],currentQ:null,hintText:'',action:'',
@@ -3140,16 +2897,28 @@ function answerShuffled(idx){
   const q=BT.currentQ;if(!q)return;
   const opts=document.querySelectorAll('.t-opt');
   opts.forEach((o,i)=>{o.classList.remove('correct','wrong');if(BT.shuffledOpts[i].isCorrect)o.classList.add('correct');else if(i===idx&&!isCorrect)o.classList.add('wrong');o.onclick=null;});
-  var armor=ARMORS.find(function(a){return a.id===G.equippedArmor;})||ARMORS[0];
-  var dodged=tryDodge();
-  var baseDmg=getEnemyAttack(BT.epId,false);
-  var netDmg=Math.max(1,baseDmg-(armor.defBonus||0)-getPassiveDefBonus());
-  if(dodged){spawnDmg('DODGE!','heal');BT.log='You dodged the attack!';}
-  else{G.hp=Math.max(0,G.hp-netDmg);spawnDmg('-'+netDmg,'dmg');}
+  // ── ENEMY ATTACKS EVERY ROUND ──
+  const dodged=tryDodge();
+  const enemyBaseDmg=getEnemyAttack(BT.epId,false);
+  const armor=ARMORS.find(a=>a.id===G.equippedArmor)||ARMORS[0];
+  const netEnemyDmg=Math.max(1,enemyBaseDmg-(armor.defBonus||0));
+  if(dodged){
+    spawnDmg('DODGE!','heal');
+    BT.log='You dodged the attack!';
+  } else {
+    G.hp=Math.max(0,G.hp-netEnemyDmg);
+    spawnDmg('-'+netEnemyDmg,'dmg');
+  }
+  // ── WRONG ANSWER — EXTRA HIT ──
   if(!isCorrect){
-    var wrongDmg=getEnemyAttack(BT.epId,true);
-    var wrongNet=Math.max(1,wrongDmg-(armor.defBonus||0));
-    setTimeout(function(){G.hp=Math.max(0,G.hp-wrongNet);spawnDmg('-'+wrongNet+' WRONG!','dmg');updateHeader();renderBattle();if(G.hp<=0)setTimeout(function(){endBattle(false);},800);},600);
+    const wrongDmg=getEnemyAttack(BT.epId,true);
+    const wrongNet=Math.max(1,wrongDmg-(armor.defBonus||0));
+    setTimeout(()=>{
+      G.hp=Math.max(0,G.hp-wrongNet);
+      spawnDmg('-'+wrongNet+' WRONG!','dmg');
+      updateHeader();renderBattle();
+      if(G.hp<=0){setTimeout(()=>endBattle(false),800);}
+    },600);
   }
   G.qTotal++;if(isCorrect){G.qCorrect++;G.currentStreak++;if(G.currentStreak>G.maxStreak)G.maxStreak=G.currentStreak;}else G.currentStreak=0;
   BT.currentQ=null;BT.hintText='';
@@ -3158,27 +2927,29 @@ function answerShuffled(idx){
 function applyAnswerResult(correct,q){
   const en=BT.enemy;
   if(correct){
-    let dmg=3+Math.floor(Math.random()*4)+Math.floor(G.level/3)+BT.weaponBonus+getPassiveDmgBonus();
+    let dmg=3+Math.floor(Math.random()*4)+Math.floor(G.level/3)+BT.weaponBonus;
     if(BT.action==='defend'){
-      const heal=10+Math.floor(Math.random()*8)+getPassiveHealBonus();
+      const heal=10+Math.floor(Math.random()*8);
       G.hp=Math.min(G.maxHp,G.hp+heal);BT.combo=Math.min(5,BT.combo+1);
-      BT.log='✅ Correct! Restored '+heal+' HP!';spawnDmg('+'+heal,'heal');
+      BT.log=`✅ Correct! Restored ${heal} HP!`;spawnDmg('+'+heal,'heal');
     } else if(BT.action==='special'){
       dmg=Math.floor(dmg*2.5);BT.enemyHp=Math.max(0,BT.enemyHp-dmg);BT.combo=0;
-      BT.log='⚖️ PRECEDENT STRIKE! '+dmg+' damage!';spawnDmg('-'+dmg,'dmg');
+      BT.log=`⚖️ PRECEDENT STRIKE! ${dmg} damage!`;spawnDmg('-'+dmg,'dmg');
     } else {
       if(BT.combo>=3)dmg=Math.floor(dmg*1.7);
       BT.enemyHp=Math.max(0,BT.enemyHp-dmg);BT.combo=Math.min(5,BT.combo+1);
-      BT.log='✅ Correct! '+dmg+' damage!'+(BT.combo>=3?' STREAK ×'+BT.combo+'!':'');
+      BT.log=`✅ Correct! ${dmg} damage!`+(BT.combo>=3?` STREAK ×${BT.combo}!`:'');
       spawnDmg('-'+dmg,'dmg');
     }
     BT.earnedXP+=5;BT.earnedGold+=3;BT.earnedScore+=10;
   } else {
+    // Wrong answer penalty — enemy already hit in answerShuffled, just show correct answer
     BT.combo=0;
-    BT.log='Wrong! Correct: '+q.opts[q.a];
+    BT.log=`❌ Wrong! Correct: ${q.opts[q.a]}`;
   }
-  if(BT.enemyHp<=0)setTimeout(function(){endBattle(true);},400);
-  else if(G.hp<=0)setTimeout(function(){endBattle(false);},400);
+  // Check win condition — loss already handled in answerShuffled timeout
+  if(BT.enemyHp<=0)setTimeout(()=>endBattle(true),400);
+  else if(G.hp<=0)setTimeout(()=>endBattle(false),400);
 }
 function useHint(){if(BT.hintUsed)return;const q=BT.currentQ||getQ();BT.currentQ=q;BT.hintUsed=true;BT.earnedScore=Math.max(0,BT.earnedScore-5);BT.hintText=q.hint||'No hint available.';renderBattle();if(currentScreen==='trivia')renderTriviaScreen();}
 function usePotion(){
@@ -3196,10 +2967,7 @@ function spawnDmg(val,type){const d=document.createElement('div');d.className='d
 function endBattle(won){
   const en=BT.enemy;
   if(won){
-    BT.earnedXP+=en.xpReward;
-    var xpMult=1+getPassiveXpBonus();BT.earnedXP=Math.round(BT.earnedXP*xpMult);
-    let gold=en.goldReward;
-    var goldMult=1+getPassiveGoldBonus();gold=Math.round(gold*goldMult);
+    BT.earnedXP+=en.xpReward;let gold=en.goldReward;
     if(G.activeGoldBoost){gold=Math.floor(gold*2);G.activeGoldBoost=false;}
     if(!BT.hintUsed){BT.earnedXP+=10;BT.earnedScore+=10;G.noHintWins++;}
     BT.earnedScore+=25;G.wins++;G.score+=BT.earnedScore;G.gold+=gold+BT.earnedGold;
@@ -3222,13 +2990,7 @@ function endBattle(won){
     else document.getElementById('new-card-reveal').style.display='none';
     document.getElementById('open-pack-btn').style.display=en.givePack?'block':'none';
     const badge=document.getElementById('pack-badge');if(badge)badge.style.display=G.packs>0?'inline':'none';
-    save();updateHeader();pushToSupabase();townUpdateStatusBar();
-    // Show saved indicator
-    const si=document.createElement('div');
-    si.style.cssText='position:fixed;bottom:80px;right:12px;background:var(--bg2);border:1px solid var(--green2);color:var(--green2);font-family:var(--cinzel);font-size:8px;padding:6px 10px;z-index:600;letter-spacing:.06em;animation:fadeIn .3s';
-    si.textContent='💾 AUTO-SAVED';
-    document.body.appendChild(si);
-    setTimeout(()=>si.remove(),2500);
+    save();updateHeader();pushToSupabase();
   } else {
     const gl=Math.floor(G.gold*0.2);G.gold=Math.max(0,G.gold-gl);G.losses++;addXP(Math.floor(BT.earnedXP*0.3));save();updateHeader();
     document.getElementById('result-emoji').textContent='💀';document.getElementById('result-headline').textContent='OVERRULED!';document.getElementById('result-headline').style.color='var(--red)';
@@ -3242,15 +3004,50 @@ function endBattle(won){
 function setShopTab(tab){shopTab=tab;document.querySelectorAll('.shop-tab').forEach((t,i)=>{t.classList.toggle('active',['weapons','armor','items','avatars'][i]===tab);});renderShop();}
 function renderShop(){
   document.getElementById('shop-gold-display').textContent=G.gold;let html='<div class="shop-grid">';
-  if(shopTab==='weapons'){html+=WEAPONS.map(w=>{const owned=G.ownedWeapons.includes(w.id),eq=G.equippedWeapon===w.id;return `<div class="shop-item ${owned?'owned':''} ${eq?'equipped':''}"><span class="si-sprite">${w.icon}</span><div class="si-name">${w.name}</div><div class="si-desc">${w.desc}</div><div class="si-stat">+${w.dmgBonus} ATK</div><div class="si-cost rarity-${w.rarity}">${w.rarity.toUpperCase()}</div>${eq?'<div style="font-family:var(--pixel);font-size:5px;color:var(--gold)">✓ EQUIPPED</div>':owned?`<button class="btn green sm full" onclick="equipWeapon('${w.id}')">EQUIP</button>`:`<div class="si-cost">${w.cost>0?w.cost+' ⚖️':'FREE'}</div><button class="btn sm full ${G.gold<w.cost?'disabled':''}" onclick="buyWeapon('${w.id}')" ${G.gold<w.cost?'disabled':''}>BUY</button>`}</div>`;}).join('');}
-  else if(shopTab==='armor'){html+=ARMORS.map(a=>{const owned=G.ownedArmors.includes(a.id),eq=G.equippedArmor===a.id;return `<div class="shop-item ${owned?'owned':''} ${eq?'equipped':''}"><span class="si-sprite">${a.icon}</span><div class="si-name">${a.name}</div><div class="si-desc">${a.desc}</div><div class="si-stat">-${a.defBonus} DMG</div><div class="si-cost rarity-${a.rarity}">${a.rarity.toUpperCase()}</div>${eq?'<div style="font-family:var(--pixel);font-size:5px;color:var(--gold)">✓ EQUIPPED</div>':owned?`<button class="btn green sm full" onclick="equipArmor('${a.id}')">EQUIP</button>`:`<div class="si-cost">${a.cost>0?a.cost+' ⚖️':'FREE'}</div><button class="btn sm full ${G.gold<a.cost?'disabled':''}" onclick="buyArmor('${a.id}')" ${G.gold<a.cost?'disabled':''}>BUY</button>`}</div>`;}).join('');}
+  if(shopTab==='weapons'){html+=WEAPONS.map(function(w){
+    var owned=G.ownedWeapons.includes(w.id),eq=G.equippedWeapon===w.id;
+    var lvlOk=G.level>=(w.minLevel||1);
+    var locked=!owned&&!lvlOk;
+    var cantAfford=!owned&&lvlOk&&G.gold<w.cost;
+    var actionHtml;
+    if(eq) actionHtml='<div style="font-family:var(--pixel);font-size:5px;color:var(--gold)">&#10003; EQUIPPED</div>';
+    else if(locked) actionHtml='<div style="font-family:var(--pixel);font-size:5px;color:var(--red)">&#128274; NEED LVL '+w.minLevel+'</div>';
+    else if(owned) actionHtml='<button class="btn green sm full" onclick="equipWeapon(&quot;'+w.id+'&quot;)">EQUIP</button>';
+    else actionHtml='<div class="si-cost">'+(w.cost>0?w.cost+' &#9878;':'FREE')+'</div><button class="btn sm full'+(cantAfford?' disabled':'')+'" onclick="buyWeapon(&quot;'+w.id+'&quot;)"'+(cantAfford?' disabled':'')+'>BUY</button>';
+    return '<div class="shop-item'+(owned?' owned':'')+(eq?' equipped':'')+'"'+(locked?' style="opacity:.45"':'')+'>'+
+      '<span class="si-sprite">'+w.icon+'</span>'+
+      '<div class="si-name">'+w.name+'</div>'+
+      '<div class="si-desc">'+w.desc+'</div>'+
+      '<div class="si-stat">+'+w.dmgBonus+' ATK</div>'+
+      '<div style="font-family:var(--pixel);font-size:5px;color:var(--text3);margin:2px 0">REQ LVL '+(w.minLevel||1)+'</div>'+
+      '<div class="si-cost rarity-'+w.rarity+'">'+w.rarity.toUpperCase()+'</div>'+
+      actionHtml+'</div>';
+  }).join('');}
+  else if(shopTab==='armor'){html+=ARMORS.map(function(a){
+    var owned=G.ownedArmors.includes(a.id),eq=G.equippedArmor===a.id;
+    var lvlOk=G.level>=(a.minLevel||1);
+    var locked=!owned&&!lvlOk;
+    var cantAfford=!owned&&lvlOk&&G.gold<a.cost;
+    var actionHtml;
+    if(eq) actionHtml='<div style="font-family:var(--pixel);font-size:5px;color:var(--gold)">&#10003; EQUIPPED</div>';
+    else if(locked) actionHtml='<div style="font-family:var(--pixel);font-size:5px;color:var(--red)">&#128274; NEED LVL '+a.minLevel+'</div>';
+    else if(owned) actionHtml='<button class="btn green sm full" onclick="equipArmor(&quot;'+a.id+'&quot;)">EQUIP</button>';
+    else actionHtml='<div class="si-cost">'+(a.cost>0?a.cost+' &#9878;':'FREE')+'</div><button class="btn sm full'+(cantAfford?' disabled':'')+'" onclick="buyArmor(&quot;'+a.id+'&quot;)"'+(cantAfford?' disabled':'')+'>BUY</button>';
+    return '<div class="shop-item'+(owned?' owned':'')+(eq?' equipped':'')+'"'+(locked?' style="opacity:.45"':'')+'>'+
+      '<span class="si-sprite">'+a.icon+'</span>'+
+      '<div class="si-name">'+a.name+'</div>'+
+      '<div class="si-desc">'+a.desc+'</div>'+
+      '<div class="si-stat">-'+a.defBonus+' DMG</div>'+
+      '<div style="font-family:var(--pixel);font-size:5px;color:var(--text3);margin:2px 0">REQ LVL '+(a.minLevel||1)+'</div>'+
+      '<div class="si-cost rarity-'+a.rarity+'">'+a.rarity.toUpperCase()+'</div>'+
+      actionHtml+'</div>';
+  }).join('');}
   else if(shopTab==='items'){html+=CONSUMABLES.map(c=>{const owned=(G.inventory[c.id]||0);return `<div class="shop-item"><span class="si-sprite">${c.icon}</span><div class="si-name">${c.name}</div><div class="si-desc">${c.desc}</div>${owned>0?`<div style="font-family:var(--pixel);font-size:5px;color:var(--teal)">OWNED: ${owned}</div>`:''}<div class="si-cost rarity-${c.rarity}">${c.rarity.toUpperCase()}</div><div class="si-cost">${c.cost} ⚖️</div><button class="btn sm full ${G.gold<c.cost?'disabled':''}" onclick="buyItem('${c.id}')" ${G.gold<c.cost?'disabled':''}>BUY</button></div>`;}).join('');}
   else if(shopTab==='avatars'){
   const catGroups=[
     {key:'president',label:'🏠 PRESIDENTS'},
     {key:'scotus_justice',label:'⚖️ SCOTUS JUSTICES'},
     {key:'modern_political',label:'🏛️ POLITICAL FIGURES'},
-    {key:'ultra_mythic',label:'🌟 ULTRA MYTHIC'},
     {key:'interest_group',label:'🤝 INTEREST GROUPS'},
     {key:'media',label:'📺 MEDIA FIGURES'},
     {key:'historical',label:'📜 FOUNDING ERA'},
@@ -3267,17 +3064,14 @@ function renderShop(){
       const cardId=isCard?a.unlockMethod.split(':')[1]:null;
       const hasCard=cardId&&G.collection.includes(cardId);
       if(isCard&&hasCard&&!owned)G.unlockedAvatars.push(a.id);
-      const lvlReq=a.minLevel||1;
-      const lvlOk=G.level>=lvlReq;
-      const canBuy=a.cost>0&&G.gold>=a.cost&&a.unlockMethod==='gold'&&lvlOk;
-      const isMythic=a.rarity==='mythic'||a.rarity==='ultra_mythic';
+      const canBuy=a.cost>0&&G.gold>=a.cost&&a.unlockMethod==='gold';
+      const isMythic=a.rarity==='mythic';
       html+=`<div class="shop-item ${owned?'owned':''} ${eq?'equipped':''}" style="${isMythic?'border-color:#ff406060;':''}">
         <div style="display:block;margin:0 auto 8px;width:64px;height:64px;border-radius:50%;overflow:visible;${isMythic?'filter:drop-shadow(0 0 10px #ff4060)':''}">
           ${getMedallionSVG(a.id,64)}</div>
         <div class="si-name">${a.name}</div>
         <div class="si-cost rarity-${a.rarity}">${a.rarity.toUpperCase()}</div>
         <div class="si-desc">${a.desc}</div>
-        ${a.passive?'<div style="font-family:var(--pixel);font-size:4px;color:var(--teal);margin-top:3px;line-height:1.6">⚡ '+a.passive.label+'</div>':''}
         ${eq?'<div style="font-family:var(--cinzel);font-size:9px;color:var(--gold)">✓ EQUIPPED</div>':
           owned?`<button class="btn green sm full" onclick="equipAvatar('${a.id}')">EQUIP</button>`:
           isCard?'<div style="font-family:var(--cinzel);font-size:8px;color:var(--text3)">Collect the case card</div>':
@@ -3419,433 +3213,6 @@ function checkAchievements(){
   if(scotus.some(e=>G.collection.includes(e.id)))add('scotus_case');
 }
 // ─── LEADERBOARD (now handled by Supabase — see pushToSupabase/fetchLeaderboard above) ───
-
-// ═══════════════════════════════════════════════════════
-// TOWN ENGINE
-// ═══════════════════════════════════════════════════════
-const TOWN = {
-  canvas:null, ctx:null, W:548, H:480,
-  player:{x:274,y:300,tx:274,ty:300,moving:false,facing:'down',frame:0,frameTimer:0},
-  // Locations — emoji + label + position
-  locations:[
-  {id:'inn',      emoji:'🏨', label:'The Inn',      sublabel:'Rest & Save',   x:120, y:125, r:30},
-  {id:'board',    emoji:'📋', label:'Notice Board', sublabel:'Leaderboard',   x:270, y:205, r:24},
-  {id:'armory',   emoji:'⚖️', label:'Armory',       sublabel:'Shop',          x:135, y:330, r:30},
-  {id:'archives', emoji:'📜', label:'Archives',     sublabel:'Cards',         x:405, y:330, r:30},
-  {id:'battle',   emoji:'⚔️', label:'Battle Hall',  sublabel:'Unit 5 / Final',x:435, y:155, r:34},
-],
-  exit:{x:274,y:30,label:'To Overworld ↑'},
-  hovered:null, activeLocation:null, tick:0, animFrame:null,
-};
-
-function townInit(){
-  TOWN.canvas=document.getElementById('town-canvas');
-  if(!TOWN.canvas)return;
-  TOWN.ctx=TOWN.canvas.getContext('2d');
-  TOWN.canvas.addEventListener('click',townHandleClick);
-  TOWN.canvas.addEventListener('mousemove',townHandleHover);
-  TOWN.canvas.addEventListener('mouseleave',()=>{TOWN.hovered=null;});
-  TOWN.canvas.addEventListener('touchend',function(e){
-    e.preventDefault();
-    const t=e.changedTouches[0];
-    const r=TOWN.canvas.getBoundingClientRect();
-    const cx=Math.round((t.clientX-r.left)*(TOWN.W/r.width));
-    const cy=Math.round((t.clientY-r.top)*(TOWN.H/r.height));
-    townHandleClickCoords(cx,cy);
-  },{passive:false});
-  document.addEventListener('keydown',townHandleKey);
-  townStartLoop();
-  townUpdateStatusBar();
-}
-
-function townStartLoop(){
-  if(TOWN.animFrame)cancelAnimationFrame(TOWN.animFrame);
-  function loop(){TOWN.tick++;townUpdate();townDraw();TOWN.animFrame=requestAnimationFrame(loop);}
-  loop();
-}
-function townStopLoop(){if(TOWN.animFrame){cancelAnimationFrame(TOWN.animFrame);TOWN.animFrame=null;}}
-
-function townUpdate(){
-  const p=TOWN.player;
-  if(p.moving){
-    const dx=p.tx-p.x,dy=p.ty-p.y,dist=Math.sqrt(dx*dx+dy*dy),speed=3;
-    if(dist<=speed){
-      p.x=p.tx;p.y=p.ty;p.moving=false;townCheckArrival();
-    } else {
-      p.x+=dx/dist*speed;p.y+=dy/dist*speed;
-      if(Math.abs(dx)>Math.abs(dy))p.facing=dx>0?'right':'left';
-      else p.facing=dy>0?'down':'up';
-      p.frameTimer++;if(p.frameTimer>7){p.frame=(p.frame+1)%4;p.frameTimer=0;}
-    }
-  }
-}
-
-function townDraw(){
-  const ctx=TOWN.ctx,W=TOWN.W,H=TOWN.H,t=TOWN.tick;
-  ctx.clearRect(0,0,W,H);
-
-  // ── GROUND ──
-  for(let gx=0;gx<W;gx+=8){
-    for(let gy=0;gy<H;gy+=8){
-      const v=Math.sin(gx*0.12+gy*0.09)*0.5+0.5;
-      ctx.fillStyle='rgb('+Math.floor(72+v*18)+','+Math.floor(115+v*22)+','+Math.floor(44+v*12)+')';
-      ctx.fillRect(gx,gy,8,8);
-    }
-  }
-  // Grass detail
-  ctx.fillStyle='rgba(0,0,0,0.12)';
-  for(let i=0;i<80;i++){
-    const gx=(i*173)%W,gy=(i*97)%H;
-    ctx.fillRect(gx,gy,1,4);ctx.fillRect(gx+2,gy+1,1,3);
-  }
-
-  // ── DIRT PATHS — more natural countryside layout ──
-ctx.lineCap='round';
-ctx.lineJoin='round';
-
-function path(pts,w){
-  ctx.strokeStyle='#c8a860';
-  ctx.lineWidth=w;
-  ctx.beginPath();
-  ctx.moveTo(pts[0][0],pts[0][1]);
-  pts.slice(1).forEach(p=>ctx.lineTo(p[0],p[1]));
-  ctx.stroke();
-
-  ctx.strokeStyle='#b09040';
-  ctx.lineWidth=Math.max(2,w-4);
-  ctx.setLineDash([6,5]);
-  ctx.beginPath();
-  ctx.moveTo(pts[0][0],pts[0][1]);
-  pts.slice(1).forEach(p=>ctx.lineTo(p[0],p[1]));
-  ctx.stroke();
-  ctx.setLineDash([]);
-}
-
-const hub = [270,255];
-
-// central village green paths
-path([[hub[0],hub[1]],[250,225],[245,205],[250,180]],14);   // to board
-path([[hub[0],hub[1]],[220,235],[185,210],[150,180],[120,125]],16); // to inn
-path([[hub[0],hub[1]],[225,280],[190,305],[160,320],[135,330]],16); // to armory
-path([[hub[0],hub[1]],[315,275],[355,300],[385,315],[405,330]],16); // to archives
-path([[hub[0],hub[1]],[320,225],[360,200],[395,180],[435,155]],18); // to battle hall
-
-// four outward roads
-path([[hub[0],hub[1]],[268,210],[268,155],[273,95],[275,20]],22);   // north road
-path([[hub[0],hub[1]],[330,252],[390,252],[455,248],[530,248]],22); // east road
-path([[hub[0],hub[1]],[270,300],[270,350],[272,410],[272,478]],22); // south road
-path([[hub[0],hub[1]],[215,258],[160,258],[95,255],[22,255]],22);   // west road
-
-  // ── POND ──
-  const pw=Math.sin(t*0.035)*0.2+0.8;
-  ctx.fillStyle='rgba(0,0,0,0.2)';ctx.beginPath();ctx.ellipse(178,298,48,28,0.2,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle=`rgba(36,108,190,${pw})`;ctx.beginPath();ctx.ellipse(175,295,45,26,0.2,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle=`rgba(80,160,230,${pw*0.5})`;ctx.beginPath();ctx.ellipse(168,289,26,14,0.4,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='rgba(220,240,255,0.25)';ctx.beginPath();ctx.ellipse(163,285,12,6,0.6,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle='#a09860';ctx.lineWidth=2.5;ctx.beginPath();ctx.ellipse(175,295,45,26,0.2,0,Math.PI*2);ctx.stroke();
-  // Ripple
-  const rp=(t*0.025)%1;
-  ctx.strokeStyle=`rgba(150,200,255,${0.5-rp*0.4})`;ctx.lineWidth=1;
-  ctx.beginPath();ctx.ellipse(175,295,20+rp*25,12+rp*14,0.2,0,Math.PI*2);ctx.stroke();
-
-  // ── TREES ──
-  const trees=[
-    [20,20],[70,15],[140,18],[220,22],[340,18],[420,15],[510,20],[530,80],
-    [530,200],[525,340],[520,440],[440,465],[330,468],[200,465],[80,462],
-    [15,420],[12,310],[15,180],[15,100],[55,55],[490,55],[495,180],
-    [490,420],[350,100],[380,360],[160,360],[140,100],
-  ];
-  trees.sort((a,b)=>a[1]-b[1]).forEach(([tx,ty])=>{
-    const sz=14+Math.sin(tx*0.2+ty*0.15)*3;
-    drawTownTree(ctx,tx,ty,sz);
-  });
-
-  // ── STONE WALL (right edge) ──
-  for(let wy=60;wy<H-40;wy+=14){
-    ctx.fillStyle=(wy%28<14)?'#a09070':'#8a7858';
-    ctx.fillRect(W-20,wy,18,12);
-    ctx.fillStyle='rgba(0,0,0,0.15)';ctx.fillRect(W-20,wy+10,18,2);
-  }
-
-  // ── WELL ──
-  drawWell(ctx,380,290);
-
-  // ── FENCE ──
-  drawFence(ctx,220,370,340,370);
-
-  // ── LOCATIONS — emoji icons ──
-  TOWN.locations.forEach(loc=>drawLocation(ctx,loc,t));
-
-  // ── EXIT ARROW ──
-  const ex=274,ey=22,ehov=TOWN.hovered==='exit';
-  ctx.fillStyle=ehov?'rgba(245,208,96,0.95)':'rgba(245,208,96,0.65)';
-  ctx.beginPath();
-  ctx.moveTo(ex,ey-14);ctx.lineTo(ex+16,ey+4);ctx.lineTo(ex+7,ey+4);
-  ctx.lineTo(ex+7,ey+16);ctx.lineTo(ex-7,ey+16);ctx.lineTo(ex-7,ey+4);
-  ctx.lineTo(ex-16,ey+4);ctx.closePath();ctx.fill();
-  ctx.strokeStyle=ehov?'#ffd060':'#c9a84c';ctx.lineWidth=1.5;ctx.stroke();
-  ctx.fillStyle=ehov?'#1a0a00':'#f0e0b0';
-  ctx.font='5px "Press Start 2P",monospace';ctx.textAlign='center';
-  ctx.fillText('OVERWORLD',ex,ey+30);
-
-  // ── PLAYER ──
-  townDrawPlayer(ctx);
-
-  // ── VIGNETTE ──
-  const vig=ctx.createRadialGradient(W/2,H/2,H*0.28,W/2,H/2,H*0.72);
-  vig.addColorStop(0,'rgba(0,0,0,0)');vig.addColorStop(1,'rgba(0,0,0,0.48)');
-  ctx.fillStyle=vig;ctx.fillRect(0,0,W,H);
-
-  // ── TOWN NAME ──
-  ctx.fillStyle='rgba(8,6,4,0.72)';ctx.fillRect(180,H-28,188,22);
-  ctx.strokeStyle='#c9a84c';ctx.lineWidth=1;ctx.strokeRect(180,H-28,188,22);
-  ctx.fillStyle='#f5e8c0';ctx.font='7px "Press Start 2P",monospace';ctx.textAlign='center';
-  ctx.fillText('⚖ CONSTITUTION CITY',274,H-12);
-}
-
-function drawLocation(ctx,loc,t){
-  const hov=TOWN.hovered===loc.id;
-  const bob=hov?Math.sin(t*0.12)*3:0;
-  const scale=hov?1.18:1;
-  const ey=loc.y+bob;
-
-  // Glow ring when hovered
-  if(hov){
-    ctx.fillStyle='rgba(245,208,96,0.18)';
-    ctx.beginPath();ctx.arc(loc.x,ey,loc.r+14,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='rgba(245,208,96,0.6)';ctx.lineWidth=2;
-    ctx.beginPath();ctx.arc(loc.x,ey,loc.r+10,0,Math.PI*2);ctx.stroke();
-  }
-
-  // Shadow
-  ctx.fillStyle='rgba(0,0,0,0.3)';
-  ctx.beginPath();ctx.ellipse(loc.x+3,ey+loc.r-2,loc.r*0.8,loc.r*0.35,0,0,Math.PI*2);ctx.fill();
-
-  // Background circle
-  ctx.fillStyle=hov?'rgba(40,30,10,0.85)':'rgba(20,15,5,0.75)';
-  ctx.beginPath();ctx.arc(loc.x,ey,loc.r,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle=hov?'#f5d060':'#c9a84c';ctx.lineWidth=hov?2.5:1.5;
-  ctx.beginPath();ctx.arc(loc.x,ey,loc.r,0,Math.PI*2);ctx.stroke();
-
-  // Emoji
-  const emojiSize=Math.round(loc.r*1.1*scale);
-  ctx.font=emojiSize+'px serif';ctx.textAlign='center';
-  ctx.fillText(loc.emoji,loc.x,ey+loc.r*0.42);
-
-  // Label
-  ctx.fillStyle=hov?'#f5d060':'#f0e8c0';
-  ctx.font=(hov?'bold ':'')+`6px "Press Start 2P",monospace`;
-  ctx.textAlign='center';
-  ctx.fillText(loc.label,loc.x,ey+loc.r+16);
-
-  // Sublabel
-  if(hov){
-    ctx.fillStyle='rgba(245,208,96,0.85)';
-    ctx.font='5px "Press Start 2P",monospace';
-    ctx.fillText('['+loc.sublabel+']',loc.x,ey+loc.r+28);
-  }
-}
-
-function drawWell(ctx,x,y){
-  ctx.fillStyle='rgba(0,0,0,0.2)';ctx.beginPath();ctx.ellipse(x+3,y+5,16,7,0,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#c0b080';ctx.fillRect(x-13,y-9,26,13);
-  ctx.fillStyle='rgba(0,0,0,0.08)';
-  for(let i=0;i<4;i++)ctx.fillRect(x-13+i*7,y-9,5,13);
-  ctx.fillStyle='#1a1208';ctx.beginPath();ctx.ellipse(x,y-7,9,4,0,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle='#807860';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(x,y-7,9,4,0,0,Math.PI*2);ctx.stroke();
-  ctx.fillStyle='#6b4020';ctx.fillRect(x-11,y-20,4,13);ctx.fillRect(x+8,y-20,4,13);
-  ctx.fillStyle='#8b5020';ctx.fillRect(x-11,y-22,23,4);
-  ctx.strokeStyle='#c8a860';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x,y-20);ctx.lineTo(x,y-7);ctx.stroke();
-  ctx.fillStyle='#8b5020';ctx.fillRect(x-3,y-17,7,6);ctx.strokeStyle='#c9a84c';ctx.lineWidth=1;ctx.strokeRect(x-3,y-17,7,6);
-}
-
-function drawFence(ctx,x1,y1,x2,y2){
-  const dist=Math.sqrt((x2-x1)**2+(y2-y1)**2);
-  const posts=Math.floor(dist/22);
-  ctx.fillStyle='#9a7030';
-  for(let i=0;i<=posts;i++){
-    const ft=i/posts;ctx.fillRect(x1+(x2-x1)*ft-2,y1+(y2-y1)*ft-12,4,18);
-  }
-  ctx.strokeStyle='#8b6020';ctx.lineWidth=2;
-  ctx.beginPath();ctx.moveTo(x1,y1-3);ctx.lineTo(x2,y2-3);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(x1,y1+3);ctx.lineTo(x2,y2+3);ctx.stroke();
-}
-
-function drawTownTree(ctx,x,y,size){
-  ctx.fillStyle='rgba(0,0,0,0.18)';ctx.beginPath();ctx.ellipse(x+2,y+4,size*0.6,size*0.3,0,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#5a3818';ctx.fillRect(x-2,y-2,5,size*0.5);
-  ctx.fillStyle='#1a4a10';ctx.beginPath();ctx.arc(x,y-size*0.5,size,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#2a6a20';ctx.beginPath();ctx.arc(x-size*0.2,y-size*0.6,size*0.72,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#3a8a30';ctx.beginPath();ctx.arc(x+size*0.1,y-size*0.72,size*0.52,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#4aaa40';ctx.beginPath();ctx.arc(x,y-size*0.88,size*0.36,0,Math.PI*2);ctx.fill();
-}
-
-function townDrawPlayer(ctx){
-  const p=TOWN.player;
-  const x=Math.round(p.x),y=Math.round(p.y);
-  const bob=p.moving?(p.frame%2===0?0:-2):0;
-  const ls=p.moving?(p.frame<2?1:-1):0;
-  const def=AVATAR_DEFS.find(a=>a&&a.id===G.avatarId&&a.portrait)||AVATAR_DEFS[2];
-  const cat=def?def.cat:'starter';
-  const bc={
-    starter:{body:'#1a3060',legs:'#1a1a3a',skin:'#e8c8a0',hair:'#3a2010'},
-    archetype:{body:'#2a2a2a',legs:'#1a1a1a',skin:'#d4b890',hair:'#1a0a00'},
-    historical:{body:'#2a1a60',legs:'#1a0a30',skin:'#e8d0a0',hair:'#2a2010'},
-    legendary:{body:'#8b0000',legs:'#4a0000',skin:'#e8c8a0',hair:'#2a1800'},
-    president:{body:'#00205b',legs:'#001030',skin:'#e0c090',hair:'#3a2800'},
-    scotus_justice:{body:'#0a0a1a',legs:'#0a0a0a',skin:'#d4b890',hair:'#1a1a1a'},
-    modern_political:{body:'#2a0a40',legs:'#1a0a20',skin:'#c09060',hair:'#1a0a00'},
-    interest_group:{body:'#1a3a1a',legs:'#0a1a0a',skin:'#d8c0a0',hair:'#2a1a00'},
-    media:{body:'#2a2a2a',legs:'#1a1a1a',skin:'#e0c890',hair:'#1a1a1a'},
-    ultra_mythic:{body:'#4a3800',legs:'#2a2000',skin:'#e8c870',hair:'#3a2800'},
-  }[cat]||{body:'#1a3060',legs:'#1a1a3a',skin:'#e8c8a0',hair:'#3a2010'};
-  const py=y-28+bob;
-  ctx.fillStyle='rgba(0,0,0,0.28)';ctx.beginPath();ctx.ellipse(x,y+2,9,4,0,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle=bc.legs;ctx.fillRect(x-5,py+20,5,10+ls*3);ctx.fillRect(x+1,py+20,5,10-ls*3);
-  ctx.fillStyle='#3a2010';ctx.fillRect(x-6,py+28+ls*3,6,4);ctx.fillRect(x+1,py+28-ls*3,6,4);
-  ctx.fillStyle=bc.body;ctx.fillRect(x-6,py+10,12,12);
-  ctx.fillStyle=bc.skin;ctx.fillRect(x-10,py+10+ls*2,4,9);ctx.fillRect(x+7,py+10-ls*2,4,9);
-  ctx.fillStyle=bc.skin;ctx.fillRect(x-5,py,10,10);
-  ctx.fillStyle=bc.hair;ctx.fillRect(x-5,py,10,3);ctx.fillRect(x-6,py+1,2,6);ctx.fillRect(x+5,py+1,2,6);
-  ctx.fillStyle='#1a0a00';
-  if(p.facing==='left')ctx.fillRect(x-3,py+5,2,2);
-  else if(p.facing==='right')ctx.fillRect(x+2,py+5,2,2);
-  else{ctx.fillRect(x-3,py+5,2,2);ctx.fillRect(x+2,py+5,2,2);}
-  if(G&&G.name){
-    const nm=G.name.split(' ')[0].substring(0,8);
-    ctx.font='5px "Press Start 2P",monospace';ctx.textAlign='center';
-    ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(x-nm.length*3-3,py-14,nm.length*6+6,10);
-    ctx.fillStyle='#f5d060';ctx.fillText(nm,x,py-6);
-  }
-}
-
-function lightenHex(hex,amt){
-  try{const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
-  return '#'+[r,g,b].map(v=>Math.min(255,v+amt).toString(16).padStart(2,'0')).join('');}catch(e){return hex;}
-}
-function darkenHex(hex,amt){
-  try{const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
-  return '#'+[r,g,b].map(v=>Math.max(0,v-amt).toString(16).padStart(2,'0')).join('');}catch(e){return hex;}
-}
-function lightenColor(h,a){return lightenHex(h,a);}
-
-function townHandleClick(e){
-  const r=TOWN.canvas.getBoundingClientRect();
-  const cx=Math.round((e.clientX-r.left)*(TOWN.W/r.width));
-  const cy=Math.round((e.clientY-r.top)*(TOWN.H/r.height));
-  townHandleClickCoords(cx,cy);
-}
-
-function townHandleClickCoords(cx,cy){
-  if(cy<55&&cx>220&&cx<330){
-    TOWN.player.tx=274;TOWN.player.ty=24;TOWN.player.moving=true;TOWN.activeLocation='__exit__';return;
-  }
-  const loc=TOWN.locations.find(l=>Math.sqrt((cx-l.x)**2+(cy-l.y)**2)<l.r+18);
-  if(loc){
-    TOWN.player.tx=loc.x;TOWN.player.ty=loc.y+loc.r+10;
-    TOWN.player.moving=true;TOWN.activeLocation=loc.id;
-  } else {
-    TOWN.player.tx=Math.max(20,Math.min(TOWN.W-20,cx));
-    TOWN.player.ty=Math.max(24,Math.min(TOWN.H-20,cy));
-    TOWN.player.moving=true;TOWN.activeLocation=null;
-  }
-}
-
-function townHandleHover(e){
-  const r=TOWN.canvas.getBoundingClientRect();
-  const cx=Math.round((e.clientX-r.left)*(TOWN.W/r.width));
-  const cy=Math.round((e.clientY-r.top)*(TOWN.H/r.height));
-  const loc=TOWN.locations.find(l=>Math.sqrt((cx-l.x)**2+(cy-l.y)**2)<l.r+18);
-  const onExit=cy<55&&cx>220&&cx<330;
-  TOWN.hovered=loc?loc.id:(onExit?'exit':null);
-  TOWN.canvas.style.cursor=(loc||onExit)?'pointer':'crosshair';
-}
-
-function townHandleKey(e){
-  if(currentScreen!=='map')return;
-  const p=TOWN.player,step=28;
-  const moves={ArrowUp:[0,-step],ArrowDown:[0,step],ArrowLeft:[-step,0],ArrowRight:[step,0],
-    w:[0,-step],s:[0,step],a:[-step,0],d:[step,0]};
-  const mv=moves[e.key];
-  if(mv){
-    e.preventDefault();
-    TOWN.player.tx=Math.max(20,Math.min(TOWN.W-20,p.x+mv[0]));
-    TOWN.player.ty=Math.max(24,Math.min(TOWN.H-20,p.y+mv[1]));
-    TOWN.player.moving=true;TOWN.activeLocation=null;
-    if(TOWN.player.ty<30){TOWN.activeLocation='__exit__';}
-  }
-}
-
-function townCheckArrival(){
-  if(!TOWN.activeLocation)return;
-  const id=TOWN.activeLocation;TOWN.activeLocation=null;
-  if(id==='__exit__'){
-    notify('🗺️ Overworld coming soon! Use Battle Hall for now.','');
-    TOWN.player.ty=80;return;
-  }
-  setTimeout(()=>openTownBuilding(id),150);
-}
-
-function openTownBuilding(id){
-  if(id==='battle'){renderTownBattleHall();showScreen('era');}
-  else if(id==='inn'){townInn();}
-  else if(id==='armory'){showScreen('shop');}
-  else if(id==='archives'){showScreen('collection');}
-  else if(id==='board'){openLeaderboard();}
-}
-
-function renderTownBattleHall(){
-  document.getElementById('era-header').innerHTML=`
-    <button class="btn sm" onclick="returnToTown()" style="margin-bottom:12px">← Back to Town</button>
-    <div style="font-family:var(--pixel);font-size:7px;color:var(--teal);margin-bottom:4px">⚔️ BATTLE HALL</div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:14px">Choose your challenge</div>`;
-  const list=document.getElementById('era-enemy-list');
-  list.innerHTML=EPISODES.map(ep=>{
-    const unlocked=G.unlockedEpisodes.includes(ep.id);
-    const coming=ep.coming;
-    const eras=ep.eras||[];
-    const beaten=eras.reduce((n,era)=>n+era.enemies.filter(e=>G.beatenEnemies.includes(e.id)).length,0);
-    const total=eras.reduce((n,era)=>n+era.enemies.length,0);
-    const complete=total>0&&beaten>=total;
-    let bStyle='color:var(--text3);border-color:var(--border)',bTxt='LOCKED';
-    if(coming)bTxt='SOON';
-    else if(complete){bStyle='color:var(--green);border-color:var(--green)';bTxt='DONE';}
-    else if(unlocked){bStyle='color:var(--gold);border-color:var(--gold2)';bTxt='ENTER';}
-    return `<div class="unit-card ${coming||!unlocked?'locked':''} ${complete?'complete':''}" onclick="${unlocked&&!coming?`selectEpisode('${ep.id}')`:''}" >
-      <div class="unit-icon">${ep.icon}</div>
-      <div class="unit-info">
-        <div class="unit-name">UNIT ${ep.num} — ${ep.name.toUpperCase()}</div>
-        <div class="unit-sub">${ep.standards}</div>
-        ${unlocked&&!coming?`<div class="unit-prog">${beaten}/${total} challenges complete</div>`:''}
-      </div>
-      <div class="unit-badge" style="${bStyle}">${bTxt}</div>
-    </div>`;
-  }).join('');
-}
-
-function townInn(){
-  const healCost=Math.max(10,Math.floor((G.maxHp-G.hp)*2));
-  const isFull=G.hp>=G.maxHp;
-  if(isFull){save();notify('🏨 Well rested! Game saved.','green');return;}
-  if(G.gold<healCost){notify('Need '+healCost+' gold to rest. You have '+G.gold+'.','');return;}
-  if(confirm('🏨 THE INN\n\nRestore '+(G.maxHp-G.hp)+' HP for '+healCost+' gold?\n\nRest and save?')){
-    G.gold-=healCost;G.hp=G.maxHp;save();updateHeader();
-    notify('🏨 Fully restored! Game saved.','green');townUpdateStatusBar();
-  }
-}
-
-function townUpdateStatusBar(){
-  if(!G)return;
-  const lbl=document.getElementById('town-hp-label');
-  if(lbl)lbl.textContent='❤️ '+G.hp+'/'+G.maxHp+'  ⚖️ '+G.gold+'  LVL '+G.level;
-}
-
-
-function returnToTown(){
-  showScreen('map');
-  if(!TOWN.animFrame) townInit();
-}
-
 // ─── SUPABASE SYNC ───
 async function pushToSupabase(){
   if(!G||!G.name||window._isTeacher)return;
