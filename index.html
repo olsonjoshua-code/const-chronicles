@@ -406,6 +406,7 @@ option{background:var(--bg2)}
     <div class="main-title" style="font-size:20px">Constitutional Chronicles</div>
     <div class="title-ornament" style="margin:10px 0"><div class="ornament-line"></div><div class="ornament-symbol">⚖</div><div class="ornament-line r"></div></div>
     <div style="font-family:var(--inter);font-size:12px;color:var(--text3);letter-spacing:.05em">AP U.S. Government &amp; Politics</div>
+    <div style="font-family:var(--cinzel);font-size:10px;color:var(--gold2);letter-spacing:.1em;margin-top:6px">Created by Joshua Olson</div>
   </div>
 
   <!-- CONTINUE BANNER, shown if save exists -->
@@ -1456,29 +1457,29 @@ const EPISODES=[
       fact:'The College Board is a nonprofit organization that administers the AP program. Despite nonprofit status, it generates over $1 billion in annual revenue. You have been fighting its curriculum all year — and now you face it directly.',
       questions:[
         {q:'Which constitutional principle establishes that the national government only has powers specifically granted to it?',
-         opts:['Implied powers','Enumerated powers','Reserved powers','Concurrent powers'],correct:1},
+         opts:['Implied powers','Enumerated powers','Reserved powers','Concurrent powers'],a:1},
         {q:'The Supreme Court established judicial review in which landmark case?',
-         opts:['McCulloch v. Maryland','Marbury v. Madison','Gibbons v. Ogden','Fletcher v. Peck'],correct:1},
+         opts:['McCulloch v. Maryland','Marbury v. Madison','Gibbons v. Ogden','Fletcher v. Peck'],a:1},
         {q:'Which of the following best describes the concept of federalism?',
-         opts:['All power is held by the national government','Power is divided between national and state governments','States hold all power not given to local governments','The president shares power with Congress'],correct:1},
+         opts:['All power is held by the national government','Power is divided between national and state governments','States hold all power not given to local governments','The president shares power with Congress'],a:1},
         {q:'The Bill of Rights was added to the Constitution primarily to address concerns of which group?',
-         opts:['Federalists who wanted stronger central government','Anti-Federalists who feared government tyranny','Southern states concerned about slavery','Northern merchants worried about trade'],correct:1},
+         opts:['Federalists who wanted stronger central government','Anti-Federalists who feared government tyranny','Southern states concerned about slavery','Northern merchants worried about trade'],a:1},
         {q:'Which branch of government has the power to declare laws unconstitutional?',
-         opts:['Executive','Legislative','Judicial','Federal Reserve'],correct:2},
+         opts:['Executive','Legislative','Judicial','Federal Reserve'],a:2},
         {q:'The elastic clause allows Congress to:',
-         opts:['Declare war without presidential approval','Make laws necessary and proper to carry out its powers','Override Supreme Court decisions','Amend the Constitution unilaterally'],correct:1},
+         opts:['Declare war without presidential approval','Make laws necessary and proper to carry out its powers','Override Supreme Court decisions','Amend the Constitution unilaterally'],a:1},
         {q:'Which amendment extended voting rights to citizens 18 years and older?',
-         opts:['19th Amendment','24th Amendment','26th Amendment','15th Amendment'],correct:2},
+         opts:['19th Amendment','24th Amendment','26th Amendment','15th Amendment'],a:2},
         {q:'Iron triangles in American politics refer to the relationship between:',
-         opts:['President, Congress and Courts','Congress, bureaucratic agencies and interest groups','Federal, state and local governments','Political parties, media and voters'],correct:1},
+         opts:['President, Congress and Courts','Congress, bureaucratic agencies and interest groups','Federal, state and local governments','Political parties, media and voters'],a:1},
         {q:'Which of the following is an example of a civil liberty?',
-         opts:['The right to vote','Freedom from unreasonable searches','Equal pay for equal work','Access to public education'],correct:1},
+         opts:['The right to vote','Freedom from unreasonable searches','Equal pay for equal work','Access to public education'],a:1},
         {q:'The War Powers Resolution of 1973 was designed to:',
-         opts:['Give the president unlimited military authority','Limit presidential war powers without congressional approval','Allow Congress to declare war unilaterally','Establish the National Security Council'],correct:1},
+         opts:['Give the president unlimited military authority','Limit presidential war powers without congressional approval','Allow Congress to declare war unilaterally','Establish the National Security Council'],a:1},
         {q:'Linkage institutions in American politics include all of the following EXCEPT:',
-         opts:['Political parties','Interest groups','The Supreme Court','Mass media'],correct:2},
+         opts:['Political parties','Interest groups','The Supreme Court','Mass media'],a:2},
         {q:'Which theory of democracy argues that competing groups ensure no single faction dominates?',
-         opts:['Elite theory','Hyperpluralism','Pluralism','Participatory democracy'],correct:2},
+         opts:['Elite theory','Hyperpluralism','Pluralism','Participatory democracy'],a:2},
       ]
     }]
    }],
@@ -3354,9 +3355,14 @@ function renderTriviaScreen(){
   document.getElementById('trivia-q').textContent=q.q;
   if(BT.hintText)document.getElementById('trivia-hint-box').innerHTML=`<div class="hint-box">📝 ${BT.hintText}</div>`;
   else document.getElementById('trivia-hint-box').innerHTML='';
-  const correctText=q.opts[q.a];const wrongs=q.opts.filter((_,i)=>i!==q.a);
+  const correctIdx=q.a!==undefined?q.a:q.correct||0;
+  const correctText=q.opts[correctIdx]||'(correct answer)';
+  const wrongs=q.opts.filter((_,i)=>i!==correctIdx&&_!==undefined&&_!=='');
   const correctPos=Math.floor(Math.random()*4);const shuffled=[];let wi=0;
-  for(let i=0;i<4;i++){if(i===correctPos)shuffled.push({text:correctText,isCorrect:true});else{shuffled.push({text:wrongs[wi]||correctText,isCorrect:false});wi++;}}
+  for(let i=0;i<4;i++){
+    if(i===correctPos)shuffled.push({text:correctText,isCorrect:true});
+    else{shuffled.push({text:wrongs[wi]||correctText,isCorrect:false});wi++;}
+  }
   BT.shuffledOpts=shuffled;
   const letters=['A','B','C','D'];
   document.getElementById('trivia-opts').innerHTML=shuffled.map((opt,i)=>`<button class="t-opt" onclick="answerShuffled(${i})">${letters[i]}. ${opt.text}</button>`).join('');
@@ -4262,7 +4268,7 @@ const SFX=(function(){
 // ─── SUPABASE SYNC ───
 async function pushToSupabase(){
   if(window._supabaseFailed)return; // stop retrying after first fail
-  if(!G||!G.name||window._isTeacher)return;
+  if(!G||!G.name)return;
   const def=AVATAR_DEFS.find(a=>a.id===G.avatarId)||AVATAR_DEFS[0];
   const rank=getRank();
   const scoreEntry={
