@@ -401,6 +401,17 @@ option{background:var(--bg2)}
     <div style="font-family:var(--inter);font-size:12px;color:var(--text3);letter-spacing:.05em">AP U.S. Government &amp; Politics</div>
   </div>
 
+  <!-- CONTINUE BANNER — shown if save exists -->
+  <div id="continue-banner" style="display:none;margin-bottom:12px">
+    <div style="background:rgba(201,168,76,.08);border:1px solid var(--gold2);padding:14px;text-align:center">
+      <div style="font-family:var(--pixel);font-size:6px;color:var(--teal);margin-bottom:8px">— WELCOME BACK —</div>
+      <div style="font-family:var(--cinzel);font-size:13px;color:var(--gold);margin-bottom:4px" id="continue-name"></div>
+      <div style="font-family:var(--inter);font-size:11px;color:var(--text2);margin-bottom:12px" id="continue-stats"></div>
+      <button class="btn green full" onclick="continueGame()" style="margin-bottom:6px">▶ CONTINUE</button>
+      <button class="btn full" onclick="hideContinue()" style="font-size:9px;border-color:var(--text3);color:var(--text3)">New / Switch Player</button>
+    </div>
+  </div>
+
   <!-- STEP 1: SELECT PERIOD -->
   <div id="login-step-1" class="panel">
     <div style="font-family:var(--pixel);font-size:6px;color:var(--teal);text-align:center;margin-bottom:16px">— SELECT YOUR CLASS —</div>
@@ -520,24 +531,38 @@ option{background:var(--bg2)}
 
 <!-- BATTLE -->
 <div id="battle-screen" class="screen">
-  <div class="battle-hud">
+  <!-- HUD — 3 equal columns matching arena below -->
+  <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin-bottom:6px">
     <div>
       <div class="fighter-name" id="b-player-name">YOU</div>
       <div class="hp-row"><div class="hp-track"><div class="hp-bar p" id="b-player-hp-bar" style="width:100%"></div></div><div class="hp-num" id="b-player-hp-num">50</div></div>
     </div>
-    <div class="vs-txt">VS</div>
+    <div class="vs-txt" style="font-family:var(--cinzel);font-size:11px;color:var(--text3);letter-spacing:.1em">VS</div>
     <div class="enemy-side">
       <div class="fighter-name" id="b-enemy-name">ENEMY</div>
       <div class="hp-row rev"><div class="hp-track"><div class="hp-bar e" id="b-enemy-hp-bar" style="width:100%"></div></div><div class="hp-num" id="b-enemy-hp-num">30</div></div>
     </div>
   </div>
-  <div class="battle-arena">
-    <div style="display:flex;flex-direction:column;align-items:center;z-index:1">
-      <div id="b-player-sprite" style="width:80px;height:80px;z-index:1"></div>
-      <div style="font-size:10px;font-family:var(--pixel);color:var(--gold);margin-top:2px" id="b-weapon-display"></div>
+  <!-- Arena — same 3-column grid as HUD -->
+  <div class="battle-arena" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:6px;padding:14px 10px;min-height:140px">
+    <!-- Player side -->
+    <div style="display:flex;flex-direction:column;align-items:center;text-align:center">
+      <div id="b-player-sprite" style="width:72px;height:72px;border-radius:50%;border:2px solid var(--gold2);overflow:hidden;background:var(--bg2);margin-bottom:6px"></div>
+      <div style="font-family:var(--cinzel);font-size:9px;color:var(--text);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px" id="b-player-name-display">YOU</div>
+      <div style="font-family:var(--inter);font-size:10px;color:var(--teal);font-style:italic;margin-bottom:4px" id="b-player-rank-display">Citizen</div>
+      <div style="font-size:18px" id="b-weapon-display">🪶</div>
+      <div style="font-family:var(--pixel);font-size:4px;color:var(--gold);margin-top:2px" id="b-weapon-name">Quill Pen</div>
     </div>
-    <div class="enemy-sprite-battle">
-      <span class="enemy-big-sprite" id="b-enemy-sprite">⚖️</span>
+    <!-- Center — VS + sequence messages -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 6px;width:120px">
+      <div style="font-family:var(--cinzel);font-size:11px;color:var(--text3);letter-spacing:.1em">VS</div>
+      <div id="seq-player" style="display:none;font-family:var(--pixel);font-size:5px;padding:8px;border-radius:3px;text-align:center;line-height:1.8;width:100%"></div>
+      <div id="seq-enemy" style="display:none;font-family:var(--pixel);font-size:5px;padding:8px;border-radius:3px;text-align:center;line-height:1.8;width:100%"></div>
+      <button id="next-turn-btn" onclick="nextTurn()" style="display:none;font-family:var(--cinzel);font-size:9px;letter-spacing:.06em;background:var(--gold);border:none;color:var(--bg);padding:8px 12px;cursor:pointer;width:100%;animation:pulse .8s infinite">NEXT TURN →</button>
+    </div>
+    <!-- Enemy side -->
+    <div style="display:flex;flex-direction:column;align-items:center;text-align:center">
+      <span class="enemy-big-sprite" id="b-enemy-sprite" style="font-size:56px;display:block;filter:drop-shadow(0 6px 12px rgba(0,0,0,.5));margin-bottom:6px">⚖️</span>
       <div class="enemy-battle-name" id="b-enemy-battle-name">NAME</div>
       <div class="enemy-battle-sub" id="b-enemy-battle-sub">Title</div>
     </div>
@@ -547,13 +572,10 @@ option{background:var(--bg2)}
     <div class="combo-pips"><div class="pip" id="pip0"></div><div class="pip" id="pip1"></div><div class="pip" id="pip2"></div><div class="pip" id="pip3"></div><div class="pip" id="pip4"></div></div>
     <div class="combo-txt" id="combo-txt"></div>
   </div>
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-family:var(--pixel);font-size:5px;color:var(--text3)">
-    <span id="b-weapon-icon" style="font-size:16px">🪶</span>
-    <span id="b-weapon-name" style="color:var(--gold)">Quill Pen</span>
-    <span style="margin-left:auto" id="b-armor-name">No Protection</span>
-    <span id="b-armor-icon" style="font-size:16px">🩲</span>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-family:var(--pixel);font-size:4px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);padding:5px 8px">
+    <span><span id="b-weapon-icon" style="font-size:12px">🪶</span> <span id="b-weapon-name-bar" style="color:var(--gold)">Quill Pen</span></span>
+    <span id="b-armor-name-bar" style="color:var(--teal)">No Armor</span> <span id="b-dodge-pct" style="color:var(--teal);margin-left:4px"></span>
   </div>
-  <div id="battle-event" style="display:none;background:rgba(192,57,43,.12);border-left:3px solid var(--red);padding:8px 12px;margin-bottom:6px;font-family:var(--pixel);font-size:5px;color:var(--red);line-height:1.8;animation:fadeIn .2s"></div>
   <div class="battle-log" id="battle-log">Choose your argument...</div>
   <div class="action-grid">
     <button class="act-btn" onclick="doAction('attack')" id="btn-attack"><span class="act-icon">⚡</span><span class="act-title">Quiz Attack</span><span class="act-sub">Correct answer deals damage</span></button>
@@ -590,7 +612,7 @@ option{background:var(--bg2)}
     <div id="rewards-list"></div>
   </div>
   <div id="new-card-reveal" style="display:none"></div>
-  <button class="btn green full" id="open-pack-btn" style="display:none" onclick="goToPackThenEra()">📦 OPEN YOUR BRIEF!</button>
+  <button class="btn green full" id="open-pack-btn" style="display:none" onclick="goToPackThenEra()">📦 VIEW YOUR BRIEF!</button>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
     <button class="btn green full" onclick="manualSave()" style="border-color:var(--green);color:var(--green)">💾 SAVE</button>
     <button class="btn full" onclick="returnToCurrentEra()">▶ CONTINUE</button>
@@ -612,16 +634,21 @@ option{background:var(--bg2)}
   <div id="shop-content"></div>
 </div>
 
-<!-- PACKS -->
-<div id="pack-screen" class="screen">
-  <div style="font-family:var(--pixel);font-size:7px;color:var(--gold);text-align:center;margin-bottom:4px">📦 CASE BRIEFS</div>
-  <div id="pack-content"></div>
-</div>
+<!-- PACKS — merged into collection, no separate screen needed -->
+<div id="pack-screen" class="screen" style="display:none"></div>
 
 <!-- COLLECTION -->
 <div id="collection-screen" class="screen">
-  <div style="font-family:var(--pixel);font-size:7px;color:var(--gold);text-align:center;margin-bottom:4px">📜 CIVIC CODEX</div>
-  <div id="coll-progress" style="font-size:14px;color:var(--text2);text-align:center;margin-bottom:10px"></div>
+  <!-- Pack opener — shown when player has unopened packs -->
+  <div id="pack-open-area" style="display:none;background:rgba(201,168,76,.08);border:2px solid var(--gold2);padding:14px;margin-bottom:14px;text-align:center">
+    <div style="font-family:var(--pixel);font-size:6px;color:var(--gold);margin-bottom:8px">📦 YOU HAVE UNOPENED BRIEFS!</div>
+    <div id="pack-open-count" style="font-size:14px;color:var(--text2);margin-bottom:10px"></div>
+    <div id="pack-open-result" style="margin-bottom:10px"></div>
+    <button class="btn green full" onclick="openPackInline()" id="open-pack-inline-btn">📦 OPEN A BRIEF</button>
+  </div>
+  <div style="font-family:var(--pixel);font-size:7px;color:var(--gold);text-align:center;margin-bottom:4px">📜 CASE BRIEFS</div>
+  <div id="coll-progress" style="font-size:14px;color:var(--text2);text-align:center;margin-bottom:6px"></div>
+  <div style="font-family:var(--pixel);font-size:4px;color:var(--text3);text-align:center;margin-bottom:10px">Beat enemies to collect briefs. Some unlock Citizens!</div>
   <div class="card-grid" id="card-grid"></div>
   <div id="coll-detail" style="margin-top:12px"></div>
 </div>
@@ -630,10 +657,10 @@ option{background:var(--bg2)}
 <div id="profile-screen" class="screen">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px">
     <div style="font-family:var(--pixel);font-size:7px;color:var(--gold)">🏅 PROFILE</div>
-    <div style="display:flex;gap:6px">
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
       <button class="btn green sm" onclick="manualSave()">💾 SAVE</button>
       <button class="btn sm" onclick="openLeaderboard()" style="border-color:var(--purple);color:var(--purple)">🏆 BOARD</button>
-      <button class="btn sm" onclick="returnToTown()" style="border-color:var(--blue);color:var(--blue)">🏛️ TOWN</button>
+      <button class="btn sm" onclick="confirmRestart()" style="border-color:var(--red);color:var(--red)">🔄 RESTART</button>
     </div>
   </div>
   <div id="profile-header" style="text-align:center;padding-bottom:1rem;border-bottom:1px solid var(--border);margin-bottom:1rem"></div>
@@ -728,12 +755,12 @@ option{background:var(--bg2)}
   <button class="btn green" onclick="closeLevelUp()">Continue</button>
 </div>
 
-<div id="bottom-nav" style="display:grid">
+<div id="bottom-nav" style="display:grid;grid-template-columns:repeat(5,1fr)">
   <button class="bn-btn active" id="nav-map" onclick="showScreen('map')"><span class="bn-icon">🗺️</span>UNITS</button>
   <button class="bn-btn" id="nav-shop" onclick="showScreen('shop')"><span class="bn-icon">⚖️</span>ARMORY</button>
-  <button class="bn-btn" id="nav-pack" onclick="showScreen('pack')"><span class="bn-icon">📦</span>BRIEFS<span class="bn-badge" id="pack-badge" style="display:none">!</span></button>
-  <button class="bn-btn" id="nav-collection" onclick="showScreen('collection')"><span class="bn-icon">📜</span>CODEX</button>
+  <button class="bn-btn" id="nav-collection" onclick="showScreen('collection')"><span class="bn-icon">📜</span>BRIEFS<span class="bn-badge" id="pack-badge" style="display:none">!</span></button>
   <button class="bn-btn" id="nav-profile" onclick="showScreen('profile')"><span class="bn-icon">🏅</span>PROFILE</button>
+  <button class="bn-btn" onclick="manualSave()" style="color:var(--green2);border-color:var(--green2)"><span class="bn-icon">💾</span>SAVE</button>
 </div>
 
 </div>
@@ -2734,7 +2761,7 @@ function renderAllSprites(){
   const h=document.getElementById('hud-sprite-wrap');
   if(h)h.innerHTML=getMedallionSVG(G.avatarId,52);
   const b=document.getElementById('b-player-sprite');
-  if(b){b.outerHTML=`<div id="b-player-sprite" style="width:80px;height:80px;z-index:1">${getMedallionSVG(G.avatarId,80)}</div>`;}
+  if(b){b.innerHTML=getMedallionSVG(G.avatarId,78);}
 }
 // ─── LOGIN ───
 let _loginPeriodSelected=null;
@@ -2792,7 +2819,16 @@ function submitLogin(){
   window._isTeacher=false;
   const sk='apgov_v1_'+first.toLowerCase()+'_'+last.toLowerCase();
   window._loginSaveKey=sk;
-  try{const ex=localStorage.getItem(sk);if(ex){const d=JSON.parse(ex);if(d&&d.name){G=d;G.period=window._loginPeriod;save();launchGame();return;}}}catch(e){}
+  try{
+    const ex=localStorage.getItem(sk);
+    if(ex){
+      const d=JSON.parse(ex);
+      if(d&&d.name){
+        G=d;G.period=window._loginPeriod;save();launchGame();return;
+      }
+    }
+  }catch(e){}
+  // No existing save for this name — fresh start
   goToAvatarCreator();
 }
 function goToLoginScreen(){
@@ -2887,7 +2923,7 @@ function returnToCurrentEra(){
     showScreen('map');
   }
 }
-function goToPackThenEra(){showScreen('pack');}
+function goToPackThenEra(){showScreen('collection');}
 function rematch(){if(BT.lastEpId&&BT.lastEraId&&BT.lastEnemyId)startBattle(BT.lastEpId,BT.lastEraId,BT.lastEnemyId);}
 // ─── HEADER ───
 function updateHeader(){
@@ -2939,7 +2975,8 @@ function renderMap(){
     </div>`;}).join('');
 }
 function selectEpisode(epId){const ep=EPISODES.find(e=>e.id===epId);if(!ep||ep.coming)return;renderEraScreen(ep);showScreen('era');}
-function backToBattleHall(){showScreen('era');renderTownBattleHall();}
+function backToBattleHall(){showScreen('map');}
+function renderTownBattleHall(){renderMap();}
 function renderEraScreen(ep){
   document.getElementById('era-header').innerHTML=`
     <button class="btn sm" onclick="showScreen('map')" style="margin-bottom:12px">← Back to Units</button>
@@ -3002,7 +3039,7 @@ function checkEraUnlocks(){
 }
 function showMapNotif(msg){const el=document.getElementById('map-notification');if(el){el.textContent='★ '+msg+' ★';el.style.display='block';setTimeout(()=>el.style.display='none',4000);}}
 // ─── BATTLE ───
-const ENEMY_ATTACK_TABLE={ep1:{min:5,max:9,wrongBonus:7},ep2:{min:10,max:16,wrongBonus:9},ep3:{min:14,max:22,wrongBonus:11},ep4:{min:19,max:28,wrongBonus:13},ep5:{min:25,max:36,wrongBonus:16}};
+const ENEMY_ATTACK_TABLE={ep1:{min:2,max:4,wrongBonus:3},ep2:{min:3,max:6,wrongBonus:4},ep3:{min:5,max:8,wrongBonus:5},ep4:{min:7,max:11,wrongBonus:6},ep5:{min:10,max:15,wrongBonus:8}};
 function getEnemyAttack(epId,isWrong){var t=ENEMY_ATTACK_TABLE[epId]||ENEMY_ATTACK_TABLE.ep1;var b=Math.floor(Math.random()*(t.max-t.min+1))+t.min;return isWrong?b+t.wrongBonus:b;}
 function getPlayerAgility(){
   var base=G.agility||0;
@@ -3051,7 +3088,19 @@ function getPassiveGoldBonus(){
   if(p.stat==='all')return 0.3;
   return 0;
 }
-function tryDodge(){var ag=getPlayerAgility();var chance=Math.min(0.4,ag*0.02);return Math.random()<chance;}
+function getDodgeChance(){
+  var base=0.18; // 18% default always
+  // Armor dodge bonus — each armor adds a flat % on top
+  var armorDodge={none:0,amendment:0.05,precedent:0.08,due_process:0.12,scotus:0.16,unanimous:0.20};
+  var armor=G.equippedArmor||'none';
+  var armorBonus=armorDodge[armor]||0;
+  // Agility passive adds dodge (each point = 0.5%)
+  var agilityBonus=Math.min(0.12, getPlayerAgility()*0.005);
+  return Math.min(0.50, base+armorBonus+agilityBonus);
+}
+function tryDodge(){
+  return Math.random()<getDodgeChance();
+}
 function startBattle(epId,eraId,enemyId){
   const ep=EPISODES.find(e=>e.id===epId);const era=ep?.eras?.find(r=>r.id===eraId);const enemy=era?.enemies?.find(e=>e.id===enemyId);
   if(!enemy)return;G.lastEpId=epId;G.lastEraId=eraId;
@@ -3061,17 +3110,26 @@ function startBattle(epId,eraId,enemyId){
   BT={epId,eraId,enemyId,enemy,enemyHp:scaledHp,enemyMaxHp:scaledHp,combo:0,hintUsed:false,
     earnedXP:0,earnedGold:0,earnedScore:0,askedQ:[],currentQ:null,hintText:'',action:'',
     log:enemy.name+' challenges your civic knowledge!',weaponBonus:weapon.dmgBonus||0,armorBonus:armor.defBonus||0,
-    lastEpId:epId,lastEraId:eraId,lastEnemyId:enemyId};
-  document.getElementById('b-weapon-name').textContent=weapon.name;document.getElementById('b-weapon-icon').textContent=weapon.icon;
-  document.getElementById('b-armor-name').textContent=armor.name;document.getElementById('b-armor-icon').textContent=armor.icon;
+    lastEpId:epId,lastEraId:eraId,lastEnemyId:enemyId,_battleOver:false};
+  var wnb=document.getElementById('b-weapon-name-bar');if(wnb)wnb.textContent=weapon.name;var wib=document.getElementById('b-weapon-icon');if(wib)wib.textContent=weapon.icon;
+  var dpEl=document.getElementById('b-dodge-pct');if(dpEl)dpEl.textContent=Math.round(getDodgeChance()*100)+'% dodge';
+  var anb=document.getElementById('b-armor-name-bar');if(anb)anb.textContent=armor.name;var aib=document.getElementById('b-armor-icon');if(aib)aib.textContent=armor.icon;
   const potCount=(G.inventory['potion_sm']||0)+(G.inventory['potion_lg']||0)+(G.inventory['potion_xl']||0);
   document.getElementById('item-sub').textContent=potCount>0?`${potCount} potion${potCount>1?'s':''}`:'No potions';
-  renderBattle();showScreen('battle');
+  renderBattle();showScreen('battle');renderAllSprites();
 }
 function renderBattle(){
   const en=BT.enemy;if(!en)return;
-  const evEl=document.getElementById('battle-event');
-  if(evEl)evEl.style.display='none';
+  // Clear sequence + hide next turn button, re-enable actions
+  ['seq-player','seq-enemy'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.style.display='none';
+  });
+  var ntb=document.getElementById('next-turn-btn');if(ntb)ntb.style.display='none';
+  setBattleActionsDisabled(false);
+  // Player name + rank
+  var rank=getRank();
+  var pnd=document.getElementById('b-player-name-display');if(pnd)pnd.textContent=G.name||'YOU';
+  var prd=document.getElementById('b-player-rank-display');if(prd)prd.textContent=rank?rank.name:'Citizen';
   const pHp=Math.max(0,G.hp/G.maxHp*100);const eHp=Math.max(0,BT.enemyHp/BT.enemyMaxHp*100);
   document.getElementById('b-player-name').textContent=G.name;document.getElementById('b-enemy-name').textContent=en.name.toUpperCase();
   const pb=document.getElementById('b-player-hp-bar');if(pb){pb.style.width=pHp+'%';pb.className='hp-bar p'+(pHp<25?' crit':pHp<50?' warn':'');}
@@ -3084,7 +3142,7 @@ function renderBattle(){
   document.getElementById('hint-btn').disabled=BT.hintUsed;
   if(BT.hintText)document.getElementById('hint-box-wrap').innerHTML=`<div class="hint-box">📝 ${BT.hintText}</div>`;
   else document.getElementById('hint-box-wrap').innerHTML='';
-  const bs=document.getElementById('b-player-sprite');if(bs)bs.innerHTML=getSpriteContent(G.avatarId);
+  const bs=document.getElementById('b-player-sprite');if(bs)bs.innerHTML=getMedallionSVG(G.avatarId,78);
   const wd=document.getElementById('b-weapon-display');const cw=WEAPONS.find(w=>w.id===(G.equippedWeapon||'quill'))||WEAPONS[0];if(wd)wd.textContent=cw.icon;
 }
 function updateComboPips(){for(let i=0;i<5;i++){const p=document.getElementById('pip'+i);if(p)p.className='pip'+(BT.combo>i?' on':'');}document.getElementById('combo-txt').textContent=BT.combo>=1?`×${BT.combo} STREAK!`:'';}
@@ -3143,86 +3201,140 @@ function answerShuffled(idx){
   var baseDmg=getEnemyAttack(BT.epId,false);
   var netDmg=Math.max(1,baseDmg-(armor.defBonus||0)-getPassiveDefBonus());
 
-  // ── ENEMY ATTACK ANIMATION ──
-  var enemyEl=document.getElementById('b-enemy-sprite');
-  var playerEl=document.getElementById('b-player-sprite');
-  var arenaEl=document.querySelector('.battle-arena');
-  var eventEl=document.getElementById('battle-event');
+  // Store for use in sequence
+  BT._pendingDodge=dodged;
+  BT._pendingNetDmg=netDmg;
+  BT._pendingArmor=armor;
+  BT._pendingIsCorrect=isCorrect;
 
-  if(dodged){
-    // Dodge — enemy lunges, player hops away
-    if(enemyEl){enemyEl.classList.remove('enemy-attacking');void enemyEl.offsetWidth;enemyEl.classList.add('enemy-attacking');}
-    if(playerEl){playerEl.classList.remove('player-dodge');void playerEl.offsetWidth;playerEl.classList.add('player-dodge');}
-    spawnDmg('DODGE!','heal');
-    BT.log='You dodged the attack!';
-    if(eventEl){eventEl.style.display='block';eventEl.style.borderColor='var(--teal)';eventEl.style.color='var(--teal)';eventEl.style.background='rgba(26,188,156,.1)';eventEl.textContent='💨 '+BT.enemy.name.toUpperCase()+' ATTACKS — YOU DODGED!';}
-    setTimeout(function(){if(enemyEl)enemyEl.classList.remove('enemy-attacking');if(playerEl)playerEl.classList.remove('player-dodge');},600);
-  } else {
-    // Enemy lunges + player takes hit
-    if(enemyEl){enemyEl.classList.remove('enemy-attacking');void enemyEl.offsetWidth;enemyEl.classList.add('enemy-attacking');}
-    setTimeout(function(){
-      G.hp=Math.max(0,G.hp-netDmg);
-      if(playerEl){playerEl.classList.remove('player-hit');void playerEl.offsetWidth;playerEl.classList.add('player-hit');}
-      if(arenaEl){arenaEl.classList.remove('screen-shake');void arenaEl.offsetWidth;arenaEl.classList.add('screen-shake');}
-      spawnDmg('-'+netDmg,'dmg');
-      if(eventEl){eventEl.style.display='block';eventEl.style.borderColor='var(--red)';eventEl.style.color='var(--red)';eventEl.style.background='rgba(192,57,43,.1)';eventEl.textContent='⚔️ '+BT.enemy.name.toUpperCase()+' STRIKES FOR '+netDmg+' DAMAGE!';}
-      setTimeout(function(){
-        if(enemyEl)enemyEl.classList.remove('enemy-attacking');
-        if(playerEl)playerEl.classList.remove('player-hit');
-        if(arenaEl)arenaEl.classList.remove('screen-shake');
-      },600);
-    },180);
-  }
-
-  if(!isCorrect){
-    var wrongDmg=getEnemyAttack(BT.epId,true);
-    var wrongNet=Math.max(1,wrongDmg-(armor.defBonus||0));
-    setTimeout(function(){
-      G.hp=Math.max(0,G.hp-wrongNet);
-      if(playerEl){playerEl.classList.remove('player-hit');void playerEl.offsetWidth;playerEl.classList.add('player-hit');}
-      if(arenaEl){arenaEl.classList.remove('screen-shake');void arenaEl.offsetWidth;arenaEl.classList.add('screen-shake');}
-      spawnDmg('-'+wrongNet,'dmg');
-      if(eventEl){eventEl.style.display='block';eventEl.style.borderColor='var(--red)';eventEl.style.color='#e74c3c';eventEl.style.background='rgba(192,57,43,.15)';eventEl.textContent='❌ WRONG! '+BT.enemy.name.toUpperCase()+' COUNTERS FOR +'+wrongNet+' DAMAGE!';}
-      updateHeader();renderBattle();
-      if(G.hp<=0)setTimeout(function(){endBattle(false);},800);
-      setTimeout(function(){if(playerEl)playerEl.classList.remove('player-hit');if(arenaEl)arenaEl.classList.remove('screen-shake');},600);
-    },700);
-  }
   G.qTotal++;if(isCorrect){G.qCorrect++;G.currentStreak++;if(G.currentStreak>G.maxStreak)G.maxStreak=G.currentStreak;}else G.currentStreak=0;
   BT.currentQ=null;BT.hintText='';
-  setTimeout(()=>{applyAnswerResult(isCorrect,q);showScreen('battle');renderBattle();},900);
+
+  // Go to battle screen — sequence plays out here
+  setTimeout(function(){
+    showScreen('battle');
+    applyAnswerResult(isCorrect,q);  // Step 1: player result shown immediately
+    setBattleActionsDisabled(true);
+
+    var enemyEl=document.getElementById('b-enemy-sprite');
+    var playerEl=document.getElementById('b-player-sprite');
+    var seqEnemy=document.getElementById('seq-enemy');
+    var pName=G.name?G.name.split(' ')[0]:'You';
+    var eName=BT.enemy.name.length>22?BT.enemy.name.split(' ').slice(0,3).join(' '):BT.enemy.name;
+    var nd=BT._pendingNetDmg;
+    var isDodge=BT._pendingDodge;
+    var wasWrong=!isCorrect;
+
+    function setSeqEnemy(msg,color,bg){
+      if(!seqEnemy)return;
+      seqEnemy.style.cssText='display:block;font-family:var(--pixel);font-size:5px;padding:8px 10px;border-radius:3px;border:1px solid '+color+';color:'+color+';background:'+bg+';text-align:center;line-height:1.7';
+      seqEnemy.textContent=msg;
+    }
+
+    // Step 2: Enemy attack at 1.8s — enough time to read player result
+    setTimeout(function(){
+      if(isDodge){
+        if(enemyEl){enemyEl.classList.remove('enemy-attacking');void enemyEl.offsetWidth;enemyEl.classList.add('enemy-attacking');}
+        if(playerEl){playerEl.classList.remove('player-dodge');void playerEl.offsetWidth;playerEl.classList.add('player-dodge');}
+        spawnDmg('DODGE!','heal');
+        setSeqEnemy('⚔️ '+eName+' attacks '+pName+' — MISS!','var(--teal)','rgba(26,188,156,.1)');
+        BT.log=eName+' missed '+pName+'!';
+        setTimeout(function(){if(enemyEl)enemyEl.classList.remove('enemy-attacking');if(playerEl)playerEl.classList.remove('player-dodge');},700);
+      } else {
+        if(enemyEl){enemyEl.classList.remove('enemy-attacking');void enemyEl.offsetWidth;enemyEl.classList.add('enemy-attacking');}
+        // Impact lands 400ms after lunge starts
+        setTimeout(function(){
+          G.hp=Math.max(0,G.hp-nd);
+          if(playerEl){playerEl.classList.remove('player-hit');void playerEl.offsetWidth;playerEl.classList.add('player-hit');}
+          spawnDmg('-'+nd,'dmg');
+          updateHpBars();
+          setSeqEnemy('⚔️ '+eName+' attacks '+pName+' — HIT! -'+nd+' HP','#e74c3c','rgba(192,57,43,.15)');
+          BT.log=eName+' strikes '+pName+' for '+nd+' damage!';
+          updateHeader();
+          setTimeout(function(){if(enemyEl)enemyEl.classList.remove('enemy-attacking');if(playerEl)playerEl.classList.remove('player-hit');},700);
+          if(G.hp<=0&&!BT._battleOver){BT._battleOver=true;setTimeout(function(){endBattle(false);},1000);}
+        },400);
+      }
+    },1800);
+
+    // Step 3: Wrong answer extra counter at 3.0s
+    if(wasWrong){
+      var wrongDmg=getEnemyAttack(BT.epId,true);
+      var wrongNet=Math.max(1,wrongDmg-(BT._pendingArmor.defBonus||0));
+      setTimeout(function(){
+        G.hp=Math.max(0,G.hp-wrongNet);
+        if(playerEl){playerEl.classList.remove('player-hit');void playerEl.offsetWidth;playerEl.classList.add('player-hit');}
+        if(enemyEl){enemyEl.classList.remove('enemy-attacking');void enemyEl.offsetWidth;enemyEl.classList.add('enemy-attacking');}
+        spawnDmg('-'+wrongNet,'dmg');
+        updateHpBars();
+        setSeqEnemy('❌ Wrong answer! '+eName+' counters — -'+wrongNet+' HP!','#ff6b6b','rgba(192,57,43,.2)');
+        BT.log='Wrong! '+eName+' counters '+pName+' for '+wrongNet+'!';
+        updateHeader();
+        if(G.hp<=0&&!BT._battleOver){BT._battleOver=true;setTimeout(function(){endBattle(false);},1000);}
+        setTimeout(function(){if(playerEl)playerEl.classList.remove('player-hit');if(enemyEl)enemyEl.classList.remove('enemy-attacking');},700);
+      },3000);
+    }
+
+    // Step 4: Next Turn button at 3.0s (correct) or 4.2s (wrong)
+    var totalDelay=wasWrong?4200:3000;
+    setTimeout(function(){
+      if(BT._battleOver)return;
+      var ntb=document.getElementById('next-turn-btn');
+      if(ntb)ntb.style.display='block';
+    },totalDelay);
+  },800);
 }
 function applyAnswerResult(correct,q){
   const en=BT.enemy;
   if(correct){
-    let dmg=3+Math.floor(Math.random()*4)+Math.floor(G.level/3)+BT.weaponBonus+getPassiveDmgBonus();
-    var evEl=document.getElementById('battle-event');
+    let dmg=8+Math.floor(Math.random()*5)+Math.floor(G.level/2)+BT.weaponBonus+getPassiveDmgBonus();
+    var seqPl=document.getElementById('seq-player');
     var enEl=document.getElementById('b-enemy-sprite');
+    var pn=G.name?G.name.split(' ')[0]:'You';
+    var en2=BT.enemy.name.length>20?BT.enemy.name.split(' ').slice(0,3).join(' '):BT.enemy.name;
+    function showSeqPl(msg,color,bg){
+      if(!seqPl)return;
+      seqPl.style.cssText='display:block;font-family:var(--pixel);font-size:5px;padding:8px 10px;border-radius:3px;border:1px solid '+color+';color:'+color+';background:'+bg+';text-align:center;line-height:1.7';
+      seqPl.textContent=msg;
+    }
     if(BT.action==='defend'){
       const heal=10+Math.floor(Math.random()*8)+getPassiveHealBonus();
       G.hp=Math.min(G.maxHp,G.hp+heal);BT.combo=Math.min(5,BT.combo+1);
-      BT.log='✅ Correct! Restored '+heal+' HP!';spawnDmg('+'+heal,'heal');
-      if(evEl){evEl.style.display='block';evEl.style.borderColor='var(--green)';evEl.style.color='var(--green)';evEl.style.background='rgba(39,174,96,.1)';evEl.textContent='🛡️ STUDY GUARD! +'+heal+' HP RESTORED!';}
+      BT.log='Correct! Restored '+heal+' HP!';spawnDmg('+'+heal,'heal');
+      updateHpBars();
+      showSeqPl('🛡️ '+pn+' studies hard — +'+heal+' HP restored!','var(--green)','rgba(39,174,96,.1)');
     } else if(BT.action==='special'){
       dmg=Math.floor(dmg*2.5);BT.enemyHp=Math.max(0,BT.enemyHp-dmg);BT.combo=0;
       if(enEl){enEl.style.filter='brightness(3) sepia(1) hue-rotate(180deg)';setTimeout(function(){if(enEl)enEl.style.filter='';},500);}
-      BT.log='⚖️ PRECEDENT STRIKE! '+dmg+' damage!';spawnDmg('-'+dmg,'dmg');
-      if(evEl){evEl.style.display='block';evEl.style.borderColor='var(--gold)';evEl.style.color='var(--gold)';evEl.style.background='rgba(201,168,76,.1)';evEl.textContent='⚖️ PRECEDENT STRIKE! '+dmg+' DAMAGE!';}
+      BT.log='PRECEDENT STRIKE! '+dmg+' damage!';spawnDmg('-'+dmg,'dmg');
+      updateHpBars();
+      showSeqPl('⚖️ '+pn+' strikes '+en2+' — PRECEDENT STRIKE! -'+dmg+' HP!','var(--gold)','rgba(201,168,76,.1)');
     } else {
       if(BT.combo>=3)dmg=Math.floor(dmg*1.7);
       BT.enemyHp=Math.max(0,BT.enemyHp-dmg);BT.combo=Math.min(5,BT.combo+1);
-      if(enEl){enEl.style.filter='brightness(2) sepia(1) hue-rotate(180deg)';setTimeout(function(){if(enEl)enEl.style.filter='';},400);}
-      BT.log='✅ Correct! '+dmg+' damage!'+(BT.combo>=3?' STREAK ×'+BT.combo+'!':'');
+      if(enEl){enEl.style.filter='brightness(2.5) sepia(1) hue-rotate(180deg)';setTimeout(function(){if(enEl)enEl.style.filter='';},400);}
+      BT.log='Correct! '+dmg+' damage!'+(BT.combo>=3?' STREAK x'+BT.combo+'!':'');
       spawnDmg('-'+dmg,'dmg');
-      if(evEl){evEl.style.display='block';evEl.style.borderColor='var(--teal)';evEl.style.color='var(--teal)';evEl.style.background='rgba(26,188,156,.08)';evEl.textContent='✅ CORRECT! '+dmg+' DAMAGE!'+(BT.combo>=3?' STREAK ×'+BT.combo+'!':'');}
+      updateHpBars();
+      showSeqPl('⚡ '+pn+' attacks '+en2+' — HIT! -'+dmg+' HP!'+(BT.combo>=3?' STREAK x'+BT.combo+'!':''),'var(--teal)','rgba(26,188,156,.08)');
     }
     BT.earnedXP+=5;BT.earnedGold+=3;BT.earnedScore+=10;
   } else {
     BT.combo=0;
     BT.log='Wrong! Correct: '+q.opts[q.a];
   }
-  if(BT.enemyHp<=0)setTimeout(function(){endBattle(true);},400);
-  else if(G.hp<=0)setTimeout(function(){endBattle(false);},400);
+  if(BT.enemyHp<=0&&!BT._battleOver){
+    BT._battleOver=true;
+    setBattleActionsDisabled(true);
+    // Clear next turn button if showing
+    var ntb2=document.getElementById('next-turn-btn');if(ntb2)ntb2.style.display='none';
+    setTimeout(function(){endBattle(true);},600);
+  } else if(G.hp<=0&&!BT._battleOver){
+    BT._battleOver=true;
+    setBattleActionsDisabled(true);
+    var ntb2=document.getElementById('next-turn-btn');if(ntb2)ntb2.style.display='none';
+    setTimeout(function(){endBattle(false);},600);
+  }
 }
 function useHint(){if(BT.hintUsed)return;const q=BT.currentQ||getQ();BT.currentQ=q;BT.hintUsed=true;BT.earnedScore=Math.max(0,BT.earnedScore-5);BT.hintText=q.hint||'No hint available.';renderBattle();if(currentScreen==='trivia')renderTriviaScreen();}
 function usePotion(){
@@ -3234,6 +3346,36 @@ function usePotion(){
   document.getElementById('item-sub').textContent=pc>0?`${pc} potion${pc>1?'s':''}`:'No potions';
   updateHeader();renderBattle();save();
 }
+function setBattleActionsDisabled(disabled){
+  ['btn-attack','btn-defend','btn-special','btn-item','hint-btn'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el){el.disabled=disabled;el.style.opacity=disabled?'0.35':'';el.style.pointerEvents=disabled?'none':'';}
+  });
+}
+
+function updateHpBars(){
+  if(!BT.enemy)return;
+  var pHp=Math.max(0,G.hp/G.maxHp*100);
+  var eHp=Math.max(0,BT.enemyHp/BT.enemyMaxHp*100);
+  var pb=document.getElementById('b-player-hp-bar');
+  var eb=document.getElementById('b-enemy-hp-bar');
+  if(pb){pb.style.width=pHp+'%';pb.className='hp-bar p'+(pHp<25?' crit':pHp<50?' warn':'');}
+  if(eb){eb.style.width=eHp+'%';eb.className='hp-bar e'+(eHp<25?' crit':'');}
+  var pn=document.getElementById('b-player-hp-num');
+  var en=document.getElementById('b-enemy-hp-num');
+  if(pn)pn.textContent=G.hp+'/'+G.maxHp;
+  if(en)en.textContent=BT.enemyHp+'/'+BT.enemyMaxHp;
+}
+
+function nextTurn(){
+  ['seq-player','seq-enemy'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.style.display='none';
+  });
+  var ntb=document.getElementById('next-turn-btn');if(ntb)ntb.style.display='none';
+  setBattleActionsDisabled(false);
+  renderBattle();
+}
+
 function doFlee(){const p=Math.floor(G.gold*0.1);G.gold=Math.max(0,G.gold-p);save();showScreen('map');if(p>0)notify(`Fled! Lost ${p} credits.`,'');}
 function spawnDmg(val,type){const d=document.createElement('div');d.className='dmg-float '+type;d.textContent=val;d.style.left=Math.random()*60+20+'%';d.style.top='40%';document.body.appendChild(d);setTimeout(()=>d.remove(),1300);}
 // ─── END BATTLE ───
@@ -3249,7 +3391,12 @@ function endBattle(won){
     BT.earnedScore+=25;G.wins++;G.score+=BT.earnedScore;G.gold+=gold+BT.earnedGold;
     if(en.givePack)G.packs++;
     if(!G.beatenEnemies.includes(BT.enemyId))G.beatenEnemies.push(BT.enemyId);
-    let newCard=false;if(!G.collection.includes(BT.enemyId)){G.collection.push(BT.enemyId);newCard=true;}
+    // Always add to beaten list; add to collection on first win
+    let newCard=false;
+    if(!G.collection.includes(BT.enemyId)){
+      G.collection.push(BT.enemyId);
+      newCard=true;
+    }
     if(en.unlockAvatar&&!G.unlockedAvatars.includes(en.unlockAvatar)){G.unlockedAvatars.push(en.unlockAvatar);notify('NEW CITIZEN UNLOCKED!','green');}
     addXP(BT.earnedXP);checkEraUnlocks();checkAchievements();checkGameCompletion();
     document.getElementById('result-emoji').textContent='🏆';
@@ -3266,7 +3413,7 @@ function endBattle(won){
     else document.getElementById('new-card-reveal').style.display='none';
     document.getElementById('open-pack-btn').style.display=en.givePack?'block':'none';
     const badge=document.getElementById('pack-badge');if(badge)badge.style.display=G.packs>0?'inline':'none';
-    save();updateHeader();pushToSupabase();townUpdateStatusBar();
+    save();updateHeader();pushToSupabase();
     // Show saved indicator
     const si=document.createElement('div');
     si.style.cssText='position:fixed;bottom:80px;right:12px;background:var(--bg2);border:1px solid var(--green2);color:var(--green2);font-family:var(--cinzel);font-size:8px;padding:6px 10px;z-index:600;letter-spacing:.06em;animation:fadeIn .3s';
@@ -3274,11 +3421,24 @@ function endBattle(won){
     document.body.appendChild(si);
     setTimeout(()=>si.remove(),2500);
   } else {
-    const gl=Math.floor(G.gold*0.2);G.gold=Math.max(0,G.gold-gl);G.losses++;addXP(Math.floor(BT.earnedXP*0.3));save();updateHeader();
-    document.getElementById('result-emoji').textContent='💀';document.getElementById('result-headline').textContent='OVERRULED!';document.getElementById('result-headline').style.color='var(--red)';
-    document.getElementById('result-msg').textContent=en.name+' overruled your argument! Lost '+gl+' credits. Study and return.';
-    document.getElementById('rewards-list').innerHTML=`<div style="padding:5px 0;font-size:14px">XP (30%): +${Math.floor(BT.earnedXP*0.3)}</div><div style="padding:5px 0;font-size:14px;color:var(--red)">Credits Lost: -${gl}</div><div style="font-size:13px;color:var(--text2);margin-top:8px;padding:8px;background:var(--bg2);border:1px solid var(--border);line-height:1.6">${en.fact}</div>`;
-    document.getElementById('new-card-reveal').style.display='none';document.getElementById('open-pack-btn').style.display='none';
+    const gl=Math.floor(G.gold*0.2);
+    G.gold=Math.max(0,G.gold-gl);
+    G.losses++;
+    addXP(Math.floor(BT.earnedXP*0.3));
+    // Restore HP to 50% so player can keep playing
+    G.hp=Math.max(Math.floor(G.maxHp*0.5), 10);
+    save();updateHeader();
+    document.getElementById('result-emoji').textContent='💀';
+    document.getElementById('result-headline').textContent='OVERRULED!';
+    document.getElementById('result-headline').style.color='var(--red)';
+    document.getElementById('result-msg').textContent=en.name+' overruled your argument! Lost '+gl+' credits. HP restored to 50%.';
+    document.getElementById('rewards-list').innerHTML=`
+      <div style="padding:5px 0;font-size:14px">XP (30%): +${Math.floor(BT.earnedXP*0.3)}</div>
+      <div style="padding:5px 0;font-size:14px;color:var(--red)">Credits Lost: -${gl}</div>
+      <div style="padding:5px 0;font-size:14px;color:var(--teal)">HP Restored: ${G.hp}/${G.maxHp}</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:8px;padding:8px;background:var(--bg2);border:1px solid var(--border);line-height:1.6">${en.fact}</div>`;
+    document.getElementById('new-card-reveal').style.display='none';
+    document.getElementById('open-pack-btn').style.display='none';
   }
   showScreen('result');
 }
@@ -3287,9 +3447,10 @@ function setShopTab(tab){shopTab=tab;document.querySelectorAll('.shop-tab').forE
 function renderShop(){
   document.getElementById('shop-gold-display').textContent=G.gold;let html='<div class="shop-grid">';
   if(shopTab==='weapons'){html+=WEAPONS.map(w=>{const owned=G.ownedWeapons.includes(w.id),eq=G.equippedWeapon===w.id;return `<div class="shop-item ${owned?'owned':''} ${eq?'equipped':''}"><span class="si-sprite">${w.icon}</span><div class="si-name">${w.name}</div><div class="si-desc">${w.desc}</div><div class="si-stat">+${w.dmgBonus} ATK</div><div class="si-cost rarity-${w.rarity}">${w.rarity.toUpperCase()}</div>${eq?'<div style="font-family:var(--pixel);font-size:5px;color:var(--gold)">✓ EQUIPPED</div>':owned?`<button class="btn green sm full" onclick="equipWeapon('${w.id}')">EQUIP</button>`:`<div class="si-cost">${w.cost>0?w.cost+' ⚖️':'FREE'}</div><button class="btn sm full ${G.gold<w.cost?'disabled':''}" onclick="buyWeapon('${w.id}')" ${G.gold<w.cost?'disabled':''}>BUY</button>`}</div>`;}).join('');}
-  else if(shopTab==='armor'){html+=ARMORS.map(a=>{const owned=G.ownedArmors.includes(a.id),eq=G.equippedArmor===a.id;return `<div class="shop-item ${owned?'owned':''} ${eq?'equipped':''}"><span class="si-sprite">${a.icon}</span><div class="si-name">${a.name}</div><div class="si-desc">${a.desc}</div><div class="si-stat">-${a.defBonus} DMG</div><div class="si-cost rarity-${a.rarity}">${a.rarity.toUpperCase()}</div>${eq?'<div style="font-family:var(--pixel);font-size:5px;color:var(--gold)">✓ EQUIPPED</div>':owned?`<button class="btn green sm full" onclick="equipArmor('${a.id}')">EQUIP</button>`:`<div class="si-cost">${a.cost>0?a.cost+' ⚖️':'FREE'}</div><button class="btn sm full ${G.gold<a.cost?'disabled':''}" onclick="buyArmor('${a.id}')" ${G.gold<a.cost?'disabled':''}>BUY</button>`}</div>`;}).join('');}
+  else if(shopTab==='armor'){html+=ARMORS.map(a=>{const owned=G.ownedArmors.includes(a.id),eq=G.equippedArmor===a.id;const armorDodgeMap={none:0,amendment:5,precedent:8,due_process:12,scotus:16,unanimous:20};const dodgeAdd=armorDodgeMap[a.id]||0;return `<div class="shop-item ${owned?'owned':''} ${eq?'equipped':''}"><span class="si-sprite">${a.icon}</span><div class="si-name">${a.name}</div><div class="si-desc">${a.desc}</div><div class="si-stat">-${a.defBonus} DMG &nbsp;|&nbsp; +${dodgeAdd}% DODGE</div><div class="si-cost rarity-${a.rarity}">${a.rarity.toUpperCase()}</div>${eq?'<div style="font-family:var(--pixel);font-size:5px;color:var(--gold)">✓ EQUIPPED</div>':owned?`<button class="btn green sm full" onclick="equipArmor('${a.id}')">EQUIP</button>`:`<div class="si-cost">${a.cost>0?a.cost+' ⚖️':'FREE'}</div><button class="btn sm full ${G.gold<a.cost?'disabled':''}" onclick="buyArmor('${a.id}')" ${G.gold<a.cost?'disabled':''}>BUY</button>`}</div>`;}).join('');}
   else if(shopTab==='items'){html+=CONSUMABLES.map(c=>{const owned=(G.inventory[c.id]||0);return `<div class="shop-item"><span class="si-sprite">${c.icon}</span><div class="si-name">${c.name}</div><div class="si-desc">${c.desc}</div>${owned>0?`<div style="font-family:var(--pixel);font-size:5px;color:var(--teal)">OWNED: ${owned}</div>`:''}<div class="si-cost rarity-${c.rarity}">${c.rarity.toUpperCase()}</div><div class="si-cost">${c.cost} ⚖️</div><button class="btn sm full ${G.gold<c.cost?'disabled':''}" onclick="buyItem('${c.id}')" ${G.gold<c.cost?'disabled':''}>BUY</button></div>`;}).join('');}
   else if(shopTab==='avatars'){
+  html+='<div style="font-family:var(--pixel);font-size:5px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);padding:8px;margin-bottom:10px;line-height:1.8">🎭 CITIZENS — Equip one to gain their passive bonus. Collect more by playing or spending gold.</div>';
   const catGroups=[
     {key:'president',label:'🏠 PRESIDENTS'},
     {key:'scotus_justice',label:'⚖️ SCOTUS JUSTICES'},
@@ -3345,6 +3506,33 @@ function renderPackScreen(){
   if(G.packs>0){el.innerHTML=`<div style="font-size:15px;color:var(--text2);text-align:center;margin-bottom:1.5rem">You have <span style="color:var(--gold);font-family:var(--pixel)">${G.packs}</span> case brief${G.packs>1?'s':''} to open!</div><div style="width:120px;height:160px;margin:0 auto 1.5rem;background:var(--bg2);border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:48px;cursor:pointer;transition:all .2s" onclick="openPack()">📦</div><div style="font-family:var(--pixel);font-size:5px;color:var(--text3);text-align:center">CLICK TO OPEN</div>`;}
   else{el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:15px">No case briefs available.<br>Win battles to earn them!</div>';}
 }
+function openPackInline(){
+  if(G.packs<=0)return;
+  G.packs--;
+  const allEnemies2=[];EPISODES.forEach(ep=>(ep.eras||[]).forEach(era=>era.enemies.forEach(e=>allEnemies2.push(e))));
+  const uncollected=allEnemies2.filter(e=>!G.collection.includes(e.id));
+  const pool=uncollected.length>0?uncollected:allEnemies2;
+  const picked=pool[Math.floor(Math.random()*pool.length)];
+  const isNew=!G.collection.includes(picked.id);
+  if(isNew)G.collection.push(picked.id);
+  save();
+  const bc=isNew?'var(--gold)':'var(--text3)';
+  const resultEl=document.getElementById('pack-open-result');
+  if(resultEl){
+    resultEl.innerHTML='<div style="background:var(--bg2);border:2px solid '+bc+';padding:12px;display:inline-block;min-width:160px;text-align:center"><div style="font-family:var(--pixel);font-size:5px;color:var(--gold);margin-bottom:4px">'+(isNew?'✦ NEW BRIEF!':'↺ DUPLICATE')+'</div><div style="font-size:36px;margin:4px 0">'+picked.sprite+'</div><div style="font-family:var(--pixel);font-size:5px;color:var(--text)">'+picked.name+'</div><div style="font-size:10px;color:var(--gold);margin-top:3px">'+picked.rarityStars+'</div></div>';
+  }
+  // Refresh pack area
+  var packArea=document.getElementById('pack-open-area');
+  var packCountEl=document.getElementById('pack-open-count');
+  var badge=document.getElementById('pack-badge');
+  if(packArea)packArea.style.display=G.packs>0?'block':'none';
+  if(packCountEl&&G.packs>0)packCountEl.textContent=G.packs+' brief'+(G.packs>1?'s':'')+' remaining';
+  if(badge)badge.style.display=G.packs>0?'inline':'none';
+  // Refresh card grid
+  renderCollection();
+  updateHeader();
+}
+
 function openPack(){
   if(G.packs<=0)return;G.packs--;
   const allEnemies=[];EPISODES.forEach(ep=>(ep.eras||[]).forEach(era=>era.enemies.forEach(e=>allEnemies.push(e))));
@@ -3358,8 +3546,22 @@ function openPack(){
 // ─── COLLECTION ───
 function renderCollection(){
   const allEnemies=[];EPISODES.forEach(ep=>(ep.eras||[]).forEach(era=>era.enemies.forEach(e=>allEnemies.push(e))));
-  document.getElementById('coll-progress').textContent=`${G.collection.length} / ${allEnemies.length} collected`;
-  document.getElementById('card-grid').innerHTML=allEnemies.map(en=>{const owned=G.collection.includes(en.id);return `<div class="c-card ${owned?'owned':''} ${owned&&en.type==='scotus'?'scotus-card':''} ${owned?'':'unknown'}" onclick="${owned?`openCard('${en.id}')`:''}" ><div style="font-size:26px;margin-bottom:3px">${owned?en.sprite:'❓'}</div><div style="font-family:var(--pixel);font-size:4px;color:var(--text)">${owned?en.name:'???'}</div><div style="font-size:10px;color:var(--gold);margin-top:1px">${owned?en.rarityStars:''}</div></div>`;}).join('');
+  document.getElementById('coll-progress').textContent=G.collection.length+' / '+allEnemies.length+' collected';
+  // Show pack opener if player has packs
+  var packArea=document.getElementById('pack-open-area');
+  var packCountEl=document.getElementById('pack-open-count');
+  if(packArea){packArea.style.display=G.packs>0?'block':'none';}
+  if(packCountEl&&G.packs>0)packCountEl.textContent=G.packs+' brief'+(G.packs>1?'s':'')+' to open!';
+  var badge=document.getElementById('pack-badge');if(badge)badge.style.display=G.packs>0?'inline':'none';
+  document.getElementById('card-grid').innerHTML=allEnemies.map(function(en){
+    var owned=G.collection.includes(en.id);
+    var cls='c-card'+(owned?' owned':'')+((owned&&en.type==='scotus')?' scotus-card':'')+(!owned?' unknown':'');
+    var click=owned?('openCard("'+en.id+'")'):' ';
+    return '<div class="'+cls+'" onclick="'+click+'">'+
+      '<div style="font-size:26px;margin-bottom:3px">'+(owned?en.sprite:'❓')+'</div>'+
+      '<div style="font-family:var(--pixel);font-size:4px;color:var(--text)">'+(owned?en.name:'???')+'</div>'+
+      '<div style="font-size:10px;color:var(--gold);margin-top:1px">'+(owned?en.rarityStars:'')+'</div></div>';
+  }).join('');
 }
 function openCard(id){
   const allEnemies=[];EPISODES.forEach(ep=>(ep.eras||[]).forEach(era=>era.enemies.forEach(e=>allEnemies.push(e))));
@@ -3471,8 +3673,41 @@ function returnToTown(){
   showScreen('map');
 }
 
+function confirmRestart(){
+  if(confirm('RESTART GAME\n\nThis will reset your XP, gold, progress and inventory — but keep you logged in as '+G.name+'.\n\nAre you sure?')){
+    restartGame();
+  }
+}
+
+function restartGame(){
+  const name=G.name;
+  const firstName=G.firstName;
+  const lastName=G.lastName;
+  const period=G.period;
+  const avatarId=G.avatarId;
+  G=defaultState();
+  G.name=name;
+  G.firstName=firstName;
+  G.lastName=lastName;
+  G.period=period;
+  G.avatarId=avatarId;
+  G.unlockedAvatars=['scholar','advocate','senator'];
+  save();
+  updateHeader();
+  renderAllSprites();
+  showScreen('map');
+  notify('Game restarted! Good luck, '+firstName+'!','green');
+}
+
+
+// Stubs for removed town engine
+function townUpdateStatusBar(){}
+function townInit(){}
+function townStopLoop(){}
+
 // ─── SUPABASE SYNC ───
 async function pushToSupabase(){
+  if(window._supabaseFailed)return; // stop retrying after first fail
   if(!G||!G.name||window._isTeacher)return;
   const def=AVATAR_DEFS.find(a=>a.id===G.avatarId)||AVATAR_DEFS[0];
   const rank=getRank();
@@ -3493,7 +3728,7 @@ async function pushToSupabase(){
   try{
     await fetch(SUPA_URL+'/rest/v1/const_scores',{method:'POST',headers:{...SUPA_HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(scoreEntry)});
     await fetch(SUPA_URL+'/rest/v1/const_student_stats',{method:'POST',headers:{...SUPA_HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(statsEntry)});
-  }catch(e){console.warn('Supabase sync failed',e);}
+  }catch(e){window._supabaseFailed=true;}
 }
 
 // ─── LEADERBOARD ───
@@ -3670,7 +3905,57 @@ function notify(msg,type){const n=document.createElement('div');n.className='not
 document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('login-screen').classList.add('active');
+  // Check for existing save
+  try{
+    const lastKey=localStorage.getItem('apgov_last_key');
+    if(lastKey){
+      const saved=localStorage.getItem(lastKey);
+      if(saved){
+        const d=JSON.parse(saved);
+        if(d&&d.name&&d.level){
+          window._continueKey=lastKey;
+          const banner=document.getElementById('continue-banner');
+          if(banner)banner.style.display='block';
+          const cn=document.getElementById('continue-name');
+          if(cn)cn.textContent=d.name;
+          const cs=document.getElementById('continue-stats');
+          if(cs)cs.textContent='Level '+d.level+' · '+d.score+' pts · '+d.period+' period';
+          // Hide step 1 initially when continue is available
+          const s1=document.getElementById('login-step-1');
+          if(s1)s1.style.display='none';
+        }
+      }
+    }
+  }catch(e){}
 });
+
+function continueGame(){
+  try{
+    const saved=localStorage.getItem(window._continueKey);
+    if(saved){
+      const d=JSON.parse(saved);
+      if(d&&d.name){
+        G=d;
+        window._loginSaveKey=window._continueKey;
+        window._loginPeriod=d.period;
+        window._isGuest=(d.period==='guest');
+        window._isTeacher=(d.period==='teacher');
+        if(window._isTeacher){launchTeacherDashboard();}
+        else{launchGame();}
+        return;
+      }
+    }
+  }catch(e){}
+  notify('Could not load save — please log in again.','red');
+  hideContinue();
+}
+
+function hideContinue(){
+  const banner=document.getElementById('continue-banner');
+  if(banner)banner.style.display='none';
+  const s1=document.getElementById('login-step-1');
+  if(s1)s1.style.display='block';
+}
 </script>
 </body>
 </html>
