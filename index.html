@@ -3821,6 +3821,7 @@ function openCard(id){
 function rechallenge(enemyId){for(const ep of EPISODES){for(const era of (ep.eras||[])){const en=era.enemies.find(e=>e.id===enemyId);if(en){startBattle(ep.id,era.id,enemyId);return;}}}}
 // ─── PROFILE ───
 function renderProfile(){
+  checkAchievements(); // retroactively credit any missed achievements
   const rank=getRank();const acc=G.qTotal>0?Math.round(G.qCorrect/G.qTotal*100):0;
   const weapon=WEAPONS.find(w=>w.id===G.equippedWeapon)||WEAPONS[0];const armor=ARMORS.find(a=>a.id===G.equippedArmor)||ARMORS[0];
   document.getElementById('profile-header').innerHTML=`<div style="width:110px;height:110px;display:block;margin:0 auto 12px;border-radius:50%;overflow:visible;filter:drop-shadow(0 0 16px rgba(201,168,76,.4))">${getMedallionSVG(G.avatarId,110)}</div><div style="font-family:var(--pixel);font-size:9px;color:var(--gold)">${G.name}</div><div style="font-size:18px;color:var(--teal);margin-top:4px">${rank.name}</div><div style="font-family:var(--pixel);font-size:6px;color:var(--blue);margin-top:4px">Level ${G.level} · ${G.xp} XP</div><div style="font-family:var(--pixel);font-size:5px;color:var(--text2);margin-top:6px">❤️ ${G.hp}/${G.maxHp} &nbsp; ⚖️ ${G.gold}</div>`;
@@ -3948,11 +3949,34 @@ function checkGameCompletion(){
 }
 
 function checkAchievements(){
-  const a=G.achievements;const add=id=>{if(!a.includes(id)){a.push(id);notify('ACHIEVEMENT: '+id.replace(/_/g,' ').toUpperCase(),'green');}};
-  if(G.wins>=1)add('first_win');if(G.collection.length>=5)add('collector5');if(G.level>=5)add('level5');if(G.level>=10)add('level10');if(G.maxStreak>=5)add('streak5');if(G.noHintWins>=1)add('no_hint');if(G.collection.includes('madison'))add('madison_card');if(G.gold>=5000)add('rich');if(G.unlockedAvatars.length>=5)add('all_avatars');
-  EPISODES.forEach(ep=>(ep.eras||[]).forEach(era=>{if(era.enemies.every(e=>G.beatenEnemies.includes(e.id)))add('complete_unit');}));
-  const scotus=[];EPISODES.forEach(ep=>(ep.eras||[]).forEach(era=>era.enemies.forEach(e=>{if(e.type==='scotus')scotus.push(e);})));
-  if(scotus.some(e=>G.collection.includes(e.id)))add('scotus_case');
+  const a=G.achievements;
+  const add=id=>{if(!a.includes(id)){a.push(id);SFX.levelUp();notify('🏆 ACHIEVEMENT UNLOCKED: '+id.replace(/_/g,' ').toUpperCase(),'green');}};
+
+  // Basic achievements
+  if(G.wins>=1)add('first_win');
+  if(G.collection.length>=5)add('collector5');
+  if(G.level>=5)add('level5');
+  if(G.level>=10)add('level10');
+  if(G.maxStreak>=5)add('streak5');
+  if(G.noHintWins>=1)add('no_hint');
+  if(G.gold>=5000)add('rich');
+  if(G.unlockedAvatars.length>=5)add('all_avatars');
+
+  // Father of the Constitution — collect Federalist No. 10 (enemy id: fed10)
+  if(G.collection.includes('fed10'))add('madison_card');
+
+  // Constitutional Scholar — collect any SCOTUS case (marbury2, us_lopez, mcculloch etc)
+  const scotusIds=['marbury2','us_lopez','mcculloch','bill_of_rights_era2','due_process_rights',
+    'civil_rights_movement','equal_protection_scotus','congress_era'];
+  if(scotusIds.some(id=>G.collection.includes(id)))add('scotus_case');
+
+  // Unit Mastered — complete all enemies in any era
+  EPISODES.forEach(ep=>(ep.eras||[]).forEach(era=>{
+    if(era.enemies.length>0&&era.enemies.every(e=>G.beatenEnemies.includes(e.id)))add('complete_unit');
+  }));
+
+  // Founding Legend — beat the College Board final boss
+  if(G.beatenEnemies.includes('college_board_boss'))add('final_boss');
 }
 // ─── LEADERBOARD (now handled by Supabase, see pushToSupabase/fetchLeaderboard above) ───
 
