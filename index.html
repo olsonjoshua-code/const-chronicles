@@ -1420,6 +1420,55 @@ const EPISODES=[
   {id:'ep3',num:3,name:'Civil Liberties & Civil Rights',period:'Bill of Rights & Beyond',icon:'⚖️',standards:'LO 3.1–3.12 · 13–18% of AP Exam',coming:true,eras:[],timeline:[]},
   {id:'ep4',num:4,name:'Political Ideologies & Beliefs',period:'Left, Right & Center',icon:'🗳️',standards:'LO 4.1–4.10 · 10–15% of AP Exam',coming:true,eras:[],timeline:[]},
   {id:'ep5',num:5,name:'Political Participation',period:'Voting, Parties & Media',icon:'🌐',standards:'LO 5.1–5.12 · 20–27% of AP Exam',coming:true,eras:[],timeline:[]},
+
+  {id:'ep6',num:6,name:'The Ultimate Reckoning',period:'Face the Final Boss',icon:'⚔️',standards:'Complete all units to unlock',coming:false,isFinalBoss:true,
+   eras:[{
+    id:'final_reckoning',name:'The Final Reckoning',
+    enemies:[{
+      id:'college_board_boss',
+      name:'The College Board',
+      sprite:'📋',
+      type:'boss',
+      title:'The Ultimate Bureaucratic Overlord',
+      rarity:'legendary',
+      rarityStars:'★★★★★',
+      hp:120,
+      xpReward:500,
+      goldReward:1000,
+      givePack:true,
+      unlockAvatar:null,
+      standard:'AP Gov Mastery',
+      isFinalBoss:true,
+      fact:'The College Board is a nonprofit organization that administers the AP program. Despite nonprofit status, it generates over $1 billion in annual revenue. You have been fighting its curriculum all year — and now you face it directly.',
+      questions:[
+        {q:'Which constitutional principle establishes that the national government only has powers specifically granted to it?',
+         opts:['Implied powers','Enumerated powers','Reserved powers','Concurrent powers'],correct:1},
+        {q:'The Supreme Court established judicial review in which landmark case?',
+         opts:['McCulloch v. Maryland','Marbury v. Madison','Gibbons v. Ogden','Fletcher v. Peck'],correct:1},
+        {q:'Which of the following best describes the concept of federalism?',
+         opts:['All power is held by the national government','Power is divided between national and state governments','States hold all power not given to local governments','The president shares power with Congress'],correct:1},
+        {q:'The Bill of Rights was added to the Constitution primarily to address concerns of which group?',
+         opts:['Federalists who wanted stronger central government','Anti-Federalists who feared government tyranny','Southern states concerned about slavery','Northern merchants worried about trade'],correct:1},
+        {q:'Which branch of government has the power to declare laws unconstitutional?',
+         opts:['Executive','Legislative','Judicial','Federal Reserve'],correct:2},
+        {q:'The elastic clause allows Congress to:',
+         opts:['Declare war without presidential approval','Make laws necessary and proper to carry out its powers','Override Supreme Court decisions','Amend the Constitution unilaterally'],correct:1},
+        {q:'Which amendment extended voting rights to citizens 18 years and older?',
+         opts:['19th Amendment','24th Amendment','26th Amendment','15th Amendment'],correct:2},
+        {q:'Iron triangles in American politics refer to the relationship between:',
+         opts:['President, Congress and Courts','Congress, bureaucratic agencies and interest groups','Federal, state and local governments','Political parties, media and voters'],correct:1},
+        {q:'Which of the following is an example of a civil liberty?',
+         opts:['The right to vote','Freedom from unreasonable searches','Equal pay for equal work','Access to public education'],correct:1},
+        {q:'The War Powers Resolution of 1973 was designed to:',
+         opts:['Give the president unlimited military authority','Limit presidential war powers without congressional approval','Allow Congress to declare war unilaterally','Establish the National Security Council'],correct:1},
+        {q:'Linkage institutions in American politics include all of the following EXCEPT:',
+         opts:['Political parties','Interest groups','The Supreme Court','Mass media'],correct:2},
+        {q:'Which theory of democracy argues that competing groups ensure no single faction dominates?',
+         opts:['Elite theory','Hyperpluralism','Pluralism','Participatory democracy'],correct:2},
+      ]
+    }]
+   }],
+   timeline:[]},
 ];
 
 // ═══════════════ UNIT 1 DATA ═══════════════
@@ -2959,7 +3008,19 @@ function closeLevelUp(){document.getElementById('levelup-overlay').classList.rem
 // ─── MAP ───
 function renderMap(){
   const list=document.getElementById('unit-list');if(!list)return;
+
+  // Check if all main units complete to unlock final boss
+  const mainEps=EPISODES.filter(e=>!e.isFinalBoss&&!e.coming);
+  const allComplete=mainEps.every(ep=>{
+    const eras=ep.eras||[];
+    const beaten=eras.reduce((n,era)=>n+era.enemies.filter(e=>G.beatenEnemies.includes(e.id)).length,0);
+    const total=eras.reduce((n,era)=>n+era.enemies.length,0);
+    return total>0&&beaten>=total;
+  });
+  if(allComplete&&!G.unlockedEpisodes.includes('ep6'))G.unlockedEpisodes.push('ep6');
+
   list.innerHTML=EPISODES.map(ep=>{
+    const isBoss=!!ep.isFinalBoss;
     const unlocked=G.unlockedEpisodes.includes(ep.id)&&G.level>=1;
     const coming=ep.coming;
     const eras=ep.eras||[];
@@ -2967,20 +3028,70 @@ function renderMap(){
     const total=eras.reduce((n,era)=>n+era.enemies.length,0);
     const complete=total>0&&beaten>=total;
     let bStyle='color:var(--text3);border-color:var(--border)',bTxt='LOCKED';
-    if(coming){bTxt='SOON';}else if(complete){bStyle='color:var(--green);border-color:var(--green)';bTxt='DONE';}
-    else if(unlocked){bStyle='color:var(--gold);border-color:var(--gold2)';bTxt='PLAY';}
-    return `<div class="unit-card ${coming||!unlocked?'locked':''} ${complete?'complete':''}" onclick="${unlocked&&!coming?`selectEpisode('${ep.id}')`:''}" >
-      <div class="unit-icon">${ep.icon}</div>
+    if(coming){bTxt='SOON';}
+    else if(complete){bStyle='color:var(--green);border-color:var(--green)';bTxt='DONE';}
+    else if(unlocked){bStyle='color:var(--gold);border-color:var(--gold2)';bTxt=isBoss?'⚔️ FACE IT':'PLAY';}
+    const bossCardStyle=isBoss&&unlocked?'border:2px solid var(--gold);background:rgba(201,168,76,.07);animation:glowPulse 2s infinite':'';
+    const clickFn=unlocked&&!coming?`selectEpisode('${ep.id}')`:' ';
+    return `<div class="unit-card ${coming||!unlocked?'locked':''} ${complete?'complete':''}" style="${bossCardStyle}" onclick="${clickFn}">
+      <div class="unit-icon" style="${isBoss&&unlocked?'font-size:32px;filter:drop-shadow(0 0 8px gold)':''}">${ep.icon}</div>
       <div class="unit-info">
-        <div class="unit-name">UNIT ${ep.num}, ${ep.name.toUpperCase()}</div>
+        <div class="unit-name" style="${isBoss?'color:var(--gold)':''}">${'UNIT '+ep.num+(isBoss?' — ':',')+ep.name.toUpperCase()}</div>
         <div class="unit-sub">${ep.standards}</div>
-        ${unlocked&&!coming?`<div class="unit-prog">${beaten}/${total} challenges complete</div>`:''}
-        ${!unlocked&&!coming?`<div style="font-size:12px;color:var(--text3)">Complete Unit ${ep.num-1} to unlock</div>`:''}
+        ${unlocked&&!coming?`<div class="unit-prog" style="${isBoss?'color:var(--gold)':''}">${isBoss?'Equip Ron Paul or Mises to deal damage!':beaten+'/'+total+' challenges complete'}</div>`:''}
+        ${!unlocked&&!coming?`<div style="font-size:12px;color:var(--text3)">${isBoss?'Complete all units to unlock':'Complete Unit '+(ep.num-1)+' to unlock'}</div>`:''}
       </div>
       <div class="unit-badge" style="${bStyle}">${bTxt}</div>
-    </div>`;}).join('');
+    </div>`;
+  }).join('');
 }
-function selectEpisode(epId){const ep=EPISODES.find(e=>e.id===epId);if(!ep||ep.coming)return;renderEraScreen(ep);showScreen('era');}
+function selectEpisode(epId){
+  const ep=EPISODES.find(e=>e.id===epId);if(!ep||ep.coming)return;
+  if(ep.isFinalBoss){
+    showFinalBossCutscene(ep);
+    return;
+  }
+  renderEraScreen(ep);showScreen('era');
+}
+
+function showFinalBossCutscene(ep){
+  const hasEconomist=G.avatarId==='ron_paul'||G.avatarId==='mises';
+  const equipped=AVATAR_DEFS.find(a=>a.id===G.avatarId);
+  const eqName=equipped?equipped.name:'your citizen';
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:900;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center';
+  overlay.innerHTML=`
+    <div style="font-size:64px;margin-bottom:16px;filter:drop-shadow(0 0 30px gold)">📋</div>
+    <div style="font-family:var(--cinzel);font-size:18px;color:var(--gold);margin-bottom:8px;letter-spacing:.1em">THE COLLEGE BOARD</div>
+    <div style="font-family:var(--cinzel);font-size:11px;color:var(--text3);margin-bottom:24px">The Ultimate Bureaucratic Overlord</div>
+    <div style="font-family:var(--pixel);font-size:5px;color:var(--text2);max-width:320px;line-height:2;margin-bottom:20px;border:1px solid var(--border);padding:16px;background:var(--bg2)">
+      "So... you have made it this far, ${G.firstName||G.name}. You have studied the Founders, 
+      the branches, the courts, civil liberties, and political participation. 
+      But do you have what it takes to defeat ME?
+      <br><br>
+      I am the College Board. I control the rubric. I write the FRQs. 
+      I decide what counts as mastery.
+      <br><br>
+      ${hasEconomist
+        ? `You carry the wisdom of ${eqName}. I sense... a threat. Prepare yourself.`
+        : `You fight with ${eqName}? Brave, but foolish. Only an economist who understands 
+           sound money and liberty can truly defeat me. Find Ron Paul or Ludwig von Mises first.`
+      }
+    </div>
+    ${!hasEconomist?`<div style="font-family:var(--pixel);font-size:5px;color:var(--red);margin-bottom:16px;border:1px solid var(--red);padding:8px">⚠️ WARNING: You cannot deal damage without Ron Paul or Mises equipped!</div>`:''}
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+      <button onclick="this.parentElement.parentElement.remove();renderEraScreen(EPISODES.find(e=>e.id==='ep6'));showScreen('era');" 
+        style="font-family:var(--cinzel);font-size:11px;background:var(--gold);border:none;color:var(--bg);padding:12px 24px;cursor:pointer;letter-spacing:.06em">
+        ⚔️ FACE THE BOARD
+      </button>
+      <button onclick="this.parentElement.parentElement.remove();" 
+        style="font-family:var(--cinzel);font-size:11px;background:transparent;border:1px solid var(--text3);color:var(--text3);padding:12px 24px;cursor:pointer">
+        ← NOT YET
+      </button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
 function backToBattleHall(){showScreen('map');}
 function renderTownBattleHall(){renderMap();}
 function renderEraScreen(ep){
@@ -3303,6 +3414,9 @@ function answerShuffled(idx){
 }
 function applyAnswerResult(correct,q){
   const en=BT.enemy;
+  // Final boss immunity — only Ron Paul or Mises can deal damage
+  const isFinalBoss=en&&en.isFinalBoss;
+  const hasEconomist=G.avatarId==='ron_paul'||G.avatarId==='mises';
   if(correct){
     let dmg=8+Math.floor(Math.random()*5)+Math.floor(G.level/2)+BT.weaponBonus+getPassiveDmgBonus();
     if(!correct)SFX.wrong();
@@ -3332,6 +3446,13 @@ function applyAnswerResult(correct,q){
       // Streak tiers: 3=1.5x, 6=2.0x, 9=3.0x
       var streakMult=BT.combo>=9?3.0:BT.combo>=6?2.0:BT.combo>=3?1.5:1.0;
       if(streakMult>1)dmg=Math.floor(dmg*streakMult);
+      // Final boss immunity
+      if(isFinalBoss&&!hasEconomist){
+        dmg=0;
+        var seqPl2=document.getElementById('seq-player');
+        if(seqPl2){seqPl2.style.cssText='display:block;font-family:var(--pixel);font-size:5px;padding:8px 10px;border-radius:3px;border:1px solid var(--red);color:var(--red);background:rgba(192,57,43,.15);text-align:center;line-height:1.7';
+        seqPl2.textContent='The College Board is IMMUNE! You need Ron Paul or Mises to deal damage!';}
+      }
       BT.enemyHp=Math.max(0,BT.enemyHp-dmg);BT.combo=Math.min(9,BT.combo+1);G.battleStreak=BT.combo;
       if(enEl){enEl.style.filter='brightness(2.5) sepia(1) hue-rotate(180deg)';setTimeout(function(){if(enEl)enEl.style.filter='';},400);}
       BT.log='Correct! '+dmg+' damage!'+(BT.combo>=3?' STREAK x'+BT.combo+'!':'');
@@ -3426,7 +3547,9 @@ function endBattle(won){
     document.getElementById('result-emoji').textContent='🏆';
     document.getElementById('result-headline').textContent='ARGUMENT WON!';
     document.getElementById('result-headline').style.color='var(--gold)';
-    document.getElementById('result-msg').textContent=en.name+' has been defeated by your constitutional knowledge!';
+    document.getElementById('result-msg').textContent=en.isFinalBoss
+      ? '🎓 YOU DEFEATED THE COLLEGE BOARD! Constitutional mastery achieved! You are a Founding Legend!'
+      : en.name+' has been defeated by your constitutional knowledge!';
     let rows=`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:14px"><span>XP Earned</span><span style="font-family:var(--pixel);font-size:6px;color:var(--gold)">+${BT.earnedXP}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:14px"><span>Credits</span><span style="font-family:var(--pixel);font-size:6px;color:var(--gold)">+${gold+BT.earnedGold} ⚖️</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:14px"><span>Score</span><span style="font-family:var(--pixel);font-size:6px;color:var(--gold)">+${BT.earnedScore}</span></div>`;
