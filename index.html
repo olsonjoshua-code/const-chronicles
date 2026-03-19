@@ -388,6 +388,7 @@ option{background:var(--bg2)}
       <div class="hud-stat">❤️<span id="hud-hp">50</span></div>
       <div class="hud-stat">📦<span id="hud-packs">0</span></div>
       <button onclick="manualSave()" style="font-family:var(--cinzel);font-size:7px;letter-spacing:.05em;background:transparent;border:1px solid var(--green2);color:var(--green2);padding:4px 8px;cursor:pointer;white-space:nowrap">💾</button>
+      <button id="music-toggle-btn" onclick="toggleMusic()" style="font-family:var(--cinzel);font-size:7px;background:transparent;border:1px solid var(--gold2);color:var(--gold2);padding:4px 8px;cursor:pointer;white-space:nowrap">🎵</button>
     </div>
   </div>
 </div>
@@ -661,6 +662,7 @@ option{background:var(--bg2)}
       <button class="btn green sm" onclick="manualSave()">💾 SAVE</button>
       <button class="btn sm" onclick="openLeaderboard()" style="border-color:var(--purple);color:var(--purple)">🏆 BOARD</button>
       <button class="btn sm" onclick="confirmRestart()" style="border-color:var(--red);color:var(--red)">🔄 RESTART</button>
+      <button class="btn sm" onclick="goToLoginFromProfile()" style="border-color:var(--text3);color:var(--text3)">← LOGIN</button>
     </div>
   </div>
   <div id="profile-header" style="text-align:center;padding-bottom:1rem;border-bottom:1px solid var(--border);margin-bottom:1rem"></div>
@@ -756,7 +758,7 @@ option{background:var(--bg2)}
 </div>
 
 <div id="bottom-nav" style="display:grid;grid-template-columns:repeat(5,1fr)">
-  <button class="bn-btn active" id="nav-map" onclick="showScreen('map')"><span class="bn-icon">🗺️</span>UNITS</button>
+  <button class="bn-btn active" id="nav-map" onclick="SFX.click();showScreen('map')"><span class="bn-icon">🗺️</span>UNITS</button>
   <button class="bn-btn" id="nav-shop" onclick="showScreen('shop')"><span class="bn-icon">⚖️</span>ARMORY</button>
   <button class="bn-btn" id="nav-collection" onclick="showScreen('collection')"><span class="bn-icon">📜</span>BRIEFS<span class="bn-badge" id="pack-badge" style="display:none">!</span></button>
   <button class="bn-btn" id="nav-profile" onclick="showScreen('profile')"><span class="bn-icon">🏅</span>PROFILE</button>
@@ -2724,7 +2726,7 @@ function defaultState(){
     askedQMap:{},completionCelebrated:false};  // tracks which questions each enemy has already asked globally
 }
 function manualSave(){
-  save();
+  save();SFX.save();
   const saved_at=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   notify('💾 Saved at '+saved_at+' — LVL '+G.level+' · '+G.score+' pts','green');
 }
@@ -2912,6 +2914,8 @@ function showScreen(id){
 function launchGame(){
   document.getElementById('game-header').style.display='block';
   document.getElementById('bottom-nav').style.display='grid';
+  // Make sure title music is playing on map
+  SFX.stopBattle();SFX.playTitle();
   updateHeader();renderAllSprites();checkEraUnlocks();showScreen('map');startLbSync();if(G.score>0)pushToSupabase();
 }
 function returnToTitle(){if(G)save();document.getElementById('game-header').style.display='none';document.getElementById('bottom-nav').style.display='none';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('title-screen').classList.add('active');currentScreen='title';}
@@ -2945,7 +2949,7 @@ function getXpPct(){const n=getXpNeeded()-getXpPrev(),h=G.xp-getXpPrev();return 
 function addXP(amt){
   if(G.activeXpBoost){amt=Math.floor(amt*1.5);G.activeXpBoost=false;}
   G.xp+=amt;let leveled=false;
-  while(G.level<20&&G.xp>=getXpNeeded()){G.level++;G.maxHp=50+G.level*5;G.hp=Math.min(G.hp+20,G.maxHp);leveled=true;}
+  while(G.level<20&&G.xp>=getXpNeeded()){G.level++;G.maxHp=50+G.level*5;G.hp=Math.min(G.hp+20,G.maxHp);leveled=true;SFX.levelUp();}
   if(leveled)showLevelUp();
 }
 function showLevelUp(){const r=getRank();document.getElementById('lu-level').textContent='Level '+G.level;document.getElementById('lu-rank').textContent=r.name;document.getElementById('lu-bonus').textContent='Max HP → '+G.maxHp+' · +20 HP restored';document.getElementById('levelup-overlay').classList.add('show');}
@@ -3117,6 +3121,7 @@ function startBattle(epId,eraId,enemyId){
   const potCount=(G.inventory['potion_sm']||0)+(G.inventory['potion_lg']||0)+(G.inventory['potion_xl']||0);
   document.getElementById('item-sub').textContent=potCount>0?`${potCount} potion${potCount>1?'s':''}`:'No potions';
   renderBattle();showScreen('battle');renderAllSprites();
+  SFX.stopTitle();SFX.playBattle();
 }
 function renderBattle(){
   const en=BT.enemy;if(!en)return;
@@ -3236,16 +3241,19 @@ function answerShuffled(idx){
       if(isDodge){
         if(enemyEl){enemyEl.classList.remove('enemy-attacking');void enemyEl.offsetWidth;enemyEl.classList.add('enemy-attacking');}
         if(playerEl){playerEl.classList.remove('player-dodge');void playerEl.offsetWidth;playerEl.classList.add('player-dodge');}
+        SFX.dodge();
         spawnDmg('DODGE!','heal');
         setSeqEnemy('⚔️ '+eName+' attacks '+pName+' — MISS!','var(--teal)','rgba(26,188,156,.1)');
         BT.log=eName+' missed '+pName+'!';
         setTimeout(function(){if(enemyEl)enemyEl.classList.remove('enemy-attacking');if(playerEl)playerEl.classList.remove('player-dodge');},700);
       } else {
+        SFX.attack();
         if(enemyEl){enemyEl.classList.remove('enemy-attacking');void enemyEl.offsetWidth;enemyEl.classList.add('enemy-attacking');}
         // Impact lands 400ms after lunge starts
         setTimeout(function(){
           G.hp=Math.max(0,G.hp-nd);
           if(playerEl){playerEl.classList.remove('player-hit');void playerEl.offsetWidth;playerEl.classList.add('player-hit');}
+          SFX.hit();
           spawnDmg('-'+nd,'dmg');
           updateHpBars();
           setSeqEnemy('⚔️ '+eName+' attacks '+pName+' — HIT! -'+nd+' HP','#e74c3c','rgba(192,57,43,.15)');
@@ -3288,6 +3296,7 @@ function applyAnswerResult(correct,q){
   const en=BT.enemy;
   if(correct){
     let dmg=8+Math.floor(Math.random()*5)+Math.floor(G.level/2)+BT.weaponBonus+getPassiveDmgBonus();
+    if(!correct)SFX.wrong();
     var seqPl=document.getElementById('seq-player');
     var enEl=document.getElementById('b-enemy-sprite');
     var pn=G.name?G.name.split(' ')[0]:'You';
@@ -3297,6 +3306,7 @@ function applyAnswerResult(correct,q){
       seqPl.style.cssText='display:block;font-family:var(--pixel);font-size:5px;padding:8px 10px;border-radius:3px;border:1px solid '+color+';color:'+color+';background:'+bg+';text-align:center;line-height:1.7';
       seqPl.textContent=msg;
     }
+    SFX.correct();
     if(BT.action==='defend'){
       const heal=10+Math.floor(Math.random()*8)+getPassiveHealBonus();
       G.hp=Math.min(G.maxHp,G.hp+heal);BT.combo=Math.min(5,BT.combo+1);
@@ -3380,6 +3390,8 @@ function doFlee(){const p=Math.floor(G.gold*0.1);G.gold=Math.max(0,G.gold-p);sav
 function spawnDmg(val,type){const d=document.createElement('div');d.className='dmg-float '+type;d.textContent=val;d.style.left=Math.random()*60+20+'%';d.style.top='40%';document.body.appendChild(d);setTimeout(()=>d.remove(),1300);}
 // ─── END BATTLE ───
 function endBattle(won){
+  SFX.stopBattle();
+  if(won)SFX.victory(); else SFX.defeat();
   const en=BT.enemy;
   if(won){
     BT.earnedXP+=en.xpReward;
@@ -3396,6 +3408,7 @@ function endBattle(won){
     if(!G.collection.includes(BT.enemyId)){
       G.collection.push(BT.enemyId);
       newCard=true;
+      SFX.card();
     }
     if(en.unlockAvatar&&!G.unlockedAvatars.includes(en.unlockAvatar)){G.unlockedAvatars.push(en.unlockAvatar);notify('NEW CITIZEN UNLOCKED!','green');}
     addXP(BT.earnedXP);checkEraUnlocks();checkAchievements();checkGameCompletion();
@@ -3670,7 +3683,30 @@ function checkAchievements(){
 // TOWN ENGINE
 // ═══════════════════════════════════════════════════════
 function returnToTown(){
+  SFX.stopBattle();SFX.playTitle();
   showScreen('map');
+}
+
+function goToLoginFromProfile(){
+  SFX.stopBattle();
+  // Show game header hidden, bottom nav hidden
+  document.getElementById('game-header').style.display='none';
+  document.getElementById('bottom-nav').style.display='none';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('login-screen').classList.add('active');
+  SFX.playTitle();
+}
+
+function toggleMusic(){
+  const on = SFX.toggle();
+  const btn = document.getElementById('music-toggle-btn');
+  if(btn){
+    btn.textContent = on ? '🎵' : '🔇';
+    btn.style.color = on ? 'var(--gold2)' : 'var(--text3)';
+    btn.style.borderColor = on ? 'var(--gold2)' : 'var(--text3)';
+    btn.style.opacity = on ? '1' : '0.5';
+  }
+  notify(on ? '🎵 Music on' : '🔇 Music off', '');
 }
 
 function confirmRestart(){
@@ -3704,6 +3740,293 @@ function restartGame(){
 function townUpdateStatusBar(){}
 function townInit(){}
 function townStopLoop(){}
+
+// ═══════════════════════════════════════════════════════
+// SOUND ENGINE — Web Audio chiptune, no external files
+// ═══════════════════════════════════════════════════════
+const SFX=(function(){
+  let ctx=null,titleLoop=null,battleLoop=null,titlePlaying=false,battlePlaying=false,musicEnabled=true;
+
+  function getCtx(){
+    if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();
+    if(ctx.state==='suspended')ctx.resume();
+    return ctx;
+  }
+
+  function tone(freq,type,start,dur,vol,ramp){
+    try{
+      const c=getCtx(),o=c.createOscillator(),g=c.createGain();
+      o.connect(g);g.connect(c.destination);
+      o.type=type||'square';
+      o.frequency.setValueAtTime(freq,c.currentTime+start);
+      g.gain.setValueAtTime(Math.min(vol||0.12,0.3),c.currentTime+start);
+      if(ramp)g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+start+dur);
+      o.start(c.currentTime+start);
+      o.stop(c.currentTime+start+dur+0.01);
+    }catch(e){}
+  }
+
+  function noise(start,dur,vol){
+    try{
+      const c=getCtx(),buf=c.createBuffer(1,c.sampleRate*dur,c.sampleRate);
+      const d=buf.getChannelData(0);
+      for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
+      const s=c.createBufferSource(),g=c.createGain(),f=c.createBiquadFilter();
+      f.type='bandpass';f.frequency.value=200;
+      s.buffer=buf;s.connect(f);f.connect(g);g.connect(c.destination);
+      g.gain.setValueAtTime(vol||0.08,c.currentTime+start);
+      g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+start+dur);
+      s.start(c.currentTime+start);
+    }catch(e){}
+  }
+
+  // ── SOUND EFFECTS ──
+  function sfxClick(){
+    tone(880,'square',0,0.04,0.06,true);
+  }
+
+  function sfxAttack(){
+    // Swoosh up
+    try{
+      const c=getCtx(),o=c.createOscillator(),g=c.createGain();
+      o.connect(g);g.connect(c.destination);
+      o.type='sawtooth';
+      o.frequency.setValueAtTime(200,c.currentTime);
+      o.frequency.exponentialRampToValueAtTime(800,c.currentTime+0.12);
+      g.gain.setValueAtTime(0.15,c.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.15);
+      o.start(c.currentTime);o.stop(c.currentTime+0.16);
+    }catch(e){}
+  }
+
+  function sfxHit(){
+    // Thud + noise burst
+    noise(0,0.12,0.15);
+    tone(80,'square',0,0.1,0.18,true);
+    tone(60,'square',0.05,0.08,0.12,true);
+  }
+
+  function sfxDodge(){
+    // Quick up-down
+    tone(600,'sine',0,0.06,0.1,true);
+    tone(900,'sine',0.06,0.06,0.08,true);
+    tone(600,'sine',0.12,0.06,0.06,true);
+  }
+
+  function sfxCorrect(){
+    tone(523,'square',0,0.08,0.1,true);
+    tone(659,'square',0.08,0.08,0.1,true);
+    tone(784,'square',0.16,0.12,0.12,true);
+  }
+
+  function sfxWrong(){
+    tone(300,'square',0,0.08,0.1,true);
+    tone(220,'square',0.08,0.12,0.12,true);
+  }
+
+  function sfxVictory(){
+    // Triumphant fanfare
+    const notes=[523,659,784,1047];
+    notes.forEach((n,i)=>tone(n,'square',i*0.1,0.18,0.13,true));
+    tone(1047,'square',0.4,0.08,0.15,true);
+    tone(1319,'square',0.48,0.08,0.15,true);
+    tone(1568,'square',0.56,0.3,0.18,true);
+  }
+
+  function sfxDefeat(){
+    // Descending sad tones
+    const notes=[523,494,440,392,349];
+    notes.forEach((n,i)=>tone(n,'square',i*0.13,0.2,0.12,true));
+  }
+
+  function sfxLevelUp(){
+    // Classic ascending arpeggio
+    const notes=[262,330,392,523,659,784,1047];
+    notes.forEach((n,i)=>tone(n,'square',i*0.07,0.14,0.13,true));
+    tone(1047,'triangle',0.5,0.4,0.15,true);
+  }
+
+  function sfxGold(){
+    tone(1047,'sine',0,0.06,0.1,true);
+    tone(1319,'sine',0.06,0.06,0.1,true);
+    tone(1568,'sine',0.12,0.1,0.12,true);
+  }
+
+  function sfxCard(){
+    // Sparkle effect
+    [1047,1319,1568,2093].forEach((n,i)=>tone(n,'sine',i*0.05,0.1,0.08,true));
+  }
+
+  function sfxSave(){
+    tone(523,'sine',0,0.06,0.08,true);
+    tone(659,'sine',0.06,0.06,0.08,true);
+    tone(784,'sine',0.12,0.08,0.1,true);
+  }
+
+  // ── MASTER GAIN NODES — instant mute ──
+  let titleGain=null, battleGain=null;
+
+  function getMusicNode(type){
+    try{
+      const c=getCtx();
+      if(type==='title'){
+        if(!titleGain){titleGain=c.createGain();titleGain.connect(c.destination);}
+        return titleGain;
+      } else {
+        if(!battleGain){battleGain=c.createGain();battleGain.connect(c.destination);}
+        return battleGain;
+      }
+    }catch(e){return null;}
+  }
+
+  function toneToGain(gainNode, freq, type, start, dur, vol){
+    try{
+      const c=getCtx();
+      if(!gainNode)return;
+      const o=c.createOscillator(), g=c.createGain();
+      o.connect(g); g.connect(gainNode);
+      o.type=type||'square';
+      o.frequency.setValueAtTime(freq, c.currentTime+start);
+      g.gain.setValueAtTime(Math.min(vol||0.12,0.3), c.currentTime+start);
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+start+dur);
+      o.start(c.currentTime+start);
+      o.stop(c.currentTime+start+dur+0.01);
+    }catch(e){}
+  }
+
+  function noiseToGain(gainNode, start, dur, vol){
+    try{
+      const c=getCtx();
+      if(!gainNode)return;
+      const buf=c.createBuffer(1,Math.ceil(c.sampleRate*dur),c.sampleRate);
+      const d=buf.getChannelData(0);
+      for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
+      const s=c.createBufferSource(), g=c.createGain(), f=c.createBiquadFilter();
+      f.type='bandpass'; f.frequency.value=200;
+      s.buffer=buf; s.connect(f); f.connect(g); g.connect(gainNode);
+      g.gain.setValueAtTime(vol||0.05, c.currentTime+start);
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+start+dur);
+      s.start(c.currentTime+start);
+    }catch(e){}
+  }
+
+  // ── TITLE MUSIC — stately, patriotic ──
+  function playTitleMusic(){
+    if(!musicEnabled||titlePlaying)return;
+    titlePlaying=true;
+    const gn=getMusicNode('title');
+    if(gn)gn.gain.setValueAtTime(1, getCtx().currentTime);
+    const BPM=72, B=60/BPM;
+    const melody=[
+      [392,1],[440,0.5],[392,0.5],[349,1],[330,1],
+      [392,1],[523,1],[494,0.5],[440,0.5],[392,2],
+      [349,1],[392,0.5],[349,0.5],[330,1],[294,1],
+      [330,1],[392,1],[440,0.5],[392,0.5],[349,2],
+    ];
+    const bass=[
+      [196,2],[220,2],[175,2],[196,2],
+      [196,2],[220,2],[175,2],[196,2],
+    ];
+    const totalLen=melody.reduce((s,[,d])=>s+d*B,0);
+    function scheduleTitle(offset){
+      if(!titlePlaying)return;
+      const gn2=getMusicNode('title');
+      let t=offset;
+      melody.forEach(([f,d])=>{toneToGain(gn2,f,'triangle',t,d*B*0.85,0.1);t+=d*B;});
+      let tb=offset;
+      bass.forEach(([f,d])=>{toneToGain(gn2,f,'sine',tb,d*B*0.9,0.09);tb+=d*B;});
+      if(titlePlaying) titleLoop=setTimeout(()=>scheduleTitle(0),totalLen*1000+100);
+    }
+    scheduleTitle(0.1);
+  }
+
+  function stopTitleMusic(){
+    titlePlaying=false;
+    if(titleLoop){clearTimeout(titleLoop);titleLoop=null;}
+    try{
+      if(titleGain){
+        titleGain.gain.setValueAtTime(0, getCtx().currentTime);
+        titleGain.gain.linearRampToValueAtTime(0, getCtx().currentTime+0.05);
+      }
+    }catch(e){}
+  }
+
+  // ── BATTLE MUSIC — tense, driving, minor key ──
+  function playBattleMusic(){
+    if(!musicEnabled||battlePlaying)return;
+    battlePlaying=true;
+    const gn=getMusicNode('battle');
+    if(gn)gn.gain.setValueAtTime(1, getCtx().currentTime);
+    const BPM=140, B=60/BPM;
+    const melody=[
+      [440,0.5],[494,0.5],[523,0.5],[494,0.5],
+      [440,1],[392,0.5],[440,0.5],
+      [349,0.5],[392,0.5],[440,0.5],[392,0.5],
+      [349,1],[330,1],
+      [392,0.5],[440,0.5],[494,0.5],[523,0.5],
+      [587,1],[523,0.5],[494,0.5],
+      [440,0.5],[494,0.5],[440,0.5],[392,0.5],
+      [440,2],
+    ];
+    const bass=[
+      [110,0.5],[0,0.5],[110,0.5],[0,0.5],
+      [110,0.5],[0,0.5],[98,0.5],[0,0.5],
+      [110,0.5],[0,0.5],[110,0.5],[0,0.5],
+      [87,0.5],[0,0.5],[98,0.5],[0,0.5],
+      [110,0.5],[0,0.5],[110,0.5],[0,0.5],
+      [131,0.5],[0,0.5],[110,0.5],[0,0.5],
+      [110,0.5],[0,0.5],[110,0.5],[0,0.5],
+      [110,1],[0,1],
+    ];
+    const totalLen=melody.reduce((s,[,d])=>s+d*B,0);
+    function scheduleBattle(offset){
+      if(!battlePlaying)return;
+      const gn2=getMusicNode('battle');
+      let t=offset;
+      melody.forEach(([f,d])=>{if(f>0)toneToGain(gn2,f,'square',t,d*B*0.7,0.07);t+=d*B;});
+      let tb=offset;
+      bass.forEach(([f,d])=>{if(f>0)toneToGain(gn2,f,'square',tb,d*B*0.6,0.09);tb+=d*B;});
+      for(let i=0;i<16;i++) noiseToGain(gn2,offset+i*B*0.5,0.04,0.03);
+      if(battlePlaying) battleLoop=setTimeout(()=>scheduleBattle(0),totalLen*1000+50);
+    }
+    scheduleBattle(0.1);
+  }
+
+  function stopBattleMusic(){
+    battlePlaying=false;
+    if(battleLoop){clearTimeout(battleLoop);battleLoop=null;}
+    try{
+      if(battleGain){
+        battleGain.gain.setValueAtTime(0, getCtx().currentTime);
+        battleGain.gain.linearRampToValueAtTime(0, getCtx().currentTime+0.05);
+      }
+    }catch(e){}
+  }
+
+  function toggleMusicFn(){
+    musicEnabled=!musicEnabled;
+    if(!musicEnabled){
+      stopTitleMusic();
+      stopBattleMusic();
+    } else {
+      // Resume the right track based on current screen
+      if(window.currentScreen==='battle')playBattleMusic();
+      else playTitleMusic();
+    }
+    return musicEnabled;
+  }
+
+  return {
+    click:sfxClick, attack:sfxAttack, hit:sfxHit, dodge:sfxDodge,
+    correct:sfxCorrect, wrong:sfxWrong, victory:sfxVictory,
+    defeat:sfxDefeat, levelUp:sfxLevelUp, gold:sfxGold,
+    card:sfxCard, save:sfxSave,
+    playTitle:playTitleMusic, stopTitle:stopTitleMusic,
+    playBattle:playBattleMusic, stopBattle:stopBattleMusic,
+    toggle:toggleMusicFn,
+  };
+})();
+
 
 // ─── SUPABASE SYNC ───
 async function pushToSupabase(){
@@ -3905,6 +4228,11 @@ function notify(msg,type){const n=document.createElement('div');n.className='not
 document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('login-screen').classList.add('active');
+  // Start title music on first user interaction
+  document.addEventListener('click',function startTitle(){
+    SFX.playTitle();
+    document.removeEventListener('click',startTitle);
+  },{once:true});
   // Check for existing save
   try{
     const lastKey=localStorage.getItem('apgov_last_key');
