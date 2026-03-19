@@ -379,6 +379,7 @@ option{background:var(--bg2)}
       <div class="hud-stat">⚖️<span id="hud-gold">0</span></div>
       <div class="hud-stat">❤️<span id="hud-hp">50</span></div>
       <div class="hud-stat">📦<span id="hud-packs">0</span></div>
+      <button onclick="manualSave()" style="font-family:var(--cinzel);font-size:7px;letter-spacing:.05em;background:transparent;border:1px solid var(--green2);color:var(--green2);padding:4px 8px;cursor:pointer;white-space:nowrap">💾</button>
     </div>
   </div>
 </div>
@@ -491,19 +492,32 @@ option{background:var(--bg2)}
   <button class="btn green full" onclick="createCharacter()">⚖ BEGIN CIVIC JOURNEY</button>
 </div>
 
-<!-- MAP -->
+<!-- TOWN -->
 <div id="map-screen" class="screen">
-  <div id="map-notification" style="display:none;background:rgba(64,200,120,0.1);border:2px solid var(--green);padding:10px;font-family:var(--pixel);font-size:6px;color:var(--green);margin-bottom:10px"></div>
-  <div style="font-family:var(--pixel);font-size:7px;color:var(--teal);text-align:center;margin-bottom:12px">⚖ SELECT UNIT ⚖</div>
-  <div id="unit-list"></div>
-  <button class="btn blue full" onclick="openTimeline()" style="margin-top:8px">📜 FOUNDATIONAL DOCUMENTS</button>
+  <div id="map-notification" style="display:none;background:rgba(64,200,120,0.1);border:2px solid var(--green);padding:10px;font-family:var(--pixel);font-size:6px;color:var(--green);margin-bottom:10px;text-align:center"></div>
+  <!-- Town canvas -->
+  <div style="position:relative;width:100%;max-width:548px;margin:0 auto">
+    <canvas id="town-canvas" width="548" height="420" style="width:100%;display:block;image-rendering:pixelated;border:2px solid var(--border2);cursor:pointer"></canvas>
+    <!-- Building labels that appear on hover -->
+    <div id="town-tooltip" style="display:none;position:absolute;background:var(--bg2);border:1px solid var(--gold);padding:6px 10px;font-family:var(--pixel);font-size:5px;color:var(--gold);pointer-events:none;z-index:10;white-space:nowrap"></div>
+  </div>
+  <!-- Town status bar -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg2);border:1px solid var(--border2);margin-top:4px;font-family:var(--pixel);font-size:5px">
+    <span id="town-location-label" style="color:var(--teal)">⚖ CONSTITUTION CITY</span>
+    <span id="town-hp-label" style="color:var(--gold)"></span>
+  </div>
+  <!-- Save overlay button -->
+  <div style="margin-top:6px;text-align:right">
+    <button onclick="manualSave()" style="font-family:var(--cinzel);font-size:9px;letter-spacing:.08em;background:rgba(39,174,96,.1);border:1px solid var(--green2);color:var(--green2);padding:8px 16px;cursor:pointer">💾 SAVE GAME</button>
+  </div>
 </div>
 
-<!-- ERA/SECTION SELECT -->
+<!-- BATTLE HALL (era/unit select) — replaces old era-screen -->
 <div id="era-screen" class="screen">
   <div id="era-header"></div>
   <div id="era-enemy-list"></div>
 </div>
+
 
 <!-- BATTLE -->
 <div id="battle-screen" class="screen">
@@ -577,8 +591,12 @@ option{background:var(--bg2)}
   </div>
   <div id="new-card-reveal" style="display:none"></div>
   <button class="btn green full" id="open-pack-btn" style="display:none" onclick="goToPackThenEra()">📦 OPEN YOUR BRIEF!</button>
-  <button class="btn full" onclick="returnToCurrentEra()">▶ CONTINUE</button>
-  <button class="btn sm full" onclick="rematch()" style="margin-top:4px">↺ REMATCH</button>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+    <button class="btn green full" onclick="manualSave()" style="border-color:var(--green);color:var(--green)">💾 SAVE</button>
+    <button class="btn full" onclick="returnToCurrentEra()">▶ CONTINUE</button>
+  </div>
+  <button class="btn sm full" onclick="rematch()" style="margin-top:6px;border-color:var(--text3);color:var(--text3)">↺ REMATCH</button>
+  <button class="btn sm full" onclick="returnToTown()" style="margin-top:4px;border-color:var(--blue);color:var(--blue)">🏛️ RETURN TO TOWN</button>
 </div>
 
 <!-- SHOP -->
@@ -615,7 +633,7 @@ option{background:var(--bg2)}
     <div style="display:flex;gap:6px">
       <button class="btn green sm" onclick="manualSave()">💾 SAVE</button>
       <button class="btn sm" onclick="openLeaderboard()" style="border-color:var(--purple);color:var(--purple)">🏆 BOARD</button>
-      <button class="btn sm" onclick="returnToTitle()" style="border-color:var(--text3);color:var(--text3)">🏠 TITLE</button>
+      <button class="btn sm" onclick="returnToTown()" style="border-color:var(--blue);color:var(--blue)">🏛️ TOWN</button>
     </div>
   </div>
   <div id="profile-header" style="text-align:center;padding-bottom:1rem;border-bottom:1px solid var(--border);margin-bottom:1rem"></div>
@@ -711,7 +729,7 @@ option{background:var(--bg2)}
 </div>
 
 <div id="bottom-nav" style="display:grid">
-  <button class="bn-btn active" id="nav-map" onclick="showScreen('map')"><span class="bn-icon">🗺️</span>UNITS</button>
+  <button class="bn-btn active" id="nav-map" onclick="showScreen('map')"><span class="bn-icon">🏛️</span>TOWN</button>
   <button class="bn-btn" id="nav-shop" onclick="showScreen('shop')"><span class="bn-icon">⚖️</span>ARMORY</button>
   <button class="bn-btn" id="nav-pack" onclick="showScreen('pack')"><span class="bn-icon">📦</span>BRIEFS<span class="bn-badge" id="pack-badge" style="display:none">!</span></button>
   <button class="bn-btn" id="nav-collection" onclick="showScreen('collection')"><span class="bn-icon">📜</span>CODEX</button>
@@ -2678,7 +2696,11 @@ function defaultState(){
     firstName:'',lastName:'',period:null,savedAt:null,lastEpId:null,lastEraId:null,
     askedQMap:{},completionCelebrated:false};  // tracks which questions each enemy has already asked globally
 }
-function manualSave(){save();notify('Game saved! ✓','green');}
+function manualSave(){
+  save();
+  const saved_at=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  notify('💾 Saved at '+saved_at+' — LVL '+G.level+' · '+G.score+' pts','green');
+}
 function save(){
   if(!G)return;G.savedAt=Date.now();
   try{const k=window._loginSaveKey||'apgov_v1_save';localStorage.setItem(k,JSON.stringify(G));localStorage.setItem('apgov_last_key',k);}catch(e){}
@@ -2846,7 +2868,11 @@ function showScreen(id){
   document.querySelectorAll('.bn-btn').forEach(b=>b.classList.remove('active'));
   const nm={map:'nav-map',shop:'nav-shop',pack:'nav-pack',collection:'nav-collection',profile:'nav-profile'};
   if(nm[id])document.getElementById(nm[id])?.classList.add('active');
-  if(id==='map')renderMap();if(id==='shop')renderShop();
+  if(id==='map'){
+    townUpdateStatusBar();
+    setTimeout(()=>{if(!TOWN.animFrame)townInit();else if(!TOWN.canvas)townInit();},50);
+  }
+  if(id==='shop')renderShop();
   if(id==='collection')renderCollection();if(id==='profile')renderProfile();
   if(id==='pack')renderPackScreen();
 }
@@ -2856,7 +2882,15 @@ function launchGame(){
   updateHeader();renderAllSprites();checkEraUnlocks();showScreen('map');startLbSync();if(G.score>0)pushToSupabase();
 }
 function returnToTitle(){if(G)save();document.getElementById('game-header').style.display='none';document.getElementById('bottom-nav').style.display='none';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('title-screen').classList.add('active');currentScreen='title';}
-function returnToCurrentEra(){if(G.lastEpId&&G.lastEraId){selectEpisode(G.lastEpId);setTimeout(()=>selectEra(G.lastEpId,G.lastEraId),50);}else showScreen('map');}
+function returnToCurrentEra(){
+  if(G.lastEpId&&G.lastEraId){
+    showScreen('era');
+    renderTownBattleHall();
+    setTimeout(()=>selectEra(G.lastEpId,G.lastEraId),50);
+  } else {
+    showScreen('map');
+  }
+}
 function goToPackThenEra(){showScreen('pack');}
 function rematch(){if(BT.lastEpId&&BT.lastEraId&&BT.lastEnemyId)startBattle(BT.lastEpId,BT.lastEraId,BT.lastEnemyId);}
 // ─── HEADER ───
@@ -2909,9 +2943,10 @@ function renderMap(){
     </div>`;}).join('');
 }
 function selectEpisode(epId){const ep=EPISODES.find(e=>e.id===epId);if(!ep||ep.coming)return;renderEraScreen(ep);showScreen('era');}
+function backToBattleHall(){showScreen('era');renderTownBattleHall();}
 function renderEraScreen(ep){
   document.getElementById('era-header').innerHTML=`
-    <button class="btn sm" onclick="showScreen('map')" style="margin-bottom:12px">← Back to Units</button>
+    <button class="btn sm" onclick="backToBattleHall()" style="margin-bottom:12px">← Back to Battle Hall</button>
     <div style="font-family:var(--cinzel);font-size:13px;color:var(--gold);letter-spacing:.08em;margin-bottom:4px">${ep.icon} ${ep.name}</div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:14px">${ep.standards}</div>`;
   const list=document.getElementById('era-enemy-list');
@@ -3187,7 +3222,13 @@ function endBattle(won){
     else document.getElementById('new-card-reveal').style.display='none';
     document.getElementById('open-pack-btn').style.display=en.givePack?'block':'none';
     const badge=document.getElementById('pack-badge');if(badge)badge.style.display=G.packs>0?'inline':'none';
-    save();updateHeader();pushToSupabase();
+    save();updateHeader();pushToSupabase();townUpdateStatusBar();
+    // Show saved indicator
+    const si=document.createElement('div');
+    si.style.cssText='position:fixed;bottom:80px;right:12px;background:var(--bg2);border:1px solid var(--green2);color:var(--green2);font-family:var(--cinzel);font-size:8px;padding:6px 10px;z-index:600;letter-spacing:.06em;animation:fadeIn .3s';
+    si.textContent='💾 AUTO-SAVED';
+    document.body.appendChild(si);
+    setTimeout(()=>si.remove(),2500);
   } else {
     const gl=Math.floor(G.gold*0.2);G.gold=Math.max(0,G.gold-gl);G.losses++;addXP(Math.floor(BT.earnedXP*0.3));save();updateHeader();
     document.getElementById('result-emoji').textContent='💀';document.getElementById('result-headline').textContent='OVERRULED!';document.getElementById('result-headline').style.color='var(--red)';
@@ -3378,6 +3419,433 @@ function checkAchievements(){
   if(scotus.some(e=>G.collection.includes(e.id)))add('scotus_case');
 }
 // ─── LEADERBOARD (now handled by Supabase — see pushToSupabase/fetchLeaderboard above) ───
+
+// ═══════════════════════════════════════════════════════
+// TOWN ENGINE
+// ═══════════════════════════════════════════════════════
+const TOWN = {
+  canvas:null, ctx:null, W:548, H:480,
+  player:{x:274,y:300,tx:274,ty:300,moving:false,facing:'down',frame:0,frameTimer:0},
+  // Locations — emoji + label + position
+  locations:[
+  {id:'inn',      emoji:'🏨', label:'The Inn',      sublabel:'Rest & Save',   x:120, y:125, r:30},
+  {id:'board',    emoji:'📋', label:'Notice Board', sublabel:'Leaderboard',   x:270, y:205, r:24},
+  {id:'armory',   emoji:'⚖️', label:'Armory',       sublabel:'Shop',          x:135, y:330, r:30},
+  {id:'archives', emoji:'📜', label:'Archives',     sublabel:'Cards',         x:405, y:330, r:30},
+  {id:'battle',   emoji:'⚔️', label:'Battle Hall',  sublabel:'Unit 5 / Final',x:435, y:155, r:34},
+],
+  exit:{x:274,y:30,label:'To Overworld ↑'},
+  hovered:null, activeLocation:null, tick:0, animFrame:null,
+};
+
+function townInit(){
+  TOWN.canvas=document.getElementById('town-canvas');
+  if(!TOWN.canvas)return;
+  TOWN.ctx=TOWN.canvas.getContext('2d');
+  TOWN.canvas.addEventListener('click',townHandleClick);
+  TOWN.canvas.addEventListener('mousemove',townHandleHover);
+  TOWN.canvas.addEventListener('mouseleave',()=>{TOWN.hovered=null;});
+  TOWN.canvas.addEventListener('touchend',function(e){
+    e.preventDefault();
+    const t=e.changedTouches[0];
+    const r=TOWN.canvas.getBoundingClientRect();
+    const cx=Math.round((t.clientX-r.left)*(TOWN.W/r.width));
+    const cy=Math.round((t.clientY-r.top)*(TOWN.H/r.height));
+    townHandleClickCoords(cx,cy);
+  },{passive:false});
+  document.addEventListener('keydown',townHandleKey);
+  townStartLoop();
+  townUpdateStatusBar();
+}
+
+function townStartLoop(){
+  if(TOWN.animFrame)cancelAnimationFrame(TOWN.animFrame);
+  function loop(){TOWN.tick++;townUpdate();townDraw();TOWN.animFrame=requestAnimationFrame(loop);}
+  loop();
+}
+function townStopLoop(){if(TOWN.animFrame){cancelAnimationFrame(TOWN.animFrame);TOWN.animFrame=null;}}
+
+function townUpdate(){
+  const p=TOWN.player;
+  if(p.moving){
+    const dx=p.tx-p.x,dy=p.ty-p.y,dist=Math.sqrt(dx*dx+dy*dy),speed=3;
+    if(dist<=speed){
+      p.x=p.tx;p.y=p.ty;p.moving=false;townCheckArrival();
+    } else {
+      p.x+=dx/dist*speed;p.y+=dy/dist*speed;
+      if(Math.abs(dx)>Math.abs(dy))p.facing=dx>0?'right':'left';
+      else p.facing=dy>0?'down':'up';
+      p.frameTimer++;if(p.frameTimer>7){p.frame=(p.frame+1)%4;p.frameTimer=0;}
+    }
+  }
+}
+
+function townDraw(){
+  const ctx=TOWN.ctx,W=TOWN.W,H=TOWN.H,t=TOWN.tick;
+  ctx.clearRect(0,0,W,H);
+
+  // ── GROUND ──
+  for(let gx=0;gx<W;gx+=8){
+    for(let gy=0;gy<H;gy+=8){
+      const v=Math.sin(gx*0.12+gy*0.09)*0.5+0.5;
+      ctx.fillStyle='rgb('+Math.floor(72+v*18)+','+Math.floor(115+v*22)+','+Math.floor(44+v*12)+')';
+      ctx.fillRect(gx,gy,8,8);
+    }
+  }
+  // Grass detail
+  ctx.fillStyle='rgba(0,0,0,0.12)';
+  for(let i=0;i<80;i++){
+    const gx=(i*173)%W,gy=(i*97)%H;
+    ctx.fillRect(gx,gy,1,4);ctx.fillRect(gx+2,gy+1,1,3);
+  }
+
+  // ── DIRT PATHS — more natural countryside layout ──
+ctx.lineCap='round';
+ctx.lineJoin='round';
+
+function path(pts,w){
+  ctx.strokeStyle='#c8a860';
+  ctx.lineWidth=w;
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0],pts[0][1]);
+  pts.slice(1).forEach(p=>ctx.lineTo(p[0],p[1]));
+  ctx.stroke();
+
+  ctx.strokeStyle='#b09040';
+  ctx.lineWidth=Math.max(2,w-4);
+  ctx.setLineDash([6,5]);
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0],pts[0][1]);
+  pts.slice(1).forEach(p=>ctx.lineTo(p[0],p[1]));
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+const hub = [270,255];
+
+// central village green paths
+path([[hub[0],hub[1]],[250,225],[245,205],[250,180]],14);   // to board
+path([[hub[0],hub[1]],[220,235],[185,210],[150,180],[120,125]],16); // to inn
+path([[hub[0],hub[1]],[225,280],[190,305],[160,320],[135,330]],16); // to armory
+path([[hub[0],hub[1]],[315,275],[355,300],[385,315],[405,330]],16); // to archives
+path([[hub[0],hub[1]],[320,225],[360,200],[395,180],[435,155]],18); // to battle hall
+
+// four outward roads
+path([[hub[0],hub[1]],[268,210],[268,155],[273,95],[275,20]],22);   // north road
+path([[hub[0],hub[1]],[330,252],[390,252],[455,248],[530,248]],22); // east road
+path([[hub[0],hub[1]],[270,300],[270,350],[272,410],[272,478]],22); // south road
+path([[hub[0],hub[1]],[215,258],[160,258],[95,255],[22,255]],22);   // west road
+
+  // ── POND ──
+  const pw=Math.sin(t*0.035)*0.2+0.8;
+  ctx.fillStyle='rgba(0,0,0,0.2)';ctx.beginPath();ctx.ellipse(178,298,48,28,0.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=`rgba(36,108,190,${pw})`;ctx.beginPath();ctx.ellipse(175,295,45,26,0.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=`rgba(80,160,230,${pw*0.5})`;ctx.beginPath();ctx.ellipse(168,289,26,14,0.4,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(220,240,255,0.25)';ctx.beginPath();ctx.ellipse(163,285,12,6,0.6,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#a09860';ctx.lineWidth=2.5;ctx.beginPath();ctx.ellipse(175,295,45,26,0.2,0,Math.PI*2);ctx.stroke();
+  // Ripple
+  const rp=(t*0.025)%1;
+  ctx.strokeStyle=`rgba(150,200,255,${0.5-rp*0.4})`;ctx.lineWidth=1;
+  ctx.beginPath();ctx.ellipse(175,295,20+rp*25,12+rp*14,0.2,0,Math.PI*2);ctx.stroke();
+
+  // ── TREES ──
+  const trees=[
+    [20,20],[70,15],[140,18],[220,22],[340,18],[420,15],[510,20],[530,80],
+    [530,200],[525,340],[520,440],[440,465],[330,468],[200,465],[80,462],
+    [15,420],[12,310],[15,180],[15,100],[55,55],[490,55],[495,180],
+    [490,420],[350,100],[380,360],[160,360],[140,100],
+  ];
+  trees.sort((a,b)=>a[1]-b[1]).forEach(([tx,ty])=>{
+    const sz=14+Math.sin(tx*0.2+ty*0.15)*3;
+    drawTownTree(ctx,tx,ty,sz);
+  });
+
+  // ── STONE WALL (right edge) ──
+  for(let wy=60;wy<H-40;wy+=14){
+    ctx.fillStyle=(wy%28<14)?'#a09070':'#8a7858';
+    ctx.fillRect(W-20,wy,18,12);
+    ctx.fillStyle='rgba(0,0,0,0.15)';ctx.fillRect(W-20,wy+10,18,2);
+  }
+
+  // ── WELL ──
+  drawWell(ctx,380,290);
+
+  // ── FENCE ──
+  drawFence(ctx,220,370,340,370);
+
+  // ── LOCATIONS — emoji icons ──
+  TOWN.locations.forEach(loc=>drawLocation(ctx,loc,t));
+
+  // ── EXIT ARROW ──
+  const ex=274,ey=22,ehov=TOWN.hovered==='exit';
+  ctx.fillStyle=ehov?'rgba(245,208,96,0.95)':'rgba(245,208,96,0.65)';
+  ctx.beginPath();
+  ctx.moveTo(ex,ey-14);ctx.lineTo(ex+16,ey+4);ctx.lineTo(ex+7,ey+4);
+  ctx.lineTo(ex+7,ey+16);ctx.lineTo(ex-7,ey+16);ctx.lineTo(ex-7,ey+4);
+  ctx.lineTo(ex-16,ey+4);ctx.closePath();ctx.fill();
+  ctx.strokeStyle=ehov?'#ffd060':'#c9a84c';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle=ehov?'#1a0a00':'#f0e0b0';
+  ctx.font='5px "Press Start 2P",monospace';ctx.textAlign='center';
+  ctx.fillText('OVERWORLD',ex,ey+30);
+
+  // ── PLAYER ──
+  townDrawPlayer(ctx);
+
+  // ── VIGNETTE ──
+  const vig=ctx.createRadialGradient(W/2,H/2,H*0.28,W/2,H/2,H*0.72);
+  vig.addColorStop(0,'rgba(0,0,0,0)');vig.addColorStop(1,'rgba(0,0,0,0.48)');
+  ctx.fillStyle=vig;ctx.fillRect(0,0,W,H);
+
+  // ── TOWN NAME ──
+  ctx.fillStyle='rgba(8,6,4,0.72)';ctx.fillRect(180,H-28,188,22);
+  ctx.strokeStyle='#c9a84c';ctx.lineWidth=1;ctx.strokeRect(180,H-28,188,22);
+  ctx.fillStyle='#f5e8c0';ctx.font='7px "Press Start 2P",monospace';ctx.textAlign='center';
+  ctx.fillText('⚖ CONSTITUTION CITY',274,H-12);
+}
+
+function drawLocation(ctx,loc,t){
+  const hov=TOWN.hovered===loc.id;
+  const bob=hov?Math.sin(t*0.12)*3:0;
+  const scale=hov?1.18:1;
+  const ey=loc.y+bob;
+
+  // Glow ring when hovered
+  if(hov){
+    ctx.fillStyle='rgba(245,208,96,0.18)';
+    ctx.beginPath();ctx.arc(loc.x,ey,loc.r+14,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='rgba(245,208,96,0.6)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(loc.x,ey,loc.r+10,0,Math.PI*2);ctx.stroke();
+  }
+
+  // Shadow
+  ctx.fillStyle='rgba(0,0,0,0.3)';
+  ctx.beginPath();ctx.ellipse(loc.x+3,ey+loc.r-2,loc.r*0.8,loc.r*0.35,0,0,Math.PI*2);ctx.fill();
+
+  // Background circle
+  ctx.fillStyle=hov?'rgba(40,30,10,0.85)':'rgba(20,15,5,0.75)';
+  ctx.beginPath();ctx.arc(loc.x,ey,loc.r,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle=hov?'#f5d060':'#c9a84c';ctx.lineWidth=hov?2.5:1.5;
+  ctx.beginPath();ctx.arc(loc.x,ey,loc.r,0,Math.PI*2);ctx.stroke();
+
+  // Emoji
+  const emojiSize=Math.round(loc.r*1.1*scale);
+  ctx.font=emojiSize+'px serif';ctx.textAlign='center';
+  ctx.fillText(loc.emoji,loc.x,ey+loc.r*0.42);
+
+  // Label
+  ctx.fillStyle=hov?'#f5d060':'#f0e8c0';
+  ctx.font=(hov?'bold ':'')+`6px "Press Start 2P",monospace`;
+  ctx.textAlign='center';
+  ctx.fillText(loc.label,loc.x,ey+loc.r+16);
+
+  // Sublabel
+  if(hov){
+    ctx.fillStyle='rgba(245,208,96,0.85)';
+    ctx.font='5px "Press Start 2P",monospace';
+    ctx.fillText('['+loc.sublabel+']',loc.x,ey+loc.r+28);
+  }
+}
+
+function drawWell(ctx,x,y){
+  ctx.fillStyle='rgba(0,0,0,0.2)';ctx.beginPath();ctx.ellipse(x+3,y+5,16,7,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#c0b080';ctx.fillRect(x-13,y-9,26,13);
+  ctx.fillStyle='rgba(0,0,0,0.08)';
+  for(let i=0;i<4;i++)ctx.fillRect(x-13+i*7,y-9,5,13);
+  ctx.fillStyle='#1a1208';ctx.beginPath();ctx.ellipse(x,y-7,9,4,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#807860';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(x,y-7,9,4,0,0,Math.PI*2);ctx.stroke();
+  ctx.fillStyle='#6b4020';ctx.fillRect(x-11,y-20,4,13);ctx.fillRect(x+8,y-20,4,13);
+  ctx.fillStyle='#8b5020';ctx.fillRect(x-11,y-22,23,4);
+  ctx.strokeStyle='#c8a860';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x,y-20);ctx.lineTo(x,y-7);ctx.stroke();
+  ctx.fillStyle='#8b5020';ctx.fillRect(x-3,y-17,7,6);ctx.strokeStyle='#c9a84c';ctx.lineWidth=1;ctx.strokeRect(x-3,y-17,7,6);
+}
+
+function drawFence(ctx,x1,y1,x2,y2){
+  const dist=Math.sqrt((x2-x1)**2+(y2-y1)**2);
+  const posts=Math.floor(dist/22);
+  ctx.fillStyle='#9a7030';
+  for(let i=0;i<=posts;i++){
+    const ft=i/posts;ctx.fillRect(x1+(x2-x1)*ft-2,y1+(y2-y1)*ft-12,4,18);
+  }
+  ctx.strokeStyle='#8b6020';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(x1,y1-3);ctx.lineTo(x2,y2-3);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x1,y1+3);ctx.lineTo(x2,y2+3);ctx.stroke();
+}
+
+function drawTownTree(ctx,x,y,size){
+  ctx.fillStyle='rgba(0,0,0,0.18)';ctx.beginPath();ctx.ellipse(x+2,y+4,size*0.6,size*0.3,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#5a3818';ctx.fillRect(x-2,y-2,5,size*0.5);
+  ctx.fillStyle='#1a4a10';ctx.beginPath();ctx.arc(x,y-size*0.5,size,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#2a6a20';ctx.beginPath();ctx.arc(x-size*0.2,y-size*0.6,size*0.72,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#3a8a30';ctx.beginPath();ctx.arc(x+size*0.1,y-size*0.72,size*0.52,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#4aaa40';ctx.beginPath();ctx.arc(x,y-size*0.88,size*0.36,0,Math.PI*2);ctx.fill();
+}
+
+function townDrawPlayer(ctx){
+  const p=TOWN.player;
+  const x=Math.round(p.x),y=Math.round(p.y);
+  const bob=p.moving?(p.frame%2===0?0:-2):0;
+  const ls=p.moving?(p.frame<2?1:-1):0;
+  const def=AVATAR_DEFS.find(a=>a&&a.id===G.avatarId&&a.portrait)||AVATAR_DEFS[2];
+  const cat=def?def.cat:'starter';
+  const bc={
+    starter:{body:'#1a3060',legs:'#1a1a3a',skin:'#e8c8a0',hair:'#3a2010'},
+    archetype:{body:'#2a2a2a',legs:'#1a1a1a',skin:'#d4b890',hair:'#1a0a00'},
+    historical:{body:'#2a1a60',legs:'#1a0a30',skin:'#e8d0a0',hair:'#2a2010'},
+    legendary:{body:'#8b0000',legs:'#4a0000',skin:'#e8c8a0',hair:'#2a1800'},
+    president:{body:'#00205b',legs:'#001030',skin:'#e0c090',hair:'#3a2800'},
+    scotus_justice:{body:'#0a0a1a',legs:'#0a0a0a',skin:'#d4b890',hair:'#1a1a1a'},
+    modern_political:{body:'#2a0a40',legs:'#1a0a20',skin:'#c09060',hair:'#1a0a00'},
+    interest_group:{body:'#1a3a1a',legs:'#0a1a0a',skin:'#d8c0a0',hair:'#2a1a00'},
+    media:{body:'#2a2a2a',legs:'#1a1a1a',skin:'#e0c890',hair:'#1a1a1a'},
+    ultra_mythic:{body:'#4a3800',legs:'#2a2000',skin:'#e8c870',hair:'#3a2800'},
+  }[cat]||{body:'#1a3060',legs:'#1a1a3a',skin:'#e8c8a0',hair:'#3a2010'};
+  const py=y-28+bob;
+  ctx.fillStyle='rgba(0,0,0,0.28)';ctx.beginPath();ctx.ellipse(x,y+2,9,4,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=bc.legs;ctx.fillRect(x-5,py+20,5,10+ls*3);ctx.fillRect(x+1,py+20,5,10-ls*3);
+  ctx.fillStyle='#3a2010';ctx.fillRect(x-6,py+28+ls*3,6,4);ctx.fillRect(x+1,py+28-ls*3,6,4);
+  ctx.fillStyle=bc.body;ctx.fillRect(x-6,py+10,12,12);
+  ctx.fillStyle=bc.skin;ctx.fillRect(x-10,py+10+ls*2,4,9);ctx.fillRect(x+7,py+10-ls*2,4,9);
+  ctx.fillStyle=bc.skin;ctx.fillRect(x-5,py,10,10);
+  ctx.fillStyle=bc.hair;ctx.fillRect(x-5,py,10,3);ctx.fillRect(x-6,py+1,2,6);ctx.fillRect(x+5,py+1,2,6);
+  ctx.fillStyle='#1a0a00';
+  if(p.facing==='left')ctx.fillRect(x-3,py+5,2,2);
+  else if(p.facing==='right')ctx.fillRect(x+2,py+5,2,2);
+  else{ctx.fillRect(x-3,py+5,2,2);ctx.fillRect(x+2,py+5,2,2);}
+  if(G&&G.name){
+    const nm=G.name.split(' ')[0].substring(0,8);
+    ctx.font='5px "Press Start 2P",monospace';ctx.textAlign='center';
+    ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(x-nm.length*3-3,py-14,nm.length*6+6,10);
+    ctx.fillStyle='#f5d060';ctx.fillText(nm,x,py-6);
+  }
+}
+
+function lightenHex(hex,amt){
+  try{const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return '#'+[r,g,b].map(v=>Math.min(255,v+amt).toString(16).padStart(2,'0')).join('');}catch(e){return hex;}
+}
+function darkenHex(hex,amt){
+  try{const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return '#'+[r,g,b].map(v=>Math.max(0,v-amt).toString(16).padStart(2,'0')).join('');}catch(e){return hex;}
+}
+function lightenColor(h,a){return lightenHex(h,a);}
+
+function townHandleClick(e){
+  const r=TOWN.canvas.getBoundingClientRect();
+  const cx=Math.round((e.clientX-r.left)*(TOWN.W/r.width));
+  const cy=Math.round((e.clientY-r.top)*(TOWN.H/r.height));
+  townHandleClickCoords(cx,cy);
+}
+
+function townHandleClickCoords(cx,cy){
+  if(cy<55&&cx>220&&cx<330){
+    TOWN.player.tx=274;TOWN.player.ty=24;TOWN.player.moving=true;TOWN.activeLocation='__exit__';return;
+  }
+  const loc=TOWN.locations.find(l=>Math.sqrt((cx-l.x)**2+(cy-l.y)**2)<l.r+18);
+  if(loc){
+    TOWN.player.tx=loc.x;TOWN.player.ty=loc.y+loc.r+10;
+    TOWN.player.moving=true;TOWN.activeLocation=loc.id;
+  } else {
+    TOWN.player.tx=Math.max(20,Math.min(TOWN.W-20,cx));
+    TOWN.player.ty=Math.max(24,Math.min(TOWN.H-20,cy));
+    TOWN.player.moving=true;TOWN.activeLocation=null;
+  }
+}
+
+function townHandleHover(e){
+  const r=TOWN.canvas.getBoundingClientRect();
+  const cx=Math.round((e.clientX-r.left)*(TOWN.W/r.width));
+  const cy=Math.round((e.clientY-r.top)*(TOWN.H/r.height));
+  const loc=TOWN.locations.find(l=>Math.sqrt((cx-l.x)**2+(cy-l.y)**2)<l.r+18);
+  const onExit=cy<55&&cx>220&&cx<330;
+  TOWN.hovered=loc?loc.id:(onExit?'exit':null);
+  TOWN.canvas.style.cursor=(loc||onExit)?'pointer':'crosshair';
+}
+
+function townHandleKey(e){
+  if(currentScreen!=='map')return;
+  const p=TOWN.player,step=28;
+  const moves={ArrowUp:[0,-step],ArrowDown:[0,step],ArrowLeft:[-step,0],ArrowRight:[step,0],
+    w:[0,-step],s:[0,step],a:[-step,0],d:[step,0]};
+  const mv=moves[e.key];
+  if(mv){
+    e.preventDefault();
+    TOWN.player.tx=Math.max(20,Math.min(TOWN.W-20,p.x+mv[0]));
+    TOWN.player.ty=Math.max(24,Math.min(TOWN.H-20,p.y+mv[1]));
+    TOWN.player.moving=true;TOWN.activeLocation=null;
+    if(TOWN.player.ty<30){TOWN.activeLocation='__exit__';}
+  }
+}
+
+function townCheckArrival(){
+  if(!TOWN.activeLocation)return;
+  const id=TOWN.activeLocation;TOWN.activeLocation=null;
+  if(id==='__exit__'){
+    notify('🗺️ Overworld coming soon! Use Battle Hall for now.','');
+    TOWN.player.ty=80;return;
+  }
+  setTimeout(()=>openTownBuilding(id),150);
+}
+
+function openTownBuilding(id){
+  if(id==='battle'){renderTownBattleHall();showScreen('era');}
+  else if(id==='inn'){townInn();}
+  else if(id==='armory'){showScreen('shop');}
+  else if(id==='archives'){showScreen('collection');}
+  else if(id==='board'){openLeaderboard();}
+}
+
+function renderTownBattleHall(){
+  document.getElementById('era-header').innerHTML=`
+    <button class="btn sm" onclick="returnToTown()" style="margin-bottom:12px">← Back to Town</button>
+    <div style="font-family:var(--pixel);font-size:7px;color:var(--teal);margin-bottom:4px">⚔️ BATTLE HALL</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:14px">Choose your challenge</div>`;
+  const list=document.getElementById('era-enemy-list');
+  list.innerHTML=EPISODES.map(ep=>{
+    const unlocked=G.unlockedEpisodes.includes(ep.id);
+    const coming=ep.coming;
+    const eras=ep.eras||[];
+    const beaten=eras.reduce((n,era)=>n+era.enemies.filter(e=>G.beatenEnemies.includes(e.id)).length,0);
+    const total=eras.reduce((n,era)=>n+era.enemies.length,0);
+    const complete=total>0&&beaten>=total;
+    let bStyle='color:var(--text3);border-color:var(--border)',bTxt='LOCKED';
+    if(coming)bTxt='SOON';
+    else if(complete){bStyle='color:var(--green);border-color:var(--green)';bTxt='DONE';}
+    else if(unlocked){bStyle='color:var(--gold);border-color:var(--gold2)';bTxt='ENTER';}
+    return `<div class="unit-card ${coming||!unlocked?'locked':''} ${complete?'complete':''}" onclick="${unlocked&&!coming?`selectEpisode('${ep.id}')`:''}" >
+      <div class="unit-icon">${ep.icon}</div>
+      <div class="unit-info">
+        <div class="unit-name">UNIT ${ep.num} — ${ep.name.toUpperCase()}</div>
+        <div class="unit-sub">${ep.standards}</div>
+        ${unlocked&&!coming?`<div class="unit-prog">${beaten}/${total} challenges complete</div>`:''}
+      </div>
+      <div class="unit-badge" style="${bStyle}">${bTxt}</div>
+    </div>`;
+  }).join('');
+}
+
+function townInn(){
+  const healCost=Math.max(10,Math.floor((G.maxHp-G.hp)*2));
+  const isFull=G.hp>=G.maxHp;
+  if(isFull){save();notify('🏨 Well rested! Game saved.','green');return;}
+  if(G.gold<healCost){notify('Need '+healCost+' gold to rest. You have '+G.gold+'.','');return;}
+  if(confirm('🏨 THE INN\n\nRestore '+(G.maxHp-G.hp)+' HP for '+healCost+' gold?\n\nRest and save?')){
+    G.gold-=healCost;G.hp=G.maxHp;save();updateHeader();
+    notify('🏨 Fully restored! Game saved.','green');townUpdateStatusBar();
+  }
+}
+
+function townUpdateStatusBar(){
+  if(!G)return;
+  const lbl=document.getElementById('town-hp-label');
+  if(lbl)lbl.textContent='❤️ '+G.hp+'/'+G.maxHp+'  ⚖️ '+G.gold+'  LVL '+G.level;
+}
+
+
+function returnToTown(){
+  showScreen('map');
+  if(!TOWN.animFrame) townInit();
+}
+
 // ─── SUPABASE SYNC ───
 async function pushToSupabase(){
   if(!G||!G.name||window._isTeacher)return;
