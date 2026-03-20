@@ -711,12 +711,7 @@ option{background:var(--bg2)}
     <button class="overlay-close" onclick="closeLeaderboard()">✕ CLOSE</button>
   </div>
   <div style="font-family:var(--pixel);font-size:5px;color:var(--text3);text-align:center;margin-bottom:10px" id="lb-sync-status">Syncing...</div>
-  <div style="display:flex;gap:6px;margin-bottom:14px" id="lb-tabs">
-    <button onclick="setLbTab('all')" id="lb-tab-all"
-      style="font-family:var(--cinzel);font-size:9px;letter-spacing:.08em;padding:7px 14px;cursor:pointer;border:1px solid var(--gold);background:var(--gold);color:var(--bg);transition:all .2s">ALL</button>
-    <button onclick="setLbTab('myclass')" id="lb-tab-myclass"
-      style="font-family:var(--cinzel);font-size:9px;letter-spacing:.08em;padding:7px 14px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text3);transition:all .2s" id="lb-tab-myclass">MY CLASS</button>
-  </div>
+  <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap" id="lb-tabs"></div>
   <div id="lb-content"></div>
 </div>
 
@@ -5114,30 +5109,42 @@ async function fetchLeaderboard(period){
 }
 function setLbTab(tab){
   lbTab=tab;
-  document.getElementById('lb-tab-all').style.background=tab==='all'?'var(--gold)':'transparent';
-  document.getElementById('lb-tab-all').style.color=tab==='all'?'var(--bg)':'var(--text3)';
-  document.getElementById('lb-tab-all').style.borderColor=tab==='all'?'var(--gold)':'var(--border2)';
-  document.getElementById('lb-tab-myclass').style.background=tab==='myclass'?'var(--gold)':'transparent';
-  document.getElementById('lb-tab-myclass').style.color=tab==='myclass'?'var(--bg)':'var(--text3)';
-  document.getElementById('lb-tab-myclass').style.borderColor=tab==='myclass'?'var(--gold)':'var(--border2)';
   renderLeaderboard();
 }
 async function renderLeaderboard(){
   const el=document.getElementById('lb-content');
   const status=document.getElementById('lb-sync-status');
-  // Hide My Class tab for guests
-  const mycTab=document.getElementById('lb-tab-myclass');
-  if(mycTab){
-    const isGuest=!G||!G.period||G.period==='guest';
-    mycTab.style.display=isGuest?'none':'inline-block';
-    if(isGuest&&lbTab==='myclass')lbTab='all';
-  }
   if(status)status.textContent='Syncing...';
-  const period=lbTab==='myclass'?(G&&G.period)||null:null;
-  const allScores=await fetchLeaderboard(period);
+
+  // Fetch all scores
+  const allScores=await fetchLeaderboard(null);
   if(status)status.textContent=allScores.length+' citizens on the board';
-  // td-sync-status is updated by loadTeacherData, not here
-  if(!allScores.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:14px">No entries yet.</div>';return;}
+
+  // Build tabs dynamically from periods in data
+  const tabsEl=document.getElementById('lb-tabs');
+  if(tabsEl){
+    const periods=[...new Set(allScores.filter(s=>!s.is_teacher).map(s=>s.period).filter(Boolean))].sort();
+    const tabs=[{key:'all',label:'ALL'}];
+    if(G&&G.period&&G.period!=='guest'&&G.period!=='teacher')tabs.push({key:G.period,label:'MY CLASS (Pd '+G.period+')'});
+    periods.forEach(function(p){
+      if(p===G?.period||p==='teacher')return;
+      if(!tabs.find(t=>t.key===p))tabs.push({key:p,label:'PERIOD '+p});
+    });
+    tabsEl.innerHTML=tabs.map(function(t){
+      var active=lbTab===t.key;
+      return '<button onclick="setLbTab(\"'+t.key+'\")" style="font-family:var(--cinzel);font-size:9px;letter-spacing:.08em;padding:7px 14px;cursor:pointer;border:1px solid '+(active?'#c9a84c':'rgba(255,255,255,.15)')+';background:'+(active?'#c9a84c':'transparent')+';color:'+(active?'#0a0c14':'rgba(232,228,216,.35)')+';transition:all .2s">'+t.label+'</button>';
+    }).join('');
+  }
+
+  // Filter scores by selected tab
+  var scores;
+  if(lbTab==='all'){
+    scores=allScores;
+  } else {
+    scores=allScores.filter(function(s){return String(s.period)===String(lbTab);});
+  }
+
+  if(!scores.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:#666;font-size:14px">No entries yet for this period.</div>';return;}
   const medals=['🥇','🥈','🥉'];
   var lbHtml='<table style="width:100%;border-collapse:collapse">';
   lbHtml+='<thead><tr>'
@@ -5148,7 +5155,7 @@ async function renderLeaderboard(){
     +'<th style="padding:8px;text-align:left;font-size:11px;color:#888;border-bottom:1px solid #222">SCORE</th>'
     +'<th style="padding:8px;text-align:left;font-size:11px;color:#888;border-bottom:1px solid #222">PROGRESS</th>'
     +'</tr></thead><tbody>';
-  allScores.slice(0,25).forEach(function(s,i){
+  scores.slice(0,25).forEach(function(s,i){
     var rc=i===0?'#c9a84c':i===1?'#aaa':i===2?'#cd7f32':'#555';
     var rt=i<3?medals[i]:('#'+(i+1));
     var pd=s.period==='guest'?'Guest':s.period?'Pd '+s.period:'?';
