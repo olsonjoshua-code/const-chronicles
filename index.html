@@ -5145,38 +5145,46 @@ async function renderLeaderboard(){
   if(tdStatus){const now=new Date();tdStatus.textContent='Last refreshed: '+now.toLocaleTimeString()+' · '+students.length+' students loaded';}
   if(!allScores.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:14px">No entries yet.</div>';return;}
   const medals=['🥇','🥈','🥉'];
-  el.innerHTML='<table class="lb-table"><thead><tr><th>#</th><th>CITIZEN</th><th>PD</th><th>LVL</th><th>SCORE</th><th>PROGRESS</th></tr></thead><tbody>'
-  +allScores.slice(0,25).map(function(s,i){
-    var rankColor=i===0?'#c9a84c':i===1?'#aaa':i===2?'#c87533':'#666';
-    var rankTxt=i<3?medals[i]:('#'+(i+1));
-    var period=s.period==='guest'?'Guest':s.period?'Pd '+s.period:'?';
-    var pct=s.pct_complete||0;
-    var pctColor=pct>=100?'#c9a84c':pct>=50?'#1abc9c':'#4888e8';
-    var barColor=pct>=100?'#c9a84c':pct>=50?'#1abc9c':'#4888e8';
-    var isYou=G&&s.name===G.name;
-    return '<tr style="background:'+(isYou?'rgba(201,168,76,.07)':'transparent')+';border-bottom:1px solid rgba(255,255,255,.04)">'
-      +'<td style="font-size:10px;color:'+rankColor+';padding:10px 8px;font-weight:bold">'+rankTxt+'</td>'
+  var lbHtml='<table style="width:100%;border-collapse:collapse">';
+  lbHtml+='<thead><tr>'
+    +'<th style="padding:8px;text-align:left;font-size:11px;color:#888;border-bottom:1px solid #222">#</th>'
+    +'<th style="padding:8px;text-align:left;font-size:11px;color:#888;border-bottom:1px solid #222">STUDENT</th>'
+    +'<th style="padding:8px;text-align:left;font-size:11px;color:#888;border-bottom:1px solid #222">PD</th>'
+    +'<th style="padding:8px;text-align:left;font-size:11px;color:#888;border-bottom:1px solid #222">LVL</th>'
+    +'<th style="padding:8px;text-align:left;font-size:11px;color:#888;border-bottom:1px solid #222">SCORE</th>'
+    +'<th style="padding:8px;text-align:left;font-size:11px;color:#888;border-bottom:1px solid #222">PROGRESS</th>'
+    +'</tr></thead><tbody>';
+  allScores.slice(0,25).forEach(function(s,i){
+    var rc=i===0?'#c9a84c':i===1?'#aaa':i===2?'#cd7f32':'#555';
+    var rt=i<3?medals[i]:('#'+(i+1));
+    var pd=s.period==='guest'?'Guest':s.period?'Pd '+s.period:'?';
+    var pct=Math.min(100,s.pct_complete||0);
+    var pc=pct>=100?'#c9a84c':pct>=50?'#1abc9c':'#4888e8';
+    var bg=(G&&s.name===G.name)?'rgba(201,168,76,.08)':'transparent';
+    lbHtml+='<tr style="background:'+bg+';border-bottom:1px solid #1a1a1a">'
+      +'<td style="padding:10px 8px;color:'+rc+';font-size:12px;font-weight:bold">'+rt+'</td>'
       +'<td style="padding:10px 8px">'
         +'<div style="display:flex;align-items:center;gap:8px">'
-          +'<span style="font-size:18px">'+(s.avatar_badge||'⚖️')+'</span>'
+          +'<span style="font-size:20px">'+(s.avatar_badge||'⚖️')+'</span>'
           +'<div>'
-            +'<div style="font-family:Cinzel,serif;font-size:11px;color:#e8e4d8;letter-spacing:.03em">'+(s.name||'')+'</div>'
-            +'<div style="font-size:10px;color:#1abc9c;margin-top:2px">'+(s.rank||'')+'</div>'
+            +'<div style="font-size:13px;color:#e8e4d8;font-weight:600">'+(s.name||'Unknown')+'</div>'
+            +'<div style="font-size:11px;color:#1abc9c">'+(s.rank||'Citizen')+'</div>'
           +'</div>'
         +'</div>'
       +'</td>'
-      +'<td style="font-size:10px;color:#9a9585;padding:10px 8px">'+period+'</td>'
-      +'<td style="font-size:13px;color:#1abc9c;padding:10px 8px">'+(s.level||1)+'</td>'
-      +'<td style="font-family:Inter,sans-serif;font-size:13px;color:#c9a84c;font-weight:600;padding:10px 8px">'+((s.score||0).toLocaleString())+'</td>'
-      +'<td style="padding:10px 8px;min-width:80px">'
-        +'<div style="font-size:10px;color:'+pctColor+';margin-bottom:4px">'+pct+'%</div>'
-        +'<div style="height:5px;background:rgba(255,255,255,.1);border-radius:3px;width:72px">'
-          +'<div style="height:100%;width:'+Math.min(100,pct)+'%;background:'+barColor+';border-radius:3px"></div>'
+      +'<td style="padding:10px 8px;font-size:12px;color:#aaa">'+pd+'</td>'
+      +'<td style="padding:10px 8px;font-size:14px;color:#1abc9c;font-weight:600">'+(s.level||1)+'</td>'
+      +'<td style="padding:10px 8px;font-size:14px;color:#c9a84c;font-weight:700">'+((s.score||0).toLocaleString())+'</td>'
+      +'<td style="padding:10px 8px">'
+        +'<div style="font-size:12px;color:'+pc+';margin-bottom:4px">'+pct+'%</div>'
+        +'<div style="height:6px;background:#1a1a2e;border-radius:3px;width:80px;border:1px solid #333">'
+          +'<div style="height:100%;width:'+pct+'%;background:'+pc+';border-radius:3px"></div>'
         +'</div>'
       +'</td>'
       +'</tr>';
-  }).join('')
-  +'</tbody></table>';
+  });
+  lbHtml+='</tbody></table>';
+  el.innerHTML=lbHtml;
 }
 function openLeaderboard(){
   document.getElementById('leaderboard-overlay').classList.add('show');
