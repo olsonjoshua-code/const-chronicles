@@ -5068,10 +5068,15 @@ async function pushToSupabase(){
   if(!G||!G.name)return;
   const def=AVATAR_DEFS.find(a=>a.id===G.avatarId)||AVATAR_DEFS[0];
   const rank=getRank();
+  const allEnemies=[];EPISODES.forEach(ep=>(ep.eras||[]).forEach(era=>era.enemies.forEach(e=>allEnemies.push(e))));
+  const totalEnemies=allEnemies.length||1;
+  const beatenCount=G.beatenEnemies.length;
+  const pctComplete=Math.round(beatenCount/totalEnemies*100);
   const scoreEntry={
     name:G.name,first_name:G.firstName||'',last_name:G.lastName||'',
     period:G.period||'guest',score:G.score,level:G.level,rank:rank.name,
     cards:G.collection.length,wins:G.wins,avatar_badge:def.badge||'⚖️',
+    pct_complete:pctComplete,beaten_count:beatenCount,
     is_guest:!!(window._isGuest),updated_at:new Date().toISOString()
   };
   const statsEntry={
@@ -5140,7 +5145,13 @@ async function renderLeaderboard(){
   if(tdStatus){const now=new Date();tdStatus.textContent='Last refreshed: '+now.toLocaleTimeString()+' · '+students.length+' students loaded';}
   if(!allScores.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:14px">No entries yet.</div>';return;}
   const medals=['🥇','🥈','🥉'];
-  el.innerHTML=`<table class="lb-table"><thead><tr><th>#</th><th>CITIZEN</th><th>PD</th><th>LVL</th><th>SCORE</th><th>CARDS</th></tr></thead><tbody>${allScores.slice(0,25).map((s,i)=>`<tr ${G&&s.name===G.name?'class="lb-you"':''}><td style="font-family:var(--pixel);font-size:7px;color:${i<3?'var(--gold)':'var(--text3)'}">${i<3?medals[i]:'#'+(i+1)}</td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">${s.avatar_badge||'⚖️'}</span><div><div class="lb-name">${s.name}</div><div style="font-size:11px;color:var(--teal)">${s.rank||''}</div></div></div></td><td style="font-family:var(--pixel);font-size:5px;color:var(--text2)">${s.period==='guest'?'Guest':s.period?'Pd '+s.period:'?'}</td><td style="font-size:13px;color:var(--teal)">${s.level}</td><td class="lb-score">${(s.score||0).toLocaleString()}</td><td style="font-size:13px;color:var(--text2)">${s.cards||0}</td></tr>`).join('')}</tbody></table>`;
+  el.innerHTML=`<table class="lb-table"><thead><tr><th>#</th><th>CITIZEN</th><th>PD</th><th>LVL</th><th>SCORE</th><th>PROGRESS</th></tr></thead><tbody>${allScores.slice(0,25).map((s,i)=>`<tr ${G&&s.name===G.name?'class="lb-you"':''}><td style="font-family:var(--pixel);font-size:7px;color:${i<3?'var(--gold)':'var(--text3)'}">${i<3?medals[i]:'#'+(i+1)}</td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">${s.avatar_badge||'⚖️'}</span><div><div class="lb-name">${s.name}</div><div style="font-size:11px;color:var(--teal)">${s.rank||''}</div></div></div></td><td style="font-family:var(--pixel);font-size:5px;color:var(--text2)">${s.period==='guest'?'Guest':s.period?'Pd '+s.period:'?'}</td><td style="font-size:13px;color:var(--teal)">${s.level}</td><td class="lb-score">${(s.score||0).toLocaleString()}</td>
+<td style="min-width:80px">
+  <div style="font-family:var(--pixel);font-size:5px;color:${(s.pct_complete||0)>=100?'#c9a84c':(s.pct_complete||0)>=50?'#1abc9c':'#e8e4d8'};margin-bottom:3px">${s.pct_complete||0}%</div>
+  <div style="height:4px;background:rgba(255,255,255,.08);border-radius:2px;width:70px">
+    <div style="height:100%;width:${Math.min(100,s.pct_complete||0)}%;background:${(s.pct_complete||0)>=100?'#c9a84c':(s.pct_complete||0)>=50?'#1abc9c':'#4888e8'};border-radius:2px;transition:width .3s"></div>
+  </div>
+</td></tr>\``).join('')}</tbody></table>`;
 }
 function openLeaderboard(){
   document.getElementById('leaderboard-overlay').classList.add('show');
