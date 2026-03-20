@@ -5082,7 +5082,7 @@ async function pushToSupabase(){
       is_guest:!!(window._isGuest),
       updated_at:new Date().toISOString()
     };
-    await fetch(SUPA_URL+'/rest/v1/const_scores?on_conflict=name,period',{
+    await fetch(SUPA_URL+'/rest/v1/const_scores?on_conflict=name',{
       method:'POST',
       headers:{...SUPA_HEADERS,'Prefer':'resolution=merge-duplicates'},
       body:JSON.stringify(row)
@@ -5139,7 +5139,13 @@ async function renderLeaderboard(){
   // Filter scores by selected tab
   var scores;
   if(lbTab==='all'){
-    scores=allScores;
+    scores=allScores.slice().sort(function(a,b){
+      // Sort by period (numerically, guests last), then by score descending
+      var pa=a.period==='guest'?9999:Number(a.period)||9998;
+      var pb=b.period==='guest'?9999:Number(b.period)||9998;
+      if(pa!==pb)return pa-pb;
+      return (b.score||0)-(a.score||0);
+    });
   } else {
     scores=allScores.filter(function(s){return String(s.period)===String(lbTab);});
   }
@@ -5155,13 +5161,21 @@ async function renderLeaderboard(){
     +'<th style="padding:8px;text-align:left;font-size:11px;color:#888;border-bottom:1px solid #222">SCORE</th>'
     +'<th style="padding:8px;text-align:left;font-size:11px;color:#888;border-bottom:1px solid #222">PROGRESS</th>'
     +'</tr></thead><tbody>';
-  scores.slice(0,25).forEach(function(s,i){
+  scores.slice(0,50).forEach(function(s,i){
     var rc=i===0?'#c9a84c':i===1?'#aaa':i===2?'#cd7f32':'#555';
     var rt=i<3?medals[i]:('#'+(i+1));
     var pd=s.period==='guest'?'Guest':s.period?'Pd '+s.period:'?';
     var pct=Math.min(100,s.pct_complete||0);
     var pc=pct>=100?'#c9a84c':pct>=50?'#1abc9c':'#4888e8';
     var bg=(G&&s.name===G.name)?'rgba(201,168,76,.08)':'transparent';
+    // Period group header divider (ALL tab only)
+    if(lbTab==='all'){
+      var prevPeriod=i>0?scores[i-1].period:null;
+      if(s.period!==prevPeriod){
+        var pdLabel=s.period==='guest'?'🎭 Guests':s.period?'📚 Period '+s.period:'Unknown';
+        lbHtml+='<tr><td colspan="6" style="padding:12px 8px 4px;font-family:var(--cinzel);font-size:9px;letter-spacing:.12em;color:#c9a84c;border-bottom:1px solid #c9a84c33;border-top:'+(i>0?'1px solid #1a1a2e':'none')+'">'+pdLabel+'</td></tr>';
+      }
+    }
     lbHtml+='<tr style="background:'+bg+';border-bottom:1px solid #1a1a1a">'
       +'<td style="padding:10px 8px;color:'+rc+';font-size:12px;font-weight:bold">'+rt+'</td>'
       +'<td style="padding:10px 8px">'
@@ -5233,13 +5247,16 @@ function renderTeacherView(everyone){
   // Period tabs
   const tabs=document.getElementById('td-period-tabs');
   if(tabs){
-    const periods=['all','2','4','guest'];
-    const labels={all:'All Students',2:'Period 2',4:'Period 4',guest:'Guests'};
+    // Build period list dynamically from actual data
+    const detectedPeriods=[...new Set(everyone.filter(s=>!s.is_teacher&&!s.is_guest&&s.period&&s.period!=='teacher'&&s.period!=='guest').map(s=>String(s.period)))].sort((a,b)=>Number(a)-Number(b));
+    const hasGuests=everyone.some(s=>s.is_guest||s.period==='guest');
+    const periods=['all',...detectedPeriods,...(hasGuests?['guest']:[])];
+    const label=p=>p==='all'?'All Students':p==='guest'?'Guests':'Period '+p;
     tabs.innerHTML=periods.map(p=>`<button onclick="tdPeriodFilter='${p}';renderTeacherView(window._tdStudents)"
       style="font-family:var(--cinzel);font-size:8px;letter-spacing:.06em;padding:6px 12px;cursor:pointer;border:1px solid;transition:all .15s;
       background:${tdPeriodFilter===p?'var(--gold)':'transparent'};
       color:${tdPeriodFilter===p?'var(--bg)':'var(--text3)'};
-      border-color:${tdPeriodFilter===p?'var(--gold)':'var(--border2)'}">${labels[p]||p}</button>`).join('');
+      border-color:${tdPeriodFilter===p?'var(--gold)':'var(--border2)'}">${label(p)}</button>`).join('');
   }
   // Filter for selected period
   const filtered=tdPeriodFilter==='all'?all:tdPeriodFilter==='guest'?everyone.filter(s=>s.is_guest):all.filter(s=>String(s.period)===tdPeriodFilter);
@@ -5286,7 +5303,7 @@ function renderTeacherView(everyone){
   if(rosterEl){
     if(!filtered.length){rosterEl.innerHTML='<div style="color:var(--text3);font-size:13px;font-style:italic;padding:12px">No students found.</div>';return;}
     const sorted=[...filtered].sort((a,b)=>{
-      const v={score:s=>s.score||0,level:s=>s.level||1,wins:s=>s.wins||0,cards:s=>s.cards_count||0,name:s=>(s.name||'').toLowerCase(),accuracy:s=>s.q_total>0?Math.round((s.q_correct||0)/s.q_total*100):0}[tdSort]||(s=>s.score||0);
+      const v={score:s=>s.score||0,level:s=>s.level||1,wins:s=>s.wins||0,cards:s=>s.cards||0,name:s=>(s.name||'').toLowerCase(),accuracy:s=>s.q_total>0?Math.round((s.q_correct||0)/s.q_total*100):0}[tdSort]||(s=>s.score||0);
       return tdSortDir*(v(a)<v(b)?-1:v(a)>v(b)?1:0);
     });
     const arrow=col=>tdSort===col?(tdSortDir>0?' ↑':' ↓'):'';
@@ -5303,7 +5320,7 @@ function renderTeacherView(everyone){
         <td class="lb-score">${(s.score||0).toLocaleString()}</td>
         <td style="font-size:12px;color:${accColor}">${acc!==null?acc+'%':', '}</td>
         <td style="font-size:12px;color:var(--text2)">${s.wins||0}</td>
-        <td style="font-size:12px;color:var(--text2)">${s.cards_count||0}</td>
+        <td style="font-size:12px;color:var(--text2)">${s.cards||0}</td>
         <td style="font-family:var(--cinzel);font-size:8px;color:var(--text2)">${s.period==='guest'?'Guest':s.period?'Pd '+s.period:', '}</td>
         <td style="font-size:9px;color:var(--text3)">${lastSeen}</td>
         <td><button onclick="deleteStudent('${s.name}')" style="font-family:var(--cinzel);font-size:8px;background:transparent;border:1px solid var(--red);color:var(--red);padding:3px 8px;cursor:pointer">✕</button></td>
