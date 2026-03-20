@@ -5145,13 +5145,38 @@ async function renderLeaderboard(){
   if(tdStatus){const now=new Date();tdStatus.textContent='Last refreshed: '+now.toLocaleTimeString()+' · '+students.length+' students loaded';}
   if(!allScores.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:14px">No entries yet.</div>';return;}
   const medals=['🥇','🥈','🥉'];
-  el.innerHTML=`<table class="lb-table"><thead><tr><th>#</th><th>CITIZEN</th><th>PD</th><th>LVL</th><th>SCORE</th><th>PROGRESS</th></tr></thead><tbody>${allScores.slice(0,25).map((s,i)=>`<tr ${G&&s.name===G.name?'class="lb-you"':''}><td style="font-family:var(--pixel);font-size:7px;color:${i<3?'var(--gold)':'var(--text3)'}">${i<3?medals[i]:'#'+(i+1)}</td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">${s.avatar_badge||'⚖️'}</span><div><div class="lb-name">${s.name}</div><div style="font-size:11px;color:var(--teal)">${s.rank||''}</div></div></div></td><td style="font-family:var(--pixel);font-size:5px;color:var(--text2)">${s.period==='guest'?'Guest':s.period?'Pd '+s.period:'?'}</td><td style="font-size:13px;color:var(--teal)">${s.level}</td><td class="lb-score">${(s.score||0).toLocaleString()}</td>
-<td style="min-width:80px">
-  <div style="font-family:var(--pixel);font-size:5px;color:${(s.pct_complete||0)>=100?'#c9a84c':(s.pct_complete||0)>=50?'#1abc9c':'#e8e4d8'};margin-bottom:3px">${s.pct_complete||0}%</div>
-  <div style="height:4px;background:rgba(255,255,255,.08);border-radius:2px;width:70px">
-    <div style="height:100%;width:${Math.min(100,s.pct_complete||0)}%;background:${(s.pct_complete||0)>=100?'#c9a84c':(s.pct_complete||0)>=50?'#1abc9c':'#4888e8'};border-radius:2px;transition:width .3s"></div>
-  </div>
-</td></tr>\``).join('')}</tbody></table>`;
+  el.innerHTML='<table class="lb-table"><thead><tr><th>#</th><th>CITIZEN</th><th>PD</th><th>LVL</th><th>SCORE</th><th>PROGRESS</th></tr></thead><tbody>'
+  +allScores.slice(0,25).map(function(s,i){
+    var rankColor=i===0?'#c9a84c':i===1?'#aaa':i===2?'#c87533':'#666';
+    var rankTxt=i<3?medals[i]:('#'+(i+1));
+    var period=s.period==='guest'?'Guest':s.period?'Pd '+s.period:'?';
+    var pct=s.pct_complete||0;
+    var pctColor=pct>=100?'#c9a84c':pct>=50?'#1abc9c':'#4888e8';
+    var barColor=pct>=100?'#c9a84c':pct>=50?'#1abc9c':'#4888e8';
+    var isYou=G&&s.name===G.name;
+    return '<tr style="background:'+(isYou?'rgba(201,168,76,.07)':'transparent')+';border-bottom:1px solid rgba(255,255,255,.04)">'
+      +'<td style="font-size:10px;color:'+rankColor+';padding:10px 8px;font-weight:bold">'+rankTxt+'</td>'
+      +'<td style="padding:10px 8px">'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+          +'<span style="font-size:18px">'+(s.avatar_badge||'⚖️')+'</span>'
+          +'<div>'
+            +'<div style="font-family:Cinzel,serif;font-size:11px;color:#e8e4d8;letter-spacing:.03em">'+(s.name||'')+'</div>'
+            +'<div style="font-size:10px;color:#1abc9c;margin-top:2px">'+(s.rank||'')+'</div>'
+          +'</div>'
+        +'</div>'
+      +'</td>'
+      +'<td style="font-size:10px;color:#9a9585;padding:10px 8px">'+period+'</td>'
+      +'<td style="font-size:13px;color:#1abc9c;padding:10px 8px">'+(s.level||1)+'</td>'
+      +'<td style="font-family:Inter,sans-serif;font-size:13px;color:#c9a84c;font-weight:600;padding:10px 8px">'+((s.score||0).toLocaleString())+'</td>'
+      +'<td style="padding:10px 8px;min-width:80px">'
+        +'<div style="font-size:10px;color:'+pctColor+';margin-bottom:4px">'+pct+'%</div>'
+        +'<div style="height:5px;background:rgba(255,255,255,.1);border-radius:3px;width:72px">'
+          +'<div style="height:100%;width:'+Math.min(100,pct)+'%;background:'+barColor+';border-radius:3px"></div>'
+        +'</div>'
+      +'</td>'
+      +'</tr>';
+  }).join('')
+  +'</tbody></table>';
 }
 function openLeaderboard(){
   document.getElementById('leaderboard-overlay').classList.add('show');
