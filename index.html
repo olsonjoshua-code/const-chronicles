@@ -724,6 +724,7 @@ option{background:var(--bg2)}
   <div class="overlay-header">
     <div class="overlay-title">📊 TEACHER DASHBOARD</div>
     <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="loadTeacherData()" style="font-family:var(--cinzel);font-size:8px;letter-spacing:.06em;background:transparent;border:1px solid var(--teal);color:var(--teal);padding:6px 10px;cursor:pointer">🔄 REFRESH</button>
       <button onclick="resetAllScores()" style="font-family:var(--cinzel);font-size:8px;letter-spacing:.06em;background:transparent;border:1px solid var(--red);color:var(--red);padding:6px 10px;cursor:pointer">RESET ALL</button>
       <button class="overlay-close" onclick="closeTeacherDashboard()">✕ CLOSE</button>
     </div>
@@ -3254,6 +3255,7 @@ function launchTeacherDashboard(){
 }
 function closeTeacherDashboard(){
   document.getElementById('teacher-dashboard').classList.remove('show');
+  if(window._tdInterval){clearInterval(window._tdInterval);window._tdInterval=null;}
   launchGame();
 }
 // ─── AVATAR CREATOR ───
@@ -5080,9 +5082,23 @@ async function pushToSupabase(){
     is_guest:!!(window._isGuest),is_teacher:false,updated_at:new Date().toISOString()
   };
   try{
-    await fetch(SUPA_URL+'/rest/v1/const_scores',{method:'POST',headers:{...SUPA_HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(scoreEntry)});
-    await fetch(SUPA_URL+'/rest/v1/const_student_stats',{method:'POST',headers:{...SUPA_HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(statsEntry)});
-  }catch(e){window._supabaseFailed=true;}
+    // Use on_conflict=name so Supabase knows to UPDATE existing rows not INSERT duplicates
+    const r1=await fetch(SUPA_URL+'/rest/v1/const_scores?on_conflict=name',{
+      method:'POST',
+      headers:{...SUPA_HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify(scoreEntry)
+    });
+    const r2=await fetch(SUPA_URL+'/rest/v1/const_student_stats?on_conflict=name',{
+      method:'POST',
+      headers:{...SUPA_HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify(statsEntry)
+    });
+    // Only flag as failed if BOTH fail — don't give up on one network hiccup
+    if(!r1.ok&&!r2.ok)window._supabaseFailed=true;
+  }catch(e){
+    // Don't permanently disable — just skip this push, try again next battle
+    console.warn('Supabase push failed:',e.message);
+  }
 }
 
 // ─── LEADERBOARD ───
@@ -5119,6 +5135,8 @@ async function renderLeaderboard(){
   const period=lbTab==='myclass'?(G&&G.period)||null:null;
   const allScores=await fetchLeaderboard(period);
   if(status)status.textContent=allScores.length+' citizens on the board';
+  const tdStatus=document.getElementById('td-sync-status');
+  if(tdStatus){const now=new Date();tdStatus.textContent='Last refreshed: '+now.toLocaleTimeString()+' · '+students.length+' students loaded';}
   if(!allScores.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:14px">No entries yet.</div>';return;}
   const medals=['🥇','🥈','🥉'];
   el.innerHTML=`<table class="lb-table"><thead><tr><th>#</th><th>CITIZEN</th><th>PD</th><th>LVL</th><th>SCORE</th><th>CARDS</th></tr></thead><tbody>${allScores.slice(0,25).map((s,i)=>`<tr ${G&&s.name===G.name?'class="lb-you"':''}><td style="font-family:var(--pixel);font-size:7px;color:${i<3?'var(--gold)':'var(--text3)'}">${i<3?medals[i]:'#'+(i+1)}</td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">${s.avatar_badge||'⚖️'}</span><div><div class="lb-name">${s.name}</div><div style="font-size:11px;color:var(--teal)">${s.rank||''}</div></div></div></td><td style="font-family:var(--pixel);font-size:5px;color:var(--text2)">${s.period==='guest'?'Guest':s.period?'Pd '+s.period:'?'}</td><td style="font-size:13px;color:var(--teal)">${s.level}</td><td class="lb-score">${(s.score||0).toLocaleString()}</td><td style="font-size:13px;color:var(--text2)">${s.cards||0}</td></tr>`).join('')}</tbody></table>`;
@@ -5143,14 +5161,24 @@ function startLbSync(){}
 
 // ─── TEACHER DASHBOARD ───
 async function loadTeacherData(){
+  // Clear any existing auto-refresh
+  if(window._tdInterval)clearInterval(window._tdInterval);
   const status=document.getElementById('td-sync-status');
   if(status)status.textContent='Loading…';
   try{
-    const r=await fetch(SUPA_URL+'/rest/v1/const_student_stats?order=score.desc&limit=200',{headers:SUPA_HEADERS});
-    const students=await r.json();
+    const r=await fetch(SUPA_URL+'/rest/v1/const_student_stats?order=score.desc&limit=200&updated_at=not.is.null',{headers:SUPA_HEADERS});
+    const students=Array.isArray(await r.clone().json().catch(()=>[])) ? await r.json() : [];
     if(status)status.textContent=`${students.filter(s=>!s.is_teacher).length} students · Last updated ${new Date().toLocaleTimeString()}`;
     renderTeacherView(students);
-  }catch(e){if(status)status.textContent='Error loading data';}
+    // Auto-refresh every 30s while dashboard is open
+    if(!window._tdInterval){
+      window._tdInterval=setInterval(function(){
+        const dash=document.getElementById('teacher-dashboard');
+        if(dash&&dash.classList.contains('show'))loadTeacherData();
+        else{clearInterval(window._tdInterval);window._tdInterval=null;}
+      },30000);
+    }
+  }catch(e){if(status)status.textContent='Error loading data — click 🔄 REFRESH to retry';}
 }
 function renderTeacherView(everyone){
   window._tdStudents=everyone;
