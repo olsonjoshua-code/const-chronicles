@@ -5064,58 +5064,53 @@ const SFX=(function(){
 
 // ─── SUPABASE SYNC ───
 async function pushToSupabase(){
-  if(window._supabaseFailed)return; // stop retrying after first fail
   if(!G||!G.name)return;
-  const def=AVATAR_DEFS.find(a=>a.id===G.avatarId)||AVATAR_DEFS[0];
-  const rank=getRank();
-  const allEnemies=[];EPISODES.forEach(ep=>(ep.eras||[]).forEach(era=>era.enemies.forEach(e=>allEnemies.push(e))));
-  const totalEnemies=allEnemies.length||1;
-  const beatenCount=G.beatenEnemies.length;
-  const pctComplete=Math.round(beatenCount/totalEnemies*100);
-  const scoreEntry={
-    name:G.name,first_name:G.firstName||'',last_name:G.lastName||'',
-    period:G.period||'guest',score:G.score,level:G.level,rank:rank.name,
-    cards:G.collection.length,wins:G.wins,avatar_badge:def.badge||'⚖️',
-    pct_complete:pctComplete,beaten_count:beatenCount,
-    is_guest:!!(window._isGuest),updated_at:new Date().toISOString()
-  };
-  const statsEntry={
-    name:G.name,first_name:G.firstName||'',last_name:G.lastName||'',
-    period:G.period||'guest',score:G.score,level:G.level,rank:rank.name,
-    wins:G.wins,q_correct:G.qCorrect||0,q_total:G.qTotal||0,
-    beaten_count:G.beatenEnemies.length,cards_count:G.collection.length,
-    max_streak:G.maxStreak||0,avatar_badge:def.badge||'⚖️',
-    is_guest:!!(window._isGuest),is_teacher:false,updated_at:new Date().toISOString()
-  };
   try{
-    // Use on_conflict=name so Supabase knows to UPDATE existing rows not INSERT duplicates
-    const r1=await fetch(SUPA_URL+'/rest/v1/const_scores?on_conflict=name',{
+    const def=AVATAR_DEFS.find(a=>a.id===G.avatarId)||AVATAR_DEFS[0];
+    const rank=getRank();
+    const allEnemies=[];EPISODES.forEach(ep=>(ep.eras||[]).forEach(era=>era.enemies.forEach(e=>allEnemies.push(e))));
+    const pctComplete=Math.round(G.beatenEnemies.length/Math.max(allEnemies.length,1)*100);
+    const row={
+      name:G.name,
+      period:G.period||'guest',
+      score:G.score,
+      level:G.level,
+      rank:rank.name,
+      wins:G.wins,
+      q_correct:G.qCorrect||0,
+      q_total:G.qTotal||0,
+      cards:G.collection.length,
+      pct_complete:pctComplete,
+      max_streak:G.maxStreak||0,
+      avatar_badge:def.badge||'⚖️',
+      is_teacher:!!(window._isTeacher),
+      is_guest:!!(window._isGuest),
+      updated_at:new Date().toISOString()
+    };
+    await fetch(SUPA_URL+'/rest/v1/const_scores?on_conflict=name,period',{
       method:'POST',
-      headers:{...SUPA_HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},
-      body:JSON.stringify(scoreEntry)
+      headers:{...SUPA_HEADERS,'Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify(row)
     });
-    const r2=await fetch(SUPA_URL+'/rest/v1/const_student_stats?on_conflict=name',{
-      method:'POST',
-      headers:{...SUPA_HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},
-      body:JSON.stringify(statsEntry)
-    });
-    // Only flag as failed if BOTH fail — don't give up on one network hiccup
-    if(!r1.ok&&!r2.ok)window._supabaseFailed=true;
-  }catch(e){
-    // Don't permanently disable — just skip this push, try again next battle
-    console.warn('Supabase push failed:',e.message);
-  }
+  }catch(e){}
 }
 
 // ─── LEADERBOARD ───
 async function fetchLeaderboard(period){
   try{
-    let url=SUPA_URL+'/rest/v1/const_scores?order=score.desc&limit=50';
-    if(period&&period!=='all')url+=`&period=eq.${encodeURIComponent(period)}`;
+    let url=SUPA_URL+'/rest/v1/const_scores?select=*&order=score.desc&limit=100';
+    if(period&&period!=='all')url+='&period=eq.'+encodeURIComponent(period);
     const r=await fetch(url,{headers:SUPA_HEADERS});
-    if(!r.ok)return [];
-    return await r.json();
-  }catch(e){return [];}
+    const d=await r.json();
+    return (d||[]).map(function(s){return {
+      name:s.name,score:s.score,level:s.level,rank:s.rank,
+      period:s.period,wins:s.wins,cards:s.cards,
+      pct_complete:s.pct_complete||0,
+      avatar_badge:s.avatar_badge,
+      is_teacher:s.is_teacher,is_guest:s.is_guest,
+      updated_at:s.updated_at
+    };});
+  }catch(e){return[];}
 }
 function setLbTab(tab){
   lbTab=tab;
@@ -5141,8 +5136,7 @@ async function renderLeaderboard(){
   const period=lbTab==='myclass'?(G&&G.period)||null:null;
   const allScores=await fetchLeaderboard(period);
   if(status)status.textContent=allScores.length+' citizens on the board';
-  const tdStatus=document.getElementById('td-sync-status');
-  if(tdStatus){const now=new Date();tdStatus.textContent='Last refreshed: '+now.toLocaleTimeString()+' · '+students.length+' students loaded';}
+  // td-sync-status is updated by loadTeacherData, not here
   if(!allScores.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:14px">No entries yet.</div>';return;}
   const medals=['🥇','🥈','🥉'];
   var lbHtml='<table style="width:100%;border-collapse:collapse">';
@@ -5211,8 +5205,8 @@ async function loadTeacherData(){
   const status=document.getElementById('td-sync-status');
   if(status)status.textContent='Loading…';
   try{
-    const r=await fetch(SUPA_URL+'/rest/v1/const_student_stats?order=score.desc&limit=200&updated_at=not.is.null',{headers:SUPA_HEADERS});
-    const students=Array.isArray(await r.clone().json().catch(()=>[])) ? await r.json() : [];
+    const r=await fetch(SUPA_URL+'/rest/v1/const_scores?select=*&order=score.desc&limit=200',{headers:SUPA_HEADERS});
+    const students=await r.json();
     if(status)status.textContent=`${students.filter(s=>!s.is_teacher).length} students · Last updated ${new Date().toLocaleTimeString()}`;
     renderTeacherView(students);
     // Auto-refresh every 30s while dashboard is open
