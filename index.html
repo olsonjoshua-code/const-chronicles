@@ -706,6 +706,7 @@ option{background:var(--bg2)}
 <div id="leaderboard-overlay" class="overlay">
   <div class="overlay-header">
     <div class="overlay-title">🏆 LEADERBOARD</div>
+    <button class="overlay-close" onclick="renderLeaderboard()" style="background:transparent;border-color:var(--teal);color:var(--teal);margin-right:8px">🔄 REFRESH</button>
     <button class="overlay-close" onclick="closeLeaderboard()">✕ CLOSE</button>
   </div>
   <div style="font-family:var(--pixel);font-size:5px;color:var(--text3);text-align:center;margin-bottom:10px" id="lb-sync-status">Syncing...</div>
@@ -3090,7 +3091,7 @@ function defaultState(){
     askedQMap:{},completionCelebrated:false};  // tracks which questions each enemy has already asked globally
 }
 function manualSave(){
-  save();SFX.save();
+  save();SFX.save();pushToSupabase();
   const saved_at=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   notify('💾 Saved at '+saved_at+', LVL '+G.level+' · '+G.score+' pts','green');
 }
@@ -5090,6 +5091,7 @@ async function fetchLeaderboard(period){
     let url=SUPA_URL+'/rest/v1/const_scores?order=score.desc&limit=50';
     if(period&&period!=='all')url+=`&period=eq.${encodeURIComponent(period)}`;
     const r=await fetch(url,{headers:SUPA_HEADERS});
+    if(!r.ok)return [];
     return await r.json();
   }catch(e){return [];}
 }
@@ -5125,8 +5127,18 @@ function openLeaderboard(){
   document.getElementById('leaderboard-overlay').classList.add('show');
   lbTab='all';
   setLbTab('all');
+  // Auto-refresh every 30 seconds while leaderboard is open
+  if(lbSyncInterval)clearInterval(lbSyncInterval);
+  lbSyncInterval=setInterval(function(){
+    const overlay=document.getElementById('leaderboard-overlay');
+    if(overlay&&overlay.classList.contains('show'))renderLeaderboard();
+    else{clearInterval(lbSyncInterval);lbSyncInterval=null;}
+  },30000);
 }
-function closeLeaderboard(){document.getElementById('leaderboard-overlay').classList.remove('show');}
+function closeLeaderboard(){
+  document.getElementById('leaderboard-overlay').classList.remove('show');
+  if(lbSyncInterval){clearInterval(lbSyncInterval);lbSyncInterval=null;}
+}
 function startLbSync(){}
 
 // ─── TEACHER DASHBOARD ───
