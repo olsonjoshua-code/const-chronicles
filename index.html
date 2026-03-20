@@ -5107,47 +5107,54 @@ async function fetchLeaderboard(period){
     };});
   }catch(e){return[];}
 }
+var _lbCachedScores=null;
 function setLbTab(tab){
   lbTab=tab;
-  renderLeaderboard();
+  if(_lbCachedScores)renderLeaderboardFromCache(_lbCachedScores);
+  else renderLeaderboard();
 }
 async function renderLeaderboard(){
   const el=document.getElementById('lb-content');
   const status=document.getElementById('lb-sync-status');
   if(status)status.textContent='Syncing...';
-
-  // Fetch all scores
   const allScores=await fetchLeaderboard(null);
-  if(status)status.textContent=allScores.length+' citizens on the board';
+  _lbCachedScores=allScores;
+  if(status)status.textContent=allScores.filter(s=>!s.is_teacher&&!s.is_guest).length+' citizens on the board';
+  renderLeaderboardFromCache(allScores);
+}
+function renderLeaderboardFromCache(allScores){
+  const el=document.getElementById('lb-content');
+  if(!el)return;
 
   // Build tabs dynamically from periods in data
   const tabsEl=document.getElementById('lb-tabs');
   if(tabsEl){
-    const periods=[...new Set(allScores.filter(s=>!s.is_teacher).map(s=>s.period).filter(Boolean))].sort();
+    const periods=[...new Set(allScores.filter(s=>!s.is_teacher&&!s.is_guest&&s.period&&s.period!=='teacher'&&s.period!=='guest').map(s=>String(s.period)))].sort((a,b)=>Number(a)-Number(b));
     const tabs=[{key:'all',label:'ALL'}];
-    if(G&&G.period&&G.period!=='guest'&&G.period!=='teacher')tabs.push({key:G.period,label:'MY CLASS (Pd '+G.period+')'});
     periods.forEach(function(p){
-      if(p===G?.period||p==='teacher')return;
-      if(!tabs.find(t=>t.key===p))tabs.push({key:p,label:'PERIOD '+p});
+      var isMyClass=G&&G.period&&String(G.period)===p&&p!=='teacher'&&p!=='guest';
+      tabs.push({key:p,label:isMyClass?'MY CLASS (Pd '+p+')':'PERIOD '+p});
     });
+    if(allScores.some(s=>s.is_guest||s.period==='guest'))tabs.push({key:'guest',label:'GUESTS'});
     tabsEl.innerHTML=tabs.map(function(t){
       var active=lbTab===t.key;
-      return '<button onclick="setLbTab(\"'+t.key+'\")" style="font-family:var(--cinzel);font-size:9px;letter-spacing:.08em;padding:7px 14px;cursor:pointer;border:1px solid '+(active?'#c9a84c':'rgba(255,255,255,.15)')+';background:'+(active?'#c9a84c':'transparent')+';color:'+(active?'#0a0c14':'rgba(232,228,216,.35)')+';transition:all .2s">'+t.label+'</button>';
+      return '<button onclick="setLbTab(\''+t.key+'\')" style="font-family:var(--cinzel);font-size:9px;letter-spacing:.08em;padding:7px 14px;cursor:pointer;border:1px solid '+(active?'#c9a84c':'rgba(255,255,255,.15)')+';background:'+(active?'#c9a84c':'transparent')+';color:'+(active?'#0a0c14':'rgba(232,228,216,.35)')+';transition:all .2s">'+t.label+'</button>';
     }).join('');
   }
 
-  // Filter scores by selected tab
+  // Filter by selected tab — always exclude teachers
   var scores;
   if(lbTab==='all'){
-    scores=allScores.slice().sort(function(a,b){
-      // Sort by period (numerically, guests last), then by score descending
+    scores=allScores.filter(s=>!s.is_teacher&&s.period!=='teacher').slice().sort(function(a,b){
       var pa=a.period==='guest'?9999:Number(a.period)||9998;
       var pb=b.period==='guest'?9999:Number(b.period)||9998;
       if(pa!==pb)return pa-pb;
       return (b.score||0)-(a.score||0);
     });
+  } else if(lbTab==='guest'){
+    scores=allScores.filter(s=>s.is_guest||s.period==='guest');
   } else {
-    scores=allScores.filter(function(s){return String(s.period)===String(lbTab);});
+    scores=allScores.filter(s=>!s.is_teacher&&String(s.period)===String(lbTab));
   }
 
   if(!scores.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:#666;font-size:14px">No entries yet for this period.</div>';return;}
@@ -5168,14 +5175,6 @@ async function renderLeaderboard(){
     var pct=Math.min(100,s.pct_complete||0);
     var pc=pct>=100?'#c9a84c':pct>=50?'#1abc9c':'#4888e8';
     var bg=(G&&s.name===G.name)?'rgba(201,168,76,.08)':'transparent';
-    // Period group header divider (ALL tab only)
-    if(lbTab==='all'){
-      var prevPeriod=i>0?scores[i-1].period:null;
-      if(s.period!==prevPeriod){
-        var pdLabel=s.period==='guest'?'🎭 Guests':s.period?'📚 Period '+s.period:'Unknown';
-        lbHtml+='<tr><td colspan="6" style="padding:12px 8px 4px;font-family:var(--cinzel);font-size:9px;letter-spacing:.12em;color:#c9a84c;border-bottom:1px solid #c9a84c33;border-top:'+(i>0?'1px solid #1a1a2e':'none')+'">'+pdLabel+'</td></tr>';
-      }
-    }
     lbHtml+='<tr style="background:'+bg+';border-bottom:1px solid #1a1a1a">'
       +'<td style="padding:10px 8px;color:'+rc+';font-size:12px;font-weight:bold">'+rt+'</td>'
       +'<td style="padding:10px 8px">'
@@ -5204,7 +5203,8 @@ async function renderLeaderboard(){
 function openLeaderboard(){
   document.getElementById('leaderboard-overlay').classList.add('show');
   lbTab='all';
-  setLbTab('all');
+  _lbCachedScores=null;
+  renderLeaderboard();
   // Auto-refresh every 30 seconds while leaderboard is open
   if(lbSyncInterval)clearInterval(lbSyncInterval);
   lbSyncInterval=setInterval(function(){
