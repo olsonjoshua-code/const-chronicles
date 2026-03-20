@@ -681,6 +681,7 @@ option{background:var(--bg2)}
       <button class="btn sm" onclick="openLeaderboard()" style="border-color:var(--purple);color:var(--purple)">🏆 BOARD</button>
       <button class="btn sm" onclick="confirmRestart()" style="border-color:var(--red);color:var(--red)">🔄 RESTART</button>
       <button class="btn sm" onclick="goToLoginFromProfile()" style="border-color:var(--text3);color:var(--text3)">← LOGIN</button>
+      <button class="btn sm" id="cert-btn" onclick="showCertificate()" style="display:none;border-color:var(--gold);color:var(--gold)">🎓 CERTIFICATE</button>
     </div>
   </div>
   <!-- Difficulty selector -->
@@ -770,6 +771,7 @@ option{background:var(--bg2)}
       <span style="font-size:12px;color:var(--text3)">,  Dr. Martin Luther King Jr.</span>
     </div>
     <button class="btn green full" onclick="closeCompletion()" style="margin-bottom:8px">✓ CONTINUE</button>
+    <button class="btn full" onclick="showCertificate()" style="border-color:var(--gold);color:var(--gold);margin-bottom:8px">🎓 VIEW & PRINT CERTIFICATE</button>
     <button class="btn full" onclick="openLeaderboard()" style="border-color:var(--purple);color:var(--purple)">🏆 VIEW LEADERBOARD</button>
   </div>
 </div>
@@ -2996,6 +2998,84 @@ EPISODES[4].timeline = [
   {year:'2016',title:'Social Media Transforms Politics',figure:'media_linkage',sprite:'📱',desc:"Twitter, Facebook, and YouTube enable direct candidate-to-voter communication, foreign disinformation campaigns, and filter bubbles on an unprecedented scale."},
 ];
 
+EPISODES[5].coming = false;
+EPISODES[5].eras = [
+  {id:'linkage_era',name:'Linkage Institutions',alwaysUnlocked:true,icon:'🔗',desc:'Parties, interest groups, media and elections',
+   enemies:[
+    {id:'political_parties_ep5',name:'Political Parties',sprite:'🐘🐴',type:'political',
+     title:'The Two-Party System',rarity:'uncommon',rarityStars:'★★☆☆☆',
+     hp:28,xpReward:55,goldReward:130,givePack:true,unlockAvatar:null,standard:'LO 5.2',
+     fact:'The United States has a two-party system dominated by Democrats and Republicans. Third parties face structural barriers including winner-take-all elections and ballot access laws.',
+     questions:[
+      {q:'What is the PRIMARY function of political parties in a democracy?',opts:['Nominate candidates and organize government','Lobby Congress for special interests','Manage the federal bureaucracy','Control the Supreme Court'],a:0},
+      {q:'A realignment occurs when',opts:['Voters shift party loyalties creating a new majority coalition','Congress overrides a presidential veto','The Supreme Court strikes down an election law','The president appoints a new cabinet'],a:0},
+      {q:'Which electoral system most strongly encourages a two-party system?',opts:['Winner-take-all plurality voting','Proportional representation','Ranked choice voting','Parliamentary systems'],a:0},
+      {q:'Party platforms are best described as',opts:['Official statements of party goals and policy positions','Legally binding contracts with voters','Instructions to party members in Congress','Requirements for party membership'],a:0},
+      {q:'Split-ticket voting occurs when a voter',opts:['Votes for candidates from different parties in the same election','Votes in both a primary and general election','Votes by mail instead of in person','Votes in two different states'],a:0},
+      {q:'Which of the following BEST describes party dealignment?',opts:['Voters increasingly identify as independent rather than with either party','Voters shift from one party to another','A third party wins a major election','Congress and president are from different parties'],a:0},
+      {q:'Divided government refers to when',opts:['The president is from a different party than the majority in Congress','Two parties form a coalition government','States and federal government disagree on policy','The Supreme Court rules against the president'],a:0},
+      {q:'Which function do political parties perform during elections?',opts:['Mobilizing voters and organizing campaigns','Writing legislation in Congress','Appointing federal judges','Enforcing campaign finance laws'],a:0},
+     ]},
+    {id:'interest_groups_ep5',name:'Interest Groups & PACs',sprite:'💼',type:'political',
+     title:'Money and Influence',rarity:'rare',rarityStars:'★★★☆☆',
+     hp:32,xpReward:65,goldReward:160,givePack:true,unlockAvatar:null,standard:'LO 5.3',
+     fact:'Interest groups try to influence policy without running candidates. The Citizens United decision (2010) allowed corporations and unions to spend unlimited money on elections through Super PACs.',
+     questions:[
+      {q:'How do interest groups differ from political parties?',opts:['Interest groups influence policy without nominating candidates','Interest groups have more members than parties','Interest groups are funded by the government','Interest groups can only lobby state governments'],a:0},
+      {q:'A PAC (Political Action Committee) is limited in',opts:['How much it can contribute directly to a candidate','Total spending on elections','Which candidates it can support','Whether it can run advertisements'],a:0},
+      {q:'Super PACs, created after Citizens United, can',opts:['Spend unlimited money on elections but cannot coordinate with campaigns','Give unlimited money directly to candidates','Be funded by foreign governments','Run candidates for federal office'],a:0},
+      {q:'The "iron triangle" refers to the relationship between',opts:['Congress, interest groups and bureaucratic agencies','President, Congress and Supreme Court','Democrats, Republicans and independents','Federal, state and local governments'],a:0},
+      {q:'Lobbying is BEST defined as',opts:['Attempting to influence government officials on behalf of a group','Running attack advertisements against candidates','Organizing protests and demonstrations','Donating money to political campaigns'],a:0},
+      {q:'Which of the following is an example of an inside strategy used by interest groups?',opts:['Meeting directly with legislators to influence policy','Organizing public protests','Running advertising campaigns','Mobilizing grassroots members'],a:0},
+      {q:'The revolving door refers to',opts:['Movement of individuals between government positions and lobbying jobs','The process of passing legislation through Congress','The rotation of Supreme Court justices','Term limits for members of Congress'],a:0},
+      {q:'Free rider problem in interest groups means',opts:['People benefit from group efforts without joining or contributing','Members can join without paying dues','Groups can spend freely on elections','All citizens must support major interest groups'],a:0},
+     ]},
+   ]},
+  {id:'elections_era',name:'Elections & Voting',alwaysUnlocked:false,icon:'🗳️',desc:'Electoral college, redistricting and voting behavior',
+   enemies:[
+    {id:'elections_ep5',name:'Elections & Electoral College',sprite:'🗳️',type:'political',
+     title:'How America Chooses Leaders',rarity:'rare',rarityStars:'★★★☆☆',
+     hp:34,xpReward:70,goldReward:170,givePack:true,unlockAvatar:null,standard:'LO 5.5',
+     fact:'The Electoral College was created by the Founders as a compromise. Each state gets electoral votes equal to its total congressional representation. A candidate needs 270 to win.',
+     questions:[
+      {q:'How many electoral votes does a candidate need to win the presidency?',opts:['270','268','300','538'],a:0},
+      {q:'A state\'s number of electoral votes equals',opts:['Its number of senators plus representatives','Its population divided by 100,000','Its number of representatives only','A fixed number set by the Constitution'],a:0},
+      {q:'Which of the following is a criticism of the Electoral College?',opts:['A candidate can win the presidency while losing the popular vote','Small states have no representation','It requires a supermajority to win','Third parties are guaranteed representation'],a:0},
+      {q:'Reapportionment refers to',opts:['Redistributing congressional seats among states after each census','Redrawing district lines within a state','The process of registering voters','Removing a member of Congress from office'],a:0},
+      {q:'Gerrymandering is the practice of',opts:['Drawing district lines to benefit a particular party or group','Increasing the number of congressional seats','Requiring voter ID at polling places','Limiting campaign spending'],a:0},
+      {q:'In Shaw v. Reno (1993), the Supreme Court ruled that',opts:['Racial gerrymandering must survive strict scrutiny','All gerrymandering is unconstitutional','Electoral districts must be equal in size','Voter ID laws are constitutional'],a:0},
+      {q:'Which factor MOST influences how people vote, according to political science research?',opts:['Party identification','A candidate\'s physical appearance','The economy on election day','Negative advertising'],a:0},
+      {q:'Incumbency advantage refers to',opts:['The electoral benefit of currently holding office','The advantage of running in a primary','Higher name recognition among new candidates','Federal funding given to incumbent campaigns'],a:0},
+     ]},
+    {id:'media_ep5',name:'Media & Political Communication',sprite:'📺',type:'political',
+     title:'The Fourth Estate',rarity:'epic',rarityStars:'★★★★☆',
+     hp:38,xpReward:80,goldReward:190,givePack:true,unlockAvatar:null,standard:'LO 5.4',
+     fact:'The media serves as a linkage institution connecting citizens to government. Social media has transformed political communication, enabling direct candidate-to-voter contact but also spreading misinformation.',
+     questions:[
+      {q:'The term "Fourth Estate" refers to',opts:['The media as an unofficial check on government power','The fourth branch of government','Local governments below the federal level','The military-industrial complex'],a:0},
+      {q:'Agenda-setting theory argues that the media',opts:['Influences what issues people think are important','Tells people directly what to think','Has no effect on public opinion','Only influences political elites'],a:0},
+      {q:'Which of the following BEST describes the framing effect?',opts:['How an issue is presented influences how audiences interpret it','Candidates use television advertising to reach voters','Voters choose candidates based on party labels','The media focuses on candidates over issues'],a:0},
+      {q:'Horse-race journalism refers to media coverage that focuses on',opts:['Poll standings and campaign strategy rather than policy','Agricultural policy and rural voters','Campaign fundraising amounts','Candidate debate performances'],a:0},
+      {q:'Which development MOST changed political communication in the 21st century?',opts:['Social media enabling direct candidate-voter interaction','The decline of print newspapers','The rise of 24-hour cable news','Citizens United and campaign advertising'],a:0},
+      {q:'Media consolidation refers to',opts:['Fewer corporations owning more media outlets','Government control of news content','The rise of citizen journalism','Public broadcasting networks'],a:0},
+      {q:'The Citizens United decision affected political communication by',opts:['Allowing unlimited independent spending on political advertising','Banning negative political advertisements','Requiring equal time for all candidates','Limiting social media political content'],a:0},
+      {q:'Which of the following BEST describes the role of media as a linkage institution?',opts:['Connecting citizens to government by informing them about political issues','Enforcing campaign finance laws','Nominating candidates for office','Organizing voter registration drives'],a:0},
+     ]},
+   ]},
+];
+
+EPISODES[5].timeline = [
+  {year:'1800',title:'First Competitive Party Election',figure:'political_parties3',sprite:'🗳️',desc:'Adams vs Jefferson marks birth of party competition in America.'},
+  {year:'1828',title:'Jacksonian Democracy',figure:'voting_rights2',sprite:'🎩',desc:'Andrew Jackson expands voting rights to all white men, mass participation begins.'},
+  {year:'1870',title:'15th Amendment',figure:'voting_rights2',sprite:'📜',desc:'Black men gain the right to vote — though enforcement would remain elusive for nearly a century.'},
+  {year:'1920',title:'19th Amendment',figure:'voting_rights2',sprite:'🗳️',desc:'Women gain the right to vote after decades of suffrage activism.'},
+  {year:'1965',title:'Voting Rights Act',figure:'voting_rights2',sprite:'✊',desc:'Federal law finally enforces Black voting rights, transforming Southern politics.'},
+  {year:'1971',title:'26th Amendment',figure:'voting_rights2',sprite:'✌️',desc:'18-year-olds gain the right to vote, driven by Vietnam War protests.'},
+  {year:'2010',title:'Citizens United',figure:'citizens_united2',sprite:'💰',desc:'Supreme Court rules corporations can spend unlimited money in elections.'},
+  {year:'2016',title:'Social Media Election',figure:'media_linkage',sprite:'📱',desc:'Social media transforms campaigning, with Twitter and Facebook central to political communication.'},
+];
+
+
 
 // ═══════════════ GAME STATE ═══════════════
 let G=null,BT={},currentScreen="login",shopTab="weapons",lbSyncInterval=null,lbTab="all",tdPeriodFilter="all",tdSort="score",tdSortDir=-1;
@@ -4335,6 +4415,9 @@ function rechallenge(enemyId){for(const ep of EPISODES){for(const era of (ep.era
 function renderProfile(){
   checkAchievements();
   updateDifficultyUI();
+  // Show certificate button if final boss beaten
+  const certBtn=document.getElementById('cert-btn');
+  if(certBtn)certBtn.style.display=G.beatenEnemies.includes('college_board_boss')?'inline-flex':'none';
   const rank=getRank();const acc=G.qTotal>0?Math.round(G.qCorrect/G.qTotal*100):0;
   const weapon=WEAPONS.find(w=>w.id===G.equippedWeapon)||WEAPONS[0];const armor=ARMORS.find(a=>a.id===G.equippedArmor)||ARMORS[0];
   document.getElementById('profile-header').innerHTML=`<div style="width:110px;height:110px;display:block;margin:0 auto 12px;border-radius:50%;overflow:visible;filter:drop-shadow(0 0 16px rgba(201,168,76,.4))">${getMedallionSVG(G.avatarId,110)}</div><div style="font-family:var(--pixel);font-size:9px;color:var(--gold)">${G.name}</div><div style="font-size:18px;color:var(--teal);margin-top:4px">${rank.name}</div><div style="font-family:var(--pixel);font-size:6px;color:var(--blue);margin-top:4px">Level ${G.level} · ${G.xp} XP</div><div style="font-family:var(--pixel);font-size:5px;color:var(--text2);margin-top:6px">❤️ ${G.hp}/${G.maxHp} &nbsp; ⚖️ ${G.gold}</div>`;
@@ -4425,6 +4508,106 @@ function toggleAchDetail(id){
 
 function closeCompletion(){
   document.getElementById('completion-overlay').style.display='none';
+}
+
+function showCertificate(){
+  const date=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const rank=getRank();
+  const acc=G.qTotal>0?Math.round(G.qCorrect/G.qTotal*100):0;
+  const certWin=window.open('','_blank','width=900,height=650');
+  certWin.document.write(`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Certificate of Mastery – ${G.name}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@400;700&family=Inter:wght@400;600&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#faf7f0;font-family:'Cinzel',serif;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+  .cert{width:820px;min-height:580px;background:#faf7f0;border:3px solid #c9a84c;padding:40px 50px;position:relative;text-align:center;box-shadow:0 0 0 8px #faf7f0,0 0 0 11px #c9a84c,0 0 0 15px #faf7f0,0 0 0 17px #8a6a2a}
+  .cert::before,.cert::after{content:'⚖';position:absolute;font-size:28px;color:#c9a84c;opacity:.4}
+  .cert::before{top:16px;left:16px}
+  .cert::after{top:16px;right:16px}
+  .corner{position:absolute;font-size:20px;color:#c9a84c;opacity:.4}
+  .seal{font-size:64px;margin:10px 0;filter:drop-shadow(0 2px 8px rgba(201,168,76,.4))}
+  .title{font-family:'Cinzel Decorative',serif;font-size:11px;letter-spacing:.3em;color:#8a6a2a;text-transform:uppercase;margin-bottom:8px}
+  .main-title{font-family:'Cinzel Decorative',serif;font-size:28px;font-weight:700;color:#1a1208;letter-spacing:.1em;margin:8px 0;line-height:1.2}
+  .divider{height:2px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin:14px auto;width:80%}
+  .thin-divider{height:1px;background:linear-gradient(90deg,transparent,#c9a84c66,transparent);margin:10px auto;width:60%}
+  .awarded{font-size:13px;color:#5a4520;letter-spacing:.15em;margin:8px 0}
+  .student-name{font-family:'Cinzel Decorative',serif;font-size:36px;font-weight:700;color:#1a1208;margin:10px 0;letter-spacing:.05em}
+  .subtitle{font-family:'Inter',sans-serif;font-size:13px;color:#5a4520;line-height:1.7;margin:8px 0;font-style:italic}
+  .stats{display:flex;justify-content:center;gap:32px;margin:16px 0;padding:12px 20px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.3)}
+  .stat{text-align:center}
+  .stat-val{font-size:22px;font-weight:700;color:#8a4820;font-family:'Cinzel Decorative',serif}
+  .stat-lbl{font-size:9px;letter-spacing:.12em;color:#8a6a2a;margin-top:2px;font-family:'Inter',sans-serif}
+  .signatures{display:flex;justify-content:space-around;margin-top:20px;padding-top:14px;border-top:1px solid rgba(201,168,76,.4)}
+  .sig{text-align:center;min-width:160px}
+  .sig-line{width:150px;height:1px;background:#8a6a2a;margin:0 auto 4px}
+  .sig-name{font-size:11px;color:#1a1208;font-weight:700}
+  .sig-title{font-size:9px;color:#8a6a2a;letter-spacing:.08em;font-family:'Inter',sans-serif}
+  .school{font-size:10px;color:#8a6a2a;letter-spacing:.1em;margin-top:14px;font-family:'Inter',sans-serif}
+  .print-btn{margin-top:20px;padding:10px 28px;background:#c9a84c;border:none;color:#1a1208;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.08em;cursor:pointer;border-radius:2px}
+  .print-btn:hover{background:#a8863a}
+  @media print{
+    body{padding:0;background:white}
+    .cert{box-shadow:none;border-color:#c9a84c}
+    .no-print{display:none!important}
+  }
+</style>
+</head>
+<body>
+<div>
+<div class="cert">
+  <span class="corner" style="bottom:16px;left:16px">⚖</span>
+  <span class="corner" style="bottom:16px;right:16px">⚖</span>
+  <div class="title">Constitutional Chronicles</div>
+  <div class="seal">🏛️</div>
+  <div class="main-title">Certificate of Mastery</div>
+  <div class="divider"></div>
+  <div class="awarded">This certifies that</div>
+  <div class="student-name">${G.name}</div>
+  <div class="thin-divider"></div>
+  <div class="subtitle">
+    has demonstrated exceptional knowledge of AP U.S. Government &amp; Politics<br>
+    by completing all units, defeating the College Board, and achieving the rank of<br>
+    <strong>${rank.name}</strong>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-val">LVL ${G.level}</div><div class="stat-lbl">FINAL LEVEL</div></div>
+    <div class="stat"><div class="stat-val">${G.score.toLocaleString()}</div><div class="stat-lbl">TOTAL SCORE</div></div>
+    <div class="stat"><div class="stat-val">${acc}%</div><div class="stat-lbl">ACCURACY</div></div>
+    <div class="stat"><div class="stat-val">${G.wins}</div><div class="stat-lbl">BATTLES WON</div></div>
+    <div class="stat"><div class="stat-val">${G.maxStreak}</div><div class="stat-lbl">BEST STREAK</div></div>
+  </div>
+  <div class="divider"></div>
+  <div class="signatures">
+    <div class="sig">
+      <div class="sig-line"></div>
+      <div class="sig-name">${G.name}</div>
+      <div class="sig-title">STUDENT</div>
+    </div>
+    <div class="sig">
+      <div class="sig-line"></div>
+      <div class="sig-name">Joshua Olson</div>
+      <div class="sig-title">AP GOVERNMENT TEACHER</div>
+    </div>
+    <div class="sig">
+      <div class="sig-line"></div>
+      <div class="sig-name">${date}</div>
+      <div class="sig-title">DATE COMPLETED</div>
+    </div>
+  </div>
+  <div class="school">AP U.S. Government &amp; Politics · Constitutional Chronicles · ${new Date().getFullYear()}</div>
+</div>
+<div style="text-align:center" class="no-print">
+  <button class="print-btn" onclick="window.print()">🖨️ PRINT / SAVE AS PDF</button>
+  <button class="print-btn" onclick="window.close()" style="background:#5a4520;margin-left:10px;color:#faf7f0">✕ CLOSE</button>
+</div>
+</div>
+</body>
+</html>`);
+  certWin.document.close();
 }
 
 function checkGameCompletion(){
