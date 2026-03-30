@@ -3312,7 +3312,10 @@ function launchGame(){
   document.getElementById('bottom-nav').style.display='grid';
   // Make sure title music is playing on map
   SFX.stopBattle();SFX.playTitle();
-  updateHeader();renderAllSprites();checkEraUnlocks();showScreen('map');startLbSync();if(G.score>0)pushToSupabase();
+  updateHeader();renderAllSprites();checkEraUnlocks();showScreen('map');startLbSync();pushToSupabase();
+  // Auto-sync to Supabase every 3 minutes during active play
+  if(window._autoSyncInterval)clearInterval(window._autoSyncInterval);
+  window._autoSyncInterval=setInterval(function(){if(G&&G.name)pushToSupabase();},3*60*1000);
 }
 function returnToTitle(){if(G)save();document.getElementById('game-header').style.display='none';document.getElementById('bottom-nav').style.display='none';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('title-screen').classList.add('active');currentScreen='title';}
 function returnToCurrentEra(){
@@ -4228,7 +4231,7 @@ function endBattle(won){
     addXP(Math.floor(BT.earnedXP*0.3));
     // Restore HP to 50% so player can keep playing
     G.hp=Math.max(Math.floor(G.maxHp*0.5), 10);
-    save();updateHeader();
+    save();updateHeader();pushToSupabase();
     document.getElementById('result-emoji').textContent='💀';
     document.getElementById('result-headline').textContent='OVERRULED!';
     document.getElementById('result-headline').style.color='var(--red)';
@@ -5087,10 +5090,8 @@ async function pushToSupabase(){
       headers:{...SUPA_HEADERS,'Prefer':'resolution=merge-duplicates'},
       body:JSON.stringify(row)
     });
-  }catch(e){}
+  }catch(e){console.warn('Supabase sync failed:',e);}
 }
-
-// ─── LEADERBOARD ───
 async function fetchLeaderboard(period){
   try{
     let url=SUPA_URL+'/rest/v1/const_scores?select=*&order=score.desc&limit=100';
